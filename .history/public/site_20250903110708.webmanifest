@@ -1,0 +1,24 @@
+// Remove the unused import
+// import SideEffectFix from "./components/SideEffectFix";
+
+// Update the manifest to use correct paths{
+  "name": "TempMail Pro",
+  "short_name": "TempMail",
+  "description": "Free Temporary Email Service",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4361ee",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",  // Updated path
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",  // Updated path
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

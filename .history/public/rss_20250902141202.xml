@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+    <title>TempMailPK Blog</title>
+    <link>https://tempmailpk.com</link>
+    <description>Latest updates and news from TempMailPK</description>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 16 Oct 2023 00:00:00 GMT</lastBuildDate>
+    <pubDate>Mon, 16 Oct 2023 00:00:00 GMT</pubDate>
+    <webMaster>admin@tempmailpk.com (Admin)</webMaster>
+    <managingEditor>editor@tempmailpk.com (Editor)</managingEditor>
+    
+    <item>
+        <title>How Temporary Email Protects Your Privacy</title>
+        <link>https://tempmailpk.com/blog/how-temp-email-protects-privacy</link>
+        <description>Learn how using temporary email addresses can help protect your personal information online.</description>
+        <pubDate>Mon, 09 Oct 2023 00:00:00 GMT</pubDate>
+        <guid>https://tempmailpk.com/blog/how-temp-email-protects-privacy</guid>
+    </item>
+    
+    <item>
+        <title>New Features Launched</title>
+        <link>https://tempmailpk.com/blog/new-features-launched</link>
+        <description>We've added several new features to improve your temporary email experience.</description>
+        <pubDate>Wed, 04 Oct 2023 00:00:00 GMT</pubDate>
+        <guid>https://tempmailpk.com/blog/new-features-launched</guid>
+    </item>
+</channel>
+</rss>

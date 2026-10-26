@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#4361ee" />
+
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Fallback SEO for crawlers that don't execute JavaScript -->
+    <title>TempMail Pro - Free Temporary Email Service</title>
+    <meta name="description" content="TempMail Pro provides free disposable email addresses to protect your inbox from spam. Create, use, and delete emails instantly.">
+    <meta name="keywords" content="temporary email, disposable email, temp mail, spam protection, free email service, anonymous email">
+    
+    <!-- Open Graph (Fallback) -->
+    <meta property="og:title" content="TempMail Pro - Free Disposable Email Service" />
+    <meta property="og:description" content="Protect your inbox with free disposable emails from TempMail Pro. No registration required." />
+    <meta property="og:image" content="https://tempmailpro.com/images/temp-mail-promo.png" />
+    <meta property="og:url" content="https://tempmailpro.com" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TempMail Pro" />
+    
+    <!-- Twitter (Fallback) -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TempMail Pro - Free Disposable Email Service" />
+    <meta name="twitter:description" content="Protect your inbox with free disposable emails from TempMail Pro." />
+    <meta name="twitter:image" content="https://tempmailpro.com/images/temp-mail-promo.png" />
+    <meta name="twitter:site" content="@tempmailpro" />
+    
+    <!-- Additional Meta Tags -->
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="author" content="TempMail Pro Team">
+    
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "TempMail Pro",
+      "url": "https://tempmailpro.com",
+      "description": "Free temporary email service for anonymous and secure communication.",
+      "applicationCategory": "CommunicationApplication",
+      "operatingSystem": "Web Browser",
+      "permissions": "browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    
+    <style>
+      :root {
+        --primary: #4361ee;
+        --secondary: #3a0ca3;
+        --accent: #f72585;
+        --light: #f8f9fa;
+        --dark: #212529;
+      }
+      
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      
+      .brand-highlight {
+        color: var(--accent);
+      }
+      
+      .navbar {
+        background-color: var(--primary);
+      }
+      
+      .hero-section {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        padding: 100px 0;
+      }
+      
+      .cta-button {
+        background-color: var(--accent);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      
+      .cta-button:hover {
+        background-color: #e51276;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      }
+      
+      .feature-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(67, 97, 238, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 28px;
+        color: var(--primary);
+      }
+      
+      .feature-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+      }
+      
+      .feature-card:hover {
+        transform: translateY(-5px);
+      }
+      
+      .section-title {
+        position: relative;
+        padding-bottom: 15px;
+      }
+      
+      .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: var(--primary);
+        border-radius: 2px;
+      }
+      
+      .promo-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Fallback for users without JavaScript -->
+    <noscript>
+      <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h1>TempMail Pro</h1>
+        <p>You need to enable JavaScript to use this application.</p>
+        <p>TempMail Pro provides free disposable email addresses to protect your inbox from spam.</p>
+        <p>Please enable JavaScript and refresh the page to continue.</p>
+      </div>
+    </noscript>
+  </body>
+</html>

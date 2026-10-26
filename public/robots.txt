@@ -1,0 +1,66 @@
+# robots.txt for TempMail Pro (https://tempmailpk.com)
+# Configured for optimal Google indexing and unrestricted AI search discovery
+
+User-agent: *
+Allow: /
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# Google Search & Google AI Overviews / Gemini
+User-agent: Googlebot
+Allow: /
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+
+User-agent: Google-Extended
+Allow: /
+
+# OpenAI ChatGPT, SearchGPT & Retrieval
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic Claude & Search
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity AI Search Engine
+User-agent: PerplexityBot
+Allow: /
+
+# Apple Intelligence & Safari Siri Search
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Microsoft Bing & Copilot
+User-agent: Bingbot
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
+# Additional AI, Search & LLM Crawlers
+User-agent: Bytespider
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# XML Sitemaps and RSS Feeds
+Sitemap: https://tempmailpk.com/sitemap.xml
+Sitemap: https://tempmailpk.com/rss.xml

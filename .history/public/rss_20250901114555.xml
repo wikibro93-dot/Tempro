@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>TempMail Pro Blog</title>
+        <link>https://tempmailpk.com</link>
+        <description>Latest articles on temporary emails, burner accounts &amp; privacy</description>
+        <lastBuildDate>Thu, 21 Aug 2025 08:02:59 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <language>en</language>
+        <copyright>All rights reserved 2025</copyright>
+        <item>
+            <title><![CDATA[The Tech Behind Disposable Emails]]></title>
+            <link>https://tempmailpk.com/blog/src\content\articles\tech-behind-disposable-emails</link>
+            <guid isPermaLink="false">https://tempmailpk.com/blog/src\content\articles\tech-behind-disposable-emails</guid>
+            <pubDate>Sun, 17 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Understand how disposable email services work under the hood.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[How to Receive SMS OTP Verification Online]]></title>
+            <link>https://tempmailpk.com/blog/src\content\articles\receive-sms-otp-online</link>
+            <guid isPermaLink="false">https://tempmailpk.com/blog/src\content\articles\receive-sms-otp-online</guid>
+            <pubDate>Sun, 17 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Discover safe and reliable methods to receive OTPs online without using your personal number.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Private Domains: How to Get Your Own Temporary Email]]></title>
+            <link>https://tempmailpk.com/blog/src\content\articles\private-domains-temp-email</link>
+            <guid isPermaLink="false">https://tempmailpk.com/blog/src\content\articles\private-domains-temp-email</guid>
+            <pubDate>Fri, 15 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Learn how to set up a private domain for disposable email and protect your online identity.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Why You Need a Burner Email for Social Media]]></title>
+            <link>https://tempmailpk.com/blog/src\content\articles\burner-email-for-social-media</link>
+            <guid isPermaLink="false">https://tempmailpk.com/blog/src\content\articles\burner-email-for-social-media</guid>
+            <pubDate>Sun, 17 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Protect your privacy by using burner emails when signing up on social platforms.]]></description>
+        </item>
+    </channel>
+</rss>

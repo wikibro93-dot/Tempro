@@ -1,0 +1,15 @@
+// Update the manifest to use correct paths
+{
+  "name": "TempMail Pro",
+  "short_name": "TempMail",
+  "description": "Free Temporary Email Service",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4361ee",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",  
+    }
+  ]
+}

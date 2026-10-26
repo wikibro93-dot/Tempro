@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Sitemap: User-agent: *
+Allow: /
+Sitemap: https://tempmailpk.com/sitemap.xml
