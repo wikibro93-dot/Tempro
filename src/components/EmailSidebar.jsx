@@ -37,13 +37,13 @@ const EmailSidebar = ({
     return (
       <div
         className={`email-sidebar-row${isSelected ? ' selected' : ''}${isExpired ? ' expired' : ''}`}
-        onClick={() => !isExpired && onSwitch && onSwitch(email.address)}
+        onClick={() => !isExpired && onSwitch && onSwitch(addr)}
         title={addr}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            !isExpired && onSwitch && onSwitch(email.address);
+            !isExpired && onSwitch && onSwitch(addr);
           }
         }}
       >
@@ -70,7 +70,7 @@ const EmailSidebar = ({
               className="email-sidebar-delete"
               onClick={(e) => {
                 e.stopPropagation();
-                onDelete(email.address);
+                onDelete(addr);
               }}
               title="Remove inbox"
               aria-label={`Remove inbox ${addr}`}
@@ -128,12 +128,12 @@ const EmailSidebar = ({
 
             return (
               <button
-                key={email.token || email.address}
+                key={email.token || addr}
                 type="button"
                 className={`mobile-inbox-chip btn btn-sm d-inline-flex align-items-center gap-2 text-nowrap ${
                   isSelected ? 'btn-primary shadow-xs' : 'btn-outline-secondary bg-white'
                 }`}
-                onClick={() => onSwitch && onSwitch(email.address)}
+                onClick={() => onSwitch && onSwitch(addr)}
                 style={{
                   minHeight: '44px',
                   borderRadius: '999px',

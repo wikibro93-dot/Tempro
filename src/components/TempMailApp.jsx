@@ -87,16 +87,25 @@ function TempMailApp({ onEmailCopied }) {
   const [showExpiredCard, setShowExpiredCard] = useState(false);
   const [showAddPanel, setShowAddPanel] = useState(false);
   const [inboxCounts, setInboxCounts] = useState(() => {
-    // Seed counts from localStorage cached messages
-    const saved = localStorage.getItem('generatedEmails');
-    if (!saved) return {};
-    const emails = JSON.parse(saved);
-    const counts = {};
-    emails.forEach((e) => {
-      const cached = localStorage.getItem(`inbox-${e.token}`);
-      if (cached) counts[e.token] = JSON.parse(cached).length;
-    });
-    return counts;
+    // Seed counts safely from localStorage cached messages
+    try {
+      const saved = localStorage.getItem('generatedEmails');
+      if (!saved) return {};
+      const emails = JSON.parse(saved);
+      if (!Array.isArray(emails)) return {};
+      const counts = {};
+      emails.forEach((e) => {
+        try {
+          const token = e?.token;
+          if (!token) return;
+          const cached = localStorage.getItem(`inbox-${token}`);
+          if (cached) counts[token] = JSON.parse(cached).length;
+        } catch (_) {}
+      });
+      return counts;
+    } catch {
+      return {};
+    }
   });
 
   const [availableDomains, setAvailableDomains] = useState(['maxxspace.com']);
@@ -589,41 +598,6 @@ function TempMailApp({ onEmailCopied }) {
     <>
       <div className="container-fluid py-3 px-3 px-md-4">
         <PageNavbar />
-        <Helmet>
-          <title>
-            {account
-              ? `TempMail Pro - ${account.address || account.email}`
-              : 'TempMail Pro App - Free Multi Emails, Multi Inbox, Custom Time & Name'}
-          </title>
-          <meta
-            name="description"
-            content={account
-              ? `Your temporary email address is ${account.address || account.email}. Create multi emails, use multi inbox, and protect your privacy with TempMail Pro.`
-              : 'Create free multi emails with multi inbox, custom expiry time, and custom name options. No sign-in required. Protect your inbox from spam and phishing with TempMail Pro.'}
-          />
-          <meta
-            property="og:title"
-            content={account ? `TempMail Pro - ${account.address || account.email}` : 'TempMail Pro App - Free Multi Emails, No Sign-In'}
-          />
-          <meta
-            property="og:description"
-            content={account
-              ? `Your temporary email address is ${account.address || account.email}. Manage multi emails and inboxes securely.`
-              : 'Generate free multi emails with multi inbox support, custom time, and custom names. No sign-in needed.'}
-          />
-          <meta
-            name="twitter:title"
-            content={account ? `TempMail Pro - ${account.address || account.email}` : 'TempMail Pro App - Free Multi Emails, No Sign-In'}
-          />
-          <meta
-            name="twitter:description"
-            content={account
-              ? `Your temporary email address is ${account.address || account.email}. Manage multi emails privately.`
-              : 'Free multi emails, multi inbox, custom time and names, and no sign-in required.'}
-          />
-          <link rel="canonical" href={`https://tempmailpk.com${location.pathname}`} />
-          <meta property="og:url" content={`https://tempmailpk.com${location.pathname}`} />
-        </Helmet>
 
         {isBackgroundPolling && (
           <div className="background-polling-indicator">

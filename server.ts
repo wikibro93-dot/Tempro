@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -579,6 +580,49 @@ app.get('/api/email/wait', async (req, res) => {
   }
 
   return res.json({ status: 'timeout', messages: [] });
+});
+
+// Dynamic SEO & AI Crawler Endpoints (Prioritizing /app and /blog with JSON-LD schema access)
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const { generateDynamicSitemap } = await import('./src/utils/dynamicSeo.js');
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+    return res.send(generateDynamicSitemap('https://tempmailpk.com'));
+  } catch (err: any) {
+    console.warn('[Backend] Dynamic sitemap error:', err.message);
+    const fallbackPath = path.resolve(__dirname, 'public/sitemap.xml');
+    if (fs.existsSync(fallbackPath)) {
+      return res.sendFile(fallbackPath);
+    }
+    return res.status(500).send('Error generating sitemap');
+  }
+});
+
+app.get('/robots.txt', async (req, res) => {
+  try {
+    const { generateDynamicRobotsTxt } = await import('./src/utils/dynamicSeo.js');
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+    return res.send(generateDynamicRobotsTxt('https://tempmailpk.com'));
+  } catch (err: any) {
+    console.warn('[Backend] Dynamic robots error:', err.message);
+    const fallbackPath = path.resolve(__dirname, 'public/robots.txt');
+    if (fs.existsSync(fallbackPath)) {
+      return res.sendFile(fallbackPath);
+    }
+    return res.status(500).send('User-agent: *\nAllow: /');
+  }
+});
+
+app.get('/llms.txt', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+  const llmsPath = path.resolve(__dirname, 'public/llms.txt');
+  if (fs.existsSync(llmsPath)) {
+    return res.sendFile(llmsPath);
+  }
+  return res.status(404).send('# LLM index not found');
 });
 
 // Frontend Serving (Dev via Vite Middleware, Prod via static)

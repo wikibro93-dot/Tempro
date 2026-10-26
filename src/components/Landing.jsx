@@ -14,53 +14,11 @@ const deferredSectionIds = new Set(["comparison", "features", "how-it-works", "s
 const Landing = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showDeferredSections, setShowDeferredSections] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    let rafA;
-    let rafB;
-    let timeoutId;
-    let idleId;
-
-    const mountDeferred = () => setShowDeferredSections(true);
-
-    if ("requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(
-        () => {
-          rafA = window.requestAnimationFrame(() => {
-            rafB = window.requestAnimationFrame(mountDeferred);
-          });
-        },
-        { timeout: 1200 }
-      );
-    } else {
-      rafA = window.requestAnimationFrame(() => {
-        rafB = window.requestAnimationFrame(() => {
-          timeoutId = window.setTimeout(mountDeferred, 120);
-        });
-      });
-    }
-
-    return () => {
-      if (idleId && "cancelIdleCallback" in window) {
-        window.cancelIdleCallback(idleId);
-      }
-      if (rafA) {
-        window.cancelAnimationFrame(rafA);
-      }
-      if (rafB) {
-        window.cancelAnimationFrame(rafB);
-      }
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
-      }
-    };
   }, []);
 
   const scrollToSection = (id) => {
@@ -73,8 +31,7 @@ const Landing = () => {
       return true;
     };
 
-    if (!performScroll() && deferredSectionIds.has(id) && !showDeferredSections) {
-      setShowDeferredSections(true);
+    if (!performScroll() && deferredSectionIds.has(id)) {
       window.requestAnimationFrame(() => {
         window.setTimeout(() => {
           performScroll();
@@ -91,7 +48,7 @@ const Landing = () => {
         <title>TempMail Pro – Free Multi-Inbox Temp Email &amp; Custom Duration</title>
         <meta
           name="description"
-          content="Generate free disposable email addresses instantly with multi-inbox tabs, custom domains, custom lifespan, and zero sign-in. Keep your primary inbox clean from spam."
+          content="Create free temporary email addresses with multiple inboxes, custom expiry, and instant OTP detection. Protect your real inbox with TempMail Pro."
         />
         <meta
           name="keywords"
@@ -101,7 +58,7 @@ const Landing = () => {
         <meta property="og:title" content="TempMail Pro – Free Multi-Inbox Temp Email" />
         <meta
           property="og:description"
-          content="Instant disposable emails with multi-inbox tabs, custom domains, and zero sign-up required."
+          content="Create free temporary email addresses with multiple inboxes, custom expiry, and instant OTP detection. Protect your real inbox with TempMail Pro."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://tempmailpk.com/" />
@@ -117,6 +74,22 @@ const Landing = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@graph": [
+              {
+                "@type": "Organization",
+                "name": "TempMail Pro",
+                "url": "https://tempmailpk.com/",
+                "logo": "https://tempmailpk.com/icon-512.png",
+                "sameAs": [
+                  "https://facebook.com/tempmailpk",
+                  "https://x.com/tempmailpk"
+                ],
+                "contactPoint": {
+                  "@type": "ContactPoint",
+                  "email": "support@tempmailpk.com",
+                  "contactType": "customer service",
+                  "availableLanguage": ["English", "Urdu"]
+                }
+              },
               {
                 "@type": "SoftwareApplication",
                 "name": "TempMail Pro",
@@ -297,17 +270,13 @@ const Landing = () => {
         {/* Competitor Comparison Section */}
         <CompetitorComparison />
 
-        {/* Deferred Sections: Bento Grid, Features, How It Works, FAQ, SEO Article */}
+        {/* Comprehensive Content Sections: Carousel, Features, How It Works, FAQ, SEO Guide */}
         <Suspense fallback={<div className="landing-lazy-placeholder landing-lazy-placeholder--deferred" aria-hidden="true" />}>
-          {showDeferredSections ? (
-            <LandingDeferredSections />
-          ) : (
-            <div className="landing-lazy-placeholder landing-lazy-placeholder--deferred" aria-hidden="true" />
-          )}
+          <LandingDeferredSections />
         </Suspense>
       </main>
 
-      {showDeferredSections ? <Footer /> : null}
+      <Footer />
     </div>
   );
 };

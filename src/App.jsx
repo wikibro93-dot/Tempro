@@ -5,6 +5,7 @@ import { HelmetProvider } from "react-helmet-async";
 import ScrollToTop from "./components/ScrollToTop";
 import Landing from "./components/Landing.jsx";
 import OfflineIndicator from "./components/OfflineIndicator";
+import RouteSeoManager from "./components/RouteSeoManager";
 
 const TempMailApp = lazy(() => import("./components/TempMailApp.jsx"));
 const PromoCard = lazy(() => import("./components/PromoCard.jsx"));
@@ -84,6 +85,7 @@ function AppContent() {
 
   return (
     <>
+      <RouteSeoManager />
       <ScrollToTop />
       <Suspense
         fallback={

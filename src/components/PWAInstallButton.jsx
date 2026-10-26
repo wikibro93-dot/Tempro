@@ -1,25 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import AppIcon from './AppIcon';
 
 export const PWAInstallButton = ({ className = '', variant = 'navbar', label = 'Install App' }) => {
   const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
-  const [showIOSModal, setShowIOSModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  // Lock background scroll when modal is active
+  useEffect(() => {
+    if (showModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showModal]);
+
+  // Handle ESC key dismiss
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setShowModal(false);
+    };
+    if (showModal) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showModal]);
 
   // If already running inside installed standalone PWA, suppress the button
   if (isInstalled) {
     return null;
   }
 
-  // If not installable and not iOS, we can show a proactive install option or subtle trigger
   const handleTrigger = () => {
     if (isInstallable) {
       install();
-    } else if (isIOS) {
-      setShowIOSModal(true);
     } else {
-      // Desktop Chrome / Edge instruction or prompt
-      setShowIOSModal(true);
+      setShowModal(true);
+    }
+  };
+
+  const handleDirectInstallFromModal = async () => {
+    if (isInstallable) {
+      await install();
+      setShowModal(false);
     }
   };
 
@@ -42,89 +68,130 @@ export const PWAInstallButton = ({ className = '', variant = 'navbar', label = '
         <span>{label}</span>
       </button>
 
-      {/* Guided Installation Modal (for iOS Safari and Desktop browsers) */}
-      {showIOSModal && (
+      {/* Modern Compact Mobile-Friendly PWA Install Dialog */}
+      {showModal && (
         <div
-          className="modal fade show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)', zIndex: 10050 }}
-          onClick={() => setShowIOSModal(false)}
+          className="pwa-modal-backdrop"
+          onClick={() => setShowModal(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pwa-modal-title"
         >
           <div
-            className="modal-dialog modal-dialog-centered"
-            style={{ maxWidth: '420px', margin: '1rem auto' }}
+            className="pwa-modal-card"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-content shadow-lg border rounded-4 bg-surface text-start overflow-hidden">
-              <div className="modal-header border-bottom p-3 d-flex align-items-center justify-content-between bg-light-subtle">
-                <div className="d-flex align-items-center gap-2">
-                  <div className="p-2 rounded-3 bg-primary text-white d-inline-flex align-items-center justify-content-center">
-                    <AppIcon iconClass="bi bi-phone-fill fs-5" />
-                  </div>
-                  <div>
-                    <h5 className="modal-title fs-6 fw-bold mb-0 text-dark">
-                      Install TempMail Pro App
-                    </h5>
-                    <small className="text-muted">100% Free · No App Store needed</small>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowIOSModal(false)}
-                  aria-label="Close"
-                ></button>
-              </div>
+            {/* Mobile Drag Indicator */}
+            <div className="pwa-modal-drag-indicator d-block d-sm-none" aria-hidden="true" />
 
-              <div className="modal-body p-4">
+            {/* High-Contrast Brand Header */}
+            <div className="pwa-modal-header">
+              <div className="pwa-modal-header__brand">
+                <div className="pwa-modal-header__icon" aria-hidden="true">
+                  <AppIcon iconClass="bi bi-phone-fill" />
+                </div>
+                <div>
+                  <h3 id="pwa-modal-title" className="pwa-modal-header__title">
+                    Install TempMail Pro
+                  </h3>
+                  <span className="pwa-modal-header__subtitle">
+                    100% Free · No App Store needed
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="pwa-modal-header__close"
+                onClick={() => setShowModal(false)}
+                aria-label="Close dialog"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Compact Body with Streamlined Steps */}
+            <div className="pwa-modal-body">
+              <p className="pwa-modal-lead">
+                {isIOS
+                  ? 'Add to your Home Screen in 2 quick taps on Safari:'
+                  : 'Install directly from your mobile browser in 2 taps:'}
+              </p>
+
+              <div className="pwa-modal-steps">
                 {isIOS ? (
-                  <div>
-                    <p className="small text-muted mb-3">
-                      Follow these 2 quick steps in Apple Safari to install on your iPhone or iPad:
-                    </p>
-                    <div className="d-flex align-items-start gap-3 p-3 rounded-3 border bg-light-subtle mb-3">
-                      <span className="badge bg-primary text-white rounded-circle p-2">1</span>
-                      <div className="small">
-                        Tap the <strong>Share</strong> button <AppIcon iconClass="bi bi-box-arrow-up text-primary fw-bold mx-1" /> at the bottom toolbar of Safari.
-                      </div>
+                  <>
+                    <div className="pwa-modal-step-item">
+                      <span className="pwa-modal-step-badge">1</span>
+                      <p className="pwa-modal-step-text">
+                        Tap <strong>Share</strong>{' '}
+                        <AppIcon iconClass="bi bi-box-arrow-up text-primary fw-bold mx-1" /> at the bottom toolbar.
+                      </p>
                     </div>
-                    <div className="d-flex align-items-start gap-3 p-3 rounded-3 border bg-light-subtle">
-                      <span className="badge bg-primary text-white rounded-circle p-2">2</span>
-                      <div className="small">
-                        Scroll down and tap <strong>Add to Home Screen</strong> <AppIcon iconClass="bi bi-plus-square text-success fw-bold mx-1" />.
-                      </div>
+                    <div className="pwa-modal-step-item">
+                      <span className="pwa-modal-step-badge">2</span>
+                      <p className="pwa-modal-step-text">
+                        Scroll down and tap <strong>"Add to Home Screen"</strong>{' '}
+                        <AppIcon iconClass="bi bi-plus-square text-success fw-bold mx-1" />.
+                      </p>
                     </div>
-                  </div>
+                  </>
                 ) : (
-                  <div>
-                    <p className="small text-muted mb-3">
-                      To install TempMail Pro on Android, Chrome, or Windows:
-                    </p>
-                    <div className="d-flex align-items-start gap-3 p-3 rounded-3 border bg-light-subtle mb-3">
-                      <span className="badge bg-primary text-white rounded-circle p-2">1</span>
-                      <div className="small">
-                        Tap the <strong>browser menu (⋮ or ⋯)</strong> at the top right of your browser.
-                      </div>
+                  <>
+                    <div className="pwa-modal-step-item">
+                      <span className="pwa-modal-step-badge">1</span>
+                      <p className="pwa-modal-step-text">
+                        Tap browser menu <strong>(⋮ or ⋯)</strong> at the top right.
+                      </p>
                     </div>
-                    <div className="d-flex align-items-start gap-3 p-3 rounded-3 border bg-light-subtle">
-                      <span className="badge bg-primary text-white rounded-circle p-2">2</span>
-                      <div className="small">
-                        Select <strong>"Install App"</strong> or <strong>"Add to Home Screen"</strong>.
-                      </div>
+                    <div className="pwa-modal-step-item">
+                      <span className="pwa-modal-step-badge">2</span>
+                      <p className="pwa-modal-step-text">
+                        Tap <strong>"Install App"</strong> or <strong>"Add to Home screen"</strong>.
+                      </p>
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
 
-              <div className="modal-footer border-top p-3 bg-light-subtle">
+              {/* Quick Perks Strip */}
+              <div className="pwa-modal-perks">
+                <span className="pwa-modal-perk-item">
+                  <AppIcon iconClass="bi bi-lightning-charge-fill text-warning" />
+                  Instant OTP
+                </span>
+                <span className="text-muted opacity-50">·</span>
+                <span className="pwa-modal-perk-item">
+                  <AppIcon iconClass="bi bi-shield-check text-success" />
+                  Zero Logs
+                </span>
+                <span className="text-muted opacity-50">·</span>
+                <span className="pwa-modal-perk-item">
+                  <AppIcon iconClass="bi bi-layers-fill text-primary" />
+                  Multi-Inbox
+                </span>
+              </div>
+            </div>
+
+            {/* Compact Modal Footer */}
+            <div className="pwa-modal-footer">
+              {isInstallable && (
                 <button
                   type="button"
-                  className="btn btn-primary w-100 fw-semibold"
-                  onClick={() => setShowIOSModal(false)}
+                  className="btn btn-outline-primary fw-semibold flex-fill py-2"
+                  style={{ borderRadius: '9px', fontSize: '0.85rem' }}
+                  onClick={handleDirectInstallFromModal}
                 >
-                  Got It!
+                  <AppIcon iconClass="bi bi-download me-1" />
+                  Install Now
                 </button>
-              </div>
+              )}
+              <button
+                type="button"
+                className="pwa-modal-btn-primary"
+                onClick={() => setShowModal(false)}
+              >
+                Got It, Thanks!
+              </button>
             </div>
           </div>
         </div>
@@ -134,3 +201,4 @@ export const PWAInstallButton = ({ className = '', variant = 'navbar', label = '
 };
 
 export default PWAInstallButton;
+

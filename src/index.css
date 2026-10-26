@@ -6088,3 +6088,285 @@ textarea:focus-visible,
   }
 }
 
+/* Modern Performance: off-screen section content-visibility for sub-200ms INP and fast LCP */
+.defer-render-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 400px;
+}
+
+/* ==========================================================================
+   PWA Compact Mobile-First Modal Styles
+   ========================================================================== */
+.pwa-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  animation: pwaFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pwaFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pwa-modal-card {
+  width: 100%;
+  max-width: 380px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: pwaSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: calc(100vh - 24px);
+}
+
+@keyframes pwaSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mobile bottom-sheet behavior on smaller screens */
+@media (max-width: 575.98px) {
+  .pwa-modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .pwa-modal-card {
+    max-width: 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    margin: 0;
+    max-height: 82vh;
+    animation: pwaSheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pwa-modal-drag-indicator {
+    width: 38px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    margin: 6px auto 2px auto;
+  }
+}
+
+@keyframes pwaSheetUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Modal Header: Crisp, high-contrast, compact */
+.pwa-modal-header {
+  background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+  color: #ffffff;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.pwa-modal-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pwa-modal-header__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.pwa-modal-header__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #ffffff;
+  margin: 0;
+}
+
+.pwa-modal-header__subtitle {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.88);
+  display: block;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.pwa-modal-header__close {
+  background: rgba(255, 255, 255, 0.18);
+  border: none;
+  color: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.pwa-modal-header__close:hover,
+.pwa-modal-header__close:focus {
+  background: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+/* Modal Body */
+.pwa-modal-body {
+  padding: 12px 14px;
+  background: #ffffff;
+  color: #1e293b;
+  overflow-y: auto;
+}
+
+.pwa-modal-lead {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 9px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+/* Step container - unified compact list */
+.pwa-modal-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 11px;
+}
+
+.pwa-modal-step-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 11px;
+  transition: background 0.15s ease;
+}
+
+.pwa-modal-step-item:hover {
+  background: #f1f5f9;
+}
+
+.pwa-modal-step-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #4361ee;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.pwa-modal-step-text {
+  font-size: 0.81rem;
+  line-height: 1.35;
+  color: #1e293b;
+  margin: 0;
+  flex: 1;
+}
+
+.pwa-modal-step-text strong {
+  color: #0f172a;
+}
+
+/* Feature tags inside modal */
+.pwa-modal-perks {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 5px 8px;
+  margin-bottom: 11px;
+  font-size: 0.72rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.pwa-modal-perk-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Modal Footer */
+.pwa-modal-footer {
+  padding: 10px 14px 12px 14px;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  gap: 8px;
+}
+
+.pwa-modal-btn-primary {
+  flex: 1;
+  background: #4361ee;
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  font-size: 0.86rem;
+  padding: 8px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.15s ease, transform 0.1s ease;
+  min-height: 38px;
+}
+
+.pwa-modal-btn-primary:hover,
+.pwa-modal-btn-primary:focus {
+  background: #3752db;
+  color: #ffffff;
+}
+
+.pwa-modal-btn-primary:active {
+  transform: scale(0.98);
+}
+

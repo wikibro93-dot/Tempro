@@ -105,8 +105,39 @@ const Footer = () => {
               </li>
               <li><Link to="/blog/how-to-use-temp-email-for-free-trials"><AppIcon iconClass="fas fa-book me-2" />How to Use Temp Email</Link></li>
               <li><Link to="/blog/is-free-temp-mail-legal"><AppIcon iconClass="fas fa-balance-scale me-2" />Is Temp Mail Legal?</Link></li>
-                <li><Link to="/privacy-stack"><AppIcon iconClass="fas fa-shield-virus me-2" />Privacy Stack Guide</Link></li>
-              <li><Link to="/blog/temp-email-vs-email-alias"><AppIcon iconClass="fas fa-code-branch me-2" />Temp Mail vs Alias</Link></li>
+              <li><Link to="/privacy-stack"><AppIcon iconClass="fas fa-shield-virus me-2" />Privacy Stack Guide</Link></li>
+            </ul>
+          </div>
+
+          {/* Contact & Transparency */}
+          <div className="site-footer__col">
+            <h3 className="site-footer__heading">Contact &amp; Trust</h3>
+            <ul className="site-footer__links">
+              <li>
+                <a href="mailto:support@tempmailpk.com" className="d-inline-flex align-items-center">
+                  <AppIcon iconClass="bi bi-envelope-fill me-2" />support@tempmailpk.com
+                </a>
+              </li>
+              <li>
+                <a href="https://facebook.com/tempmailpk" target="_blank" rel="noopener noreferrer" className="d-inline-flex align-items-center">
+                  <AppIcon iconClass="bi bi-facebook me-2" />Facebook Page
+                </a>
+              </li>
+              <li>
+                <a href="https://x.com/tempmailpk" target="_blank" rel="noopener noreferrer" className="d-inline-flex align-items-center">
+                  <AppIcon iconClass="bi bi-twitter-x me-2" />@tempmailpk on X
+                </a>
+              </li>
+              <li>
+                <Link to="/about" className="d-inline-flex align-items-center">
+                  <AppIcon iconClass="bi bi-building me-2" />Organization &amp; Team
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="d-inline-flex align-items-center">
+                  <AppIcon iconClass="bi bi-shield-lock me-2" />Zero-Logs Policy
+                </Link>
+              </li>
             </ul>
           </div>
 

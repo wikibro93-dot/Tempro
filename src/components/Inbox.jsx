@@ -554,7 +554,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                         <span>Attached Files ({messageContent?.attachments?.length || 1})</span>
                       </h6>
                       <a
-                        href={`${API_ROOT}/inbox/download/${selectedMsg.token}/${selectedMsg.id}`}
+                        href={`${API_ROOT}/inbox/download/${selectedMsg?.token || messageContent?.token || ''}/${selectedMsg.id}`}
                         download={`email-${selectedMsg.id}.eml`}
                         className="btn btn-sm btn-outline-secondary py-1 px-2 small d-inline-flex align-items-center gap-1"
                         style={{ fontSize: '0.78rem' }}
@@ -570,7 +570,8 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                         {messageContent.attachments.map((att) => {
                           const sizeKb = att.size ? Math.round(att.size / 1024) : 0;
                           const sizeDisplay = sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`;
-                          const downloadUrl = `${API_ROOT}/inbox/attachment/${selectedMsg.token}/${selectedMsg.id}/${att.id}`;
+                          const tokenForDownload = selectedMsg?.token || messageContent?.token || '';
+                          const downloadUrl = `${API_ROOT}/inbox/attachment/${tokenForDownload}/${selectedMsg.id}/${att.id}`;
 
                           return (
                             <div key={att.id} className="col-sm-6">
