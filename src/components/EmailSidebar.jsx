@@ -86,40 +86,41 @@ const EmailSidebar = ({
   return (
     <>
       {/* ── Mobile Horizontal Strip (< 992px) ── */}
-      <div className="d-lg-none mobile-inboxes-strip mb-3">
-        <div className="d-flex align-items-center justify-content-between mb-2 px-1">
-          <div className="d-flex align-items-center gap-2">
-            <span className="fw-bold small text-dark d-flex align-items-center gap-1">
-              <AppIcon iconClass="bi bi-inbox-fill text-primary" />
-              <span>Inboxes ({activeEmails.length})</span>
+      <div className="d-lg-none mobile-inboxes-strip mb-2">
+        <div className="d-flex align-items-center justify-content-between mb-1.5 px-1">
+          <div className="d-flex align-items-center gap-1.5">
+            <AppIcon iconClass="bi bi-inbox-fill text-primary" size={13} />
+            <span className="fw-bold small text-dark" style={{ fontSize: '0.82rem' }}>
+              Inboxes ({activeEmails.length})
             </span>
           </div>
+
           <div className="d-flex align-items-center gap-2">
             {generatedEmails.length > 1 && (
               <button
                 type="button"
-                className="btn btn-sm btn-link text-decoration-none p-0 small text-secondary"
+                className="btn btn-sm btn-link text-decoration-none p-0 text-secondary"
                 onClick={() => setShowManageModal(true)}
-                style={{ fontSize: '0.82rem' }}
+                style={{ fontSize: '0.78rem', fontWeight: 600 }}
               >
-                Manage Inboxes
+                Manage ({generatedEmails.length})
               </button>
             )}
             <button
               type="button"
-              className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 py-1 px-2"
+              className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 py-0.5 px-2"
               onClick={onCreateNew}
               disabled={isCreating}
-              style={{ minHeight: '36px', fontSize: '0.82rem' }}
+              style={{ minHeight: '28px', fontSize: '0.78rem', borderRadius: '6px' }}
             >
-              <AppIcon iconClass="bi bi-plus-lg" />
+              <AppIcon iconClass="bi bi-plus-lg" size={11} />
               <span>New</span>
             </button>
           </div>
         </div>
 
         {/* Scrollable touch carousel */}
-        <div className="mobile-inbox-chips d-flex align-items-center gap-2 overflow-x-auto pb-1">
+        <div className="mobile-inbox-chips d-flex align-items-center gap-1.5 overflow-x-auto pb-1">
           {activeEmails.map((email) => {
             const isSelected = email.token === activeToken;
             const count = inboxCounts[email.token] || 0;
@@ -130,31 +131,33 @@ const EmailSidebar = ({
               <button
                 key={email.token || addr}
                 type="button"
-                className={`mobile-inbox-chip btn btn-sm d-inline-flex align-items-center gap-2 text-nowrap ${
+                className={`mobile-inbox-chip btn btn-sm d-inline-flex align-items-center gap-1.5 text-nowrap ${
                   isSelected ? 'btn-primary shadow-xs' : 'btn-outline-secondary bg-white'
                 }`}
                 onClick={() => onSwitch && onSwitch(addr)}
                 style={{
-                  minHeight: '44px',
+                  minHeight: '34px',
                   borderRadius: '999px',
-                  padding: '6px 14px',
-                  fontSize: '0.85rem',
+                  padding: '3px 10px',
+                  fontSize: '0.8rem',
                   fontWeight: isSelected ? 600 : 500,
                 }}
               >
                 <span
                   className="rounded-circle d-inline-flex align-items-center justify-content-center text-uppercase"
                   style={{
-                    width: '22px',
-                    height: '22px',
-                    fontSize: '0.72rem',
-                    background: isSelected ? 'rgba(255,255,255,0.25)' : '#e2e8f0',
+                    width: '18px',
+                    height: '18px',
+                    fontSize: '0.66rem',
+                    fontWeight: 700,
+                    background: isSelected ? 'rgba(255,255,255,0.3)' : '#e2e8f0',
                     color: isSelected ? '#ffffff' : '#334155',
+                    flexShrink: 0,
                   }}
                 >
                   {shortName[0]}
                 </span>
-                <span className="text-truncate" style={{ maxWidth: '140px' }}>
+                <span className="text-truncate" style={{ maxWidth: '110px' }}>
                   {shortName}
                 </span>
                 {count > 0 && (
@@ -162,7 +165,12 @@ const EmailSidebar = ({
                     className={`badge rounded-pill ${
                       isSelected ? 'bg-white text-primary' : 'bg-primary text-white'
                     }`}
-                    style={{ fontSize: '0.72rem' }}
+                    style={{
+                      fontSize: '0.65rem',
+                      padding: '1px 5px',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                    }}
                   >
                     {count}
                   </span>
@@ -223,81 +231,116 @@ const EmailSidebar = ({
         </div>
       </div>
 
-      {/* Mobile Manage Modal */}
+      {/* Mobile Manage Modal - Sleek Compact Bottom-Sheet Dialog */}
       {showManageModal && (
         <div
-          className="modal fade show d-block"
-          tabIndex={-1}
-          style={{ background: 'rgba(0,0,0,0.5)', zIndex: 1050 }}
+          className="pwa-modal-backdrop"
+          onClick={() => setShowManageModal(false)}
           role="dialog"
           aria-modal="true"
         >
-          <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div className="modal-content border-0 rounded-4 shadow">
-              <div className="modal-header border-bottom">
-                <h5 className="modal-title fw-bold fs-6">Manage Your Inboxes</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowManageModal(false)}
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div className="modal-body p-3">
-                <p className="small text-muted mb-3">
-                  Switch between inboxes or delete old ones to keep your list organized.
-                </p>
-                <div className="list-group">
-                  {generatedEmails.map((e) => {
-                    const isSelected = e.token === activeToken;
-                    const isExpired = new Date(e.expiration) <= now;
-                    return (
-                      <div
-                        key={e.token || e.address}
-                        className={`list-group-item list-group-item-action d-flex align-items-center justify-content-between p-3 ${
-                          isSelected ? 'active' : ''
-                        }`}
-                        onClick={() => {
-                          onSwitch && onSwitch(e.address);
-                          setShowManageModal(false);
-                        }}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <div className="text-truncate me-2">
-                          <div className="fw-semibold text-truncate">{e.address}</div>
-                          <div
-                            className={`small ${isSelected ? 'text-white-50' : 'text-muted'}`}
-                          >
-                            {isExpired ? 'Expired' : `Expires in ${formatExpiry(e.expiration)}`}
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          className={`btn btn-sm ${
-                            isSelected ? 'btn-outline-light' : 'btn-outline-danger'
-                          }`}
-                          onClick={(ev) => {
-                            ev.stopPropagation();
-                            onDelete && onDelete(e.address);
-                          }}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    );
-                  })}
+          <div
+            className="pwa-modal-card"
+            style={{ maxWidth: '420px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="pwa-modal-drag-indicator d-block d-sm-none" aria-hidden="true" />
+
+            {/* Modal Header */}
+            <div className="pwa-modal-header">
+              <div className="pwa-modal-header__brand">
+                <div className="pwa-modal-header__icon" aria-hidden="true">
+                  <AppIcon iconClass="bi bi-collection-fill" />
+                </div>
+                <div>
+                  <h3 className="pwa-modal-header__title">
+                    Manage Inboxes ({generatedEmails.length})
+                  </h3>
+                  <span className="pwa-modal-header__subtitle">
+                    Switch between active mailboxes or remove old ones
+                  </span>
                 </div>
               </div>
-              <div className="modal-footer border-top">
-                <button
-                  type="button"
-                  className="btn btn-secondary w-100"
-                  onClick={() => setShowManageModal(false)}
-                  style={{ minHeight: '44px' }}
-                >
-                  Close
-                </button>
+              <button
+                type="button"
+                className="pwa-modal-header__close"
+                onClick={() => setShowManageModal(false)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal List Body */}
+            <div className="pwa-modal-body p-2" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+              <div className="d-flex flex-column gap-1.5">
+                {generatedEmails.map((e) => {
+                  const isSelected = e.token === activeToken;
+                  const isExpired = new Date(e.expiration) <= now;
+                  const addr = e.address || e.email || '';
+
+                  return (
+                    <div
+                      key={e.token || addr}
+                      className={`d-flex align-items-center justify-content-between p-2 px-2.5 rounded-3 border transition-all ${
+                        isSelected
+                          ? 'bg-primary-subtle border-primary-subtle'
+                          : 'bg-surface hover-bg-light'
+                      }`}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => {
+                        onSwitch && onSwitch(addr);
+                        setShowManageModal(false);
+                      }}
+                    >
+                      <div className="text-truncate me-2">
+                        <div className="d-flex align-items-center gap-1.5">
+                          {isSelected && (
+                            <span className="badge bg-primary text-white rounded-pill px-1.5" style={{ fontSize: '0.65rem' }}>
+                              Active
+                            </span>
+                          )}
+                          <span className={`font-monospace fw-bold small text-truncate ${isSelected ? 'text-primary' : 'text-dark'}`}>
+                            {addr}
+                          </span>
+                        </div>
+                        <div className="text-muted" style={{ fontSize: '0.74rem' }}>
+                          {isExpired ? (
+                            <span className="text-danger fw-semibold">Expired</span>
+                          ) : (
+                            <span>Expires in {formatExpiry(e.expiration)}</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 py-1 px-2 shrink-0"
+                        style={{ minHeight: '30px', fontSize: '0.76rem', borderRadius: '6px' }}
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          onDelete && onDelete(addr);
+                        }}
+                        title={`Remove ${addr}`}
+                      >
+                        <AppIcon iconClass="bi bi-trash3" size={12} />
+                        <span>Remove</span>
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pwa-modal-footer">
+              <button
+                type="button"
+                className="pwa-modal-btn-primary"
+                onClick={() => setShowManageModal(false)}
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>

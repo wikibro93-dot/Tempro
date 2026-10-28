@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, memo } from 'react';
 import axios from 'axios';
 import { List } from 'react-window';
 import AppIcon from './AppIcon';
+import SafeEmailViewer from './SafeEmailViewer';
 import offlineMailbox from '../utils/offlineMailbox';
 
 // Helper to extract verification/OTP codes from subject or message preview
@@ -534,15 +535,13 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                       Retry
                     </button>
                   </div>
-                ) : viewMode === 'html' && messageContent?.html ? (
-                  <div
-                    className="email-html-viewport bg-white p-3 rounded-3 border"
-                    dangerouslySetInnerHTML={{ __html: messageContent.html }}
-                  />
                 ) : (
-                  <pre className="p-3 rounded-3 border bg-body-tertiary font-monospace small text-dark mb-0 whitespace-pre-wrap">
-                    {messageContent?.text || selectedMsg.text || 'No text content available in this email.'}
-                  </pre>
+                  <SafeEmailViewer
+                    html={messageContent?.html || selectedMsg?.html}
+                    text={messageContent?.text || selectedMsg?.text || selectedMsg?.intro}
+                    viewMode={viewMode}
+                    isOffline={isOfflineContent}
+                  />
                 )}
 
                 {/* Attachments & Download Section */}

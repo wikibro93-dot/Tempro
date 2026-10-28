@@ -607,21 +607,10 @@ function TempMailApp({ onEmailCopied }) {
           </div>
         )}
 
-        <section className="monetag-app-ad-section" aria-label="Sponsored content">
-          <div className="monetag-app-ad-slot">
-            <div className="monetag-ad-slot__label">Sponsored</div>
-            <div className="monetag-ads monetag-ads--compact" data-zone="11505330" data-ad-format="auto" aria-live="polite"></div>
-          </div>
-        </section>
-
-        {error && !showExpiredCard && (
-          <ErrorAlert error={error} setError={setError} onRetry={fetchInbox} />
-        )}
-
         {/* Two-column layout — sidebar + main */}
         <div className="multi-inbox-layout">
 
-          {/* ── Left Sidebar ── */}
+          {/* ── Left Sidebar (Mobile strip on <992px, left column on desktop) ── */}
           <EmailSidebar
             generatedEmails={generatedEmails}
             activeToken={account?.token}
@@ -651,9 +640,9 @@ function TempMailApp({ onEmailCopied }) {
             {account && !showAddPanel && (
               <>
                 {showExpiredCard && (
-                  <div className="alert alert-warning d-flex align-items-center gap-2 mb-3">
-                    <AppIcon iconClass="bi bi-exclamation-triangle-fill" />
-                    <span>This email has expired. Use <strong>+ Add Inbox</strong> in the sidebar to create a new one.</span>
+                  <div className="alert alert-warning d-flex align-items-center gap-2 mb-2 py-2 px-3 small">
+                    <AppIcon iconClass="bi bi-exclamation-triangle-fill text-warning" />
+                    <span>This email has expired. Use <strong>+ New</strong> to generate a fresh address.</span>
                   </div>
                 )}
 
@@ -665,18 +654,27 @@ function TempMailApp({ onEmailCopied }) {
                   onNewEmailClick={() => setShowAddPanel(v => !v)}
                 />
 
-                {!showExpiredCard && tokenValid && (
-                  <div className="mt-3">
-                    <YesimRecommendation />
-                  </div>
-                )}
-
+                {/* Primary Inbox View — Directly visible on mobile screen */}
                 <Inbox
                   messages={messages.map(msg => ({ ...msg, token: account.token }))}
                   isLoading={isInboxLoading}
                   onRetry={() => fetchInbox(true)}
                   onTokenExpired={handleTokenExpired}
                 />
+
+                {/* Sponsored Ad Section (Placed below active inbox so it doesn't push mail offscreen) */}
+                <section className="monetag-app-ad-section mt-3" aria-label="Sponsored content">
+                  <div className="monetag-app-ad-slot">
+                    <div className="monetag-ad-slot__label">Sponsored</div>
+                    <div className="monetag-ads monetag-ads--compact" data-zone="11505330" data-ad-format="auto" aria-live="polite"></div>
+                  </div>
+                </section>
+
+                {!showExpiredCard && tokenValid && (
+                  <div className="mt-3">
+                    <YesimRecommendation />
+                  </div>
+                )}
               </>
             )}
           </div>

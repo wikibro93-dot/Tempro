@@ -5,7 +5,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://tempmailpk.com/app</loc>
-    <lastmod>2026-10-26</lastmod>
+    <lastmod>2026-10-28</lastmod>
     <changefreq>hourly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/app" />
@@ -17,7 +17,7 @@
   </url>
   <url>
     <loc>https://tempmailpk.com/</loc>
-    <lastmod>2026-10-26</lastmod>
+    <lastmod>2026-10-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/" />
@@ -29,7 +29,7 @@
   </url>
   <url>
     <loc>https://tempmailpk.com/blog</loc>
-    <lastmod>2026-10-26</lastmod>
+    <lastmod>2026-10-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog" />
@@ -41,7 +41,7 @@
   </url>
   <url>
     <loc>https://tempmailpk.com/privacy-stack</loc>
-    <lastmod>2026-10-26</lastmod>
+    <lastmod>2026-10-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/privacy-stack" />

@@ -5863,6 +5863,43 @@ textarea:focus-visible,
   min-height: 240px;
   overflow-x: auto;
   color: #1e293b;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-size: 0.92rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.email-html-viewport img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 6px;
+}
+
+.email-html-viewport table {
+  max-width: 100% !important;
+  border-collapse: collapse;
+}
+
+.email-html-viewport a {
+  color: #4361ee;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.email-html-viewport pre,
+.email-html-viewport code {
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.email-html-viewport blockquote {
+  border-left: 3px solid #cbd5e1;
+  padding-left: 12px;
+  color: #64748b;
+  margin: 12px 0;
 }
 
 /* Monospace Tabular Numerals */
@@ -6370,3 +6407,58 @@ textarea:focus-visible,
   transform: scale(0.98);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   COMPACT MOBILE /app UI STYLING & MINIFICATION
+   ───────────────────────────────────────────────────────────── */
+
+/* Chips carousel smooth touch scrolling */
+.mobile-inbox-chips {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.mobile-inbox-chips::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
+.mobile-inbox-chip {
+  flex-shrink: 0;
+  transition: all 0.15s ease-in-out;
+  border-width: 1px !important;
+}
+
+.mobile-inbox-chip:active {
+  transform: scale(0.97);
+}
+
+/* Compact Account Manager Card */
+.am-compact-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.am-address-strip {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  min-height: 40px;
+}
+
+/* Mobile screen optimization for /app layout */
+@media (max-width: 767.98px) {
+  .multi-inbox-layout {
+    gap: 0.5rem;
+  }
+  
+  .am-compact-card {
+    padding: 0.55rem 0.65rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .am-address-strip {
+    padding: 0.25rem 0.45rem !important;
+  }
+}

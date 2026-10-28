@@ -286,13 +286,23 @@
         color: white !important;
       }
       
-      /* Improve touch target size for all buttons and interactive elements */
-      .btn, .badge {
+      /* Improve touch target size for standard interactive buttons */
+      .btn:not(.btn-sm):not(.btn-xs) {
         min-height: 44px;
         min-width: 44px;
+      }
+      .badge {
+        min-height: auto;
+        min-width: auto;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+      }
+      .btn .badge {
+        min-width: auto;
+        min-height: auto;
+        padding: 0.2em 0.5em;
+        line-height: 1;
       }
       
       /* Ensure focus indicators are visible */
