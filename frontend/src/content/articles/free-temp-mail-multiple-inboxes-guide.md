@@ -62,3 +62,16 @@ If you use more than a handful of inboxes at once, write down which inbox was us
 - Some websites block disposable email domains. If a signup matters long term, use a permanent address you control.
 - Anyone who can open an inbox can read its messages, so keep your inboxes private and do not share screenshots of them.
 - When an inbox expires, its messages are treated as unrecoverable. Save any confirmation link or code you still need before expiry.
+
+## Organizing signups for users in the United States
+
+TempMail Pro is free and works worldwide, including for users in the United States. There is no US office, address, or phone number claimed here — the service itself is the same for US users as for users anywhere else, and the value is in how you organize the signups.
+
+A simple US split is:
+
+- US trials: one inbox per trial, so cancellation and renewal emails stay separate.
+- US shopping and coupons: one inbox for store signups and promo mail, kept out of your real inbox.
+- US job boards and newsletters: one inbox for applications and subscriptions you are only evaluating.
+- US testing and QA: one inbox per test case, as described in the testing guides.
+
+Use US spelling and US date and currency formats in your own notes when you label inboxes, so you can tell at a glance which signup a message belongs to. The same limits apply in the United States as elsewhere: do not use a temporary inbox where you will need password recovery later, for banking or other sensitive accounts, or for an account you cannot afford to lose. If a US service blocks disposable domains, use a permanent address for that signup instead.

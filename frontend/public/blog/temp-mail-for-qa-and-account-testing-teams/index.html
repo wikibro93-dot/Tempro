@@ -141,7 +141,15 @@
 <p>• Record delivery times and message counts in test notes, because temporary inboxes themselves expire.</p>
 <p>• Do not use temporary inboxes for real customer accounts, production data, or recovery-critical flows.</p>
 <h2>Limitations for QA teams</h2>
-<p>Temp mail tests the email part of a flow, not the whole product. It does not replace testing with real inboxes for deliverability, spam-folder placement, or long-term account behaviour. Some services block disposable domains, so a blocked signup in a test may reflect that policy, not a bug in your product. Record that distinction in the test result.</p></article>
+<p>Temp mail tests the email part of a flow, not the whole product. It does not replace testing with real inboxes for deliverability, spam-folder placement, or long-term account behaviour. Some services block disposable domains, so a blocked signup in a test may reflect that policy, not a bug in your product. Record that distinction in the test result.</p>
+<h2>Testing US signup flows</h2>
+<p>TempMail Pro is free and works worldwide, including for teams testing signup flows for users in the United States. A US test run is worth treating as its own locale case, not as a copy of another locale&#39;s run.</p>
+<p>For a US signup test, check in a dedicated temporary inbox:</p>
+<p>• Locale and language: US English spelling, and email content that matches the United States locale under test.</p>
+<p>• Dates and money: US date format and US dollar amounts in confirmation and receipt emails, where the product shows them.</p>
+<p>• Time zones: timestamps that make sense for US time zones, for example Eastern or Pacific time, where the product displays them.</p>
+<p>• Verification and recovery: the same five checks as above — verification arrival, link or code use once, expired-link handling, password-reset behavior, and localization — run in a fresh inbox per check.</p>
+<p>Keep the same boundaries as any other QA run: do not use temporary inboxes for real customer accounts or production data, do not reuse a test inbox across regression cycles, and record a blocked disposable-domain signup as a policy result, not as a product bug, unless your product is supposed to accept it. Do not use temp mail to test evading a ban or a fraud control.</p></article>
         <section><h2>Related guides</h2><ul><li><a href="/blog/temp-email-for-account-testing">Temporary Email for QA Testing and Account Testing</a></li><li><a href="/blog/free-temp-mail-for-students-and-developers">Best Free Temp Mail for Students and Developers</a></li><li><a href="/blog/why-temp-mail-services-limit-to-10-minutes">Why Most Temp Mail Services Limit You to 10 Minutes</a></li></ul><p><a href="/blog">All guides</a> · <a href="/app">Open the TempMail Pro app</a></p></section>
 
         <div class="cta-box">

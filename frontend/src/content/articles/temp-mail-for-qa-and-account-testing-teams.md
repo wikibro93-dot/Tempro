@@ -59,3 +59,16 @@ Run each check in its own inbox. If two checks share an inbox, a leftover messag
 ## Limitations for QA teams
 
 Temp mail tests the email part of a flow, not the whole product. It does not replace testing with real inboxes for deliverability, spam-folder placement, or long-term account behaviour. Some services block disposable domains, so a blocked signup in a test may reflect that policy, not a bug in your product. Record that distinction in the test result.
+
+## Testing US signup flows
+
+TempMail Pro is free and works worldwide, including for teams testing signup flows for users in the United States. A US test run is worth treating as its own locale case, not as a copy of another locale's run.
+
+For a US signup test, check in a dedicated temporary inbox:
+
+- Locale and language: US English spelling, and email content that matches the United States locale under test.
+- Dates and money: US date format and US dollar amounts in confirmation and receipt emails, where the product shows them.
+- Time zones: timestamps that make sense for US time zones, for example Eastern or Pacific time, where the product displays them.
+- Verification and recovery: the same five checks as above — verification arrival, link or code use once, expired-link handling, password-reset behavior, and localization — run in a fresh inbox per check.
+
+Keep the same boundaries as any other QA run: do not use temporary inboxes for real customer accounts or production data, do not reuse a test inbox across regression cycles, and record a blocked disposable-domain signup as a policy result, not as a product bug, unless your product is supposed to accept it. Do not use temp mail to test evading a ban or a fraud control.

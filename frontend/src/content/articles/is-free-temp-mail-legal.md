@@ -54,3 +54,13 @@ If a service's terms say disposable addresses are not allowed, that is a policy 
 ## Bottom line for teams
 
 Temporary email itself is usually legal. Misuse is the risk, not the tool. Teams should write this distinction into their own testing policy: temp mail is allowed for low-risk testing and privacy, and not allowed for impersonation, ban evasion, or abuse of promotions.
+
+## A note for users in the United States
+
+This section is general information only, not legal advice for a specific situation in the United States or any US state.
+
+The United States does not have a single federal privacy law that works the same way as a comprehensive law in another region. Some US states have their own privacy laws, and the rules that apply can vary by state, by the type of service, and by the service's own terms. That variation is why a one-line answer — "temp mail is legal in the US" — would be misleading on its own.
+
+What stays true in the United States is the same distinction as elsewhere in this guide: using a temporary address for privacy and spam reduction, for a low-risk signup, or for testing your own signup flow is normally low risk, while fraud, impersonation, evading a ban or a lawful restriction, or abusing a promotion creates risk. If a US service's terms say disposable addresses are not allowed, it can refuse the signup or close the account, even if no law is broken.
+
+For anything with legal or financial consequences in the United States, check the service's terms and get proper legal advice. Do not rely on this guide, or on a temporary inbox, to resolve a regulated, financial, government, or medical account question.

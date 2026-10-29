@@ -159,6 +159,22 @@ const About = () => {
               </div>
             </div>
 
+            <SectionCard title="For users in the United States">
+                <p>
+                  TempMail Pro is free and works worldwide, including for users in the United States.
+                  US users can use the same features as everyone else: multiple inboxes, custom names,
+                  and custom expiry, with no sign-in required.
+                </p>
+                <p>
+                  This is a service description, not a location claim. TempMail Pro does not claim a
+                  US office, address, phone number, or company registration here. The same limits
+                  apply in the United States as elsewhere: temporary inboxes are not for permanent,
+                  recovery, banking, or other sensitive accounts, and some services block disposable
+                  domains. For US trial, shopping, job-board, and newsletter signups, and for testing
+                  US signup flows, see the free-trials, multiple-inboxes, QA, and legal guides.
+                </p>
+            </SectionCard>
+
             <FinalCtaCard
               title="Ready to Protect Your Privacy?"
               description="Join thousands of users who trust TempMail Pro for their temporary email needs."

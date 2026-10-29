@@ -94,3 +94,15 @@ The expiry table above is a guide, not a promise that a service will accept a te
 ## What temp mail cannot do for trials
 
 Temp mail does not make a trial free if the service requires payment, does not bypass a service's rules, and does not recover an account after the inbox expires. If a trial is for an account you will rely on, use a permanent address from the start. Temp mail is for low-risk evaluation, not for accounts you cannot afford to lose.
+
+## For users in the United States: US trial signups, without the follow-up flood
+
+TempMail Pro is free and works worldwide, including for users in the United States. The US trial pattern is a good fit for a temporary inbox, because many US signups — streaming services, shopping sites, job boards, newsletters, and AI tools offered in the United States — ask for an email before you can try the product, and then keep sending follow-up campaigns long after the trial ends.
+
+A practical US setup is:
+
+- One temporary inbox per US trial, so a streaming trial, a shopping coupon, and a newsletter signup do not mix.
+- An expiry that matches the trial: 10 minutes to 1 hour for a quick demo, 24 hours to 7 days if the trial sends follow-ups you need to read.
+- The trial end date and cancellation steps saved in your own notes, outside the temporary inbox, because the inbox itself expires.
+
+This does not promise that a specific US brand will accept a temporary address. Some US services block disposable domains, and that is their policy choice — do not try to work around a block with temp mail. Do not use a temporary inbox for a US trial that requires payment, billing history, or account recovery, and do not use it to evade a ban or abuse a promotion. For a trial you decide to keep, move it to a permanent address you control before the temporary inbox expires.
