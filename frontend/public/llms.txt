@@ -1,0 +1,29 @@
+# TempMail Pro
+> Free disposable temporary email service with multi-inbox management, custom durations (10m to 7 days), custom usernames, and sub-second OTP verification delivery.
+
+## Overview
+TempMail Pro (https://tempmailpk.com) is an anonymous, privacy-focused temporary email platform. Users can create disposable email addresses without registration, manage multiple inboxes simultaneously, choose from live premium domains (e.g., @maxxspace.com), and auto-detect OTP verification codes with 1-click copy.
+
+## Core Features
+- **Multi-Inbox Management**: Create and switch between up to 10 active disposable email accounts in parallel without paying subscription fees.
+- **Custom Lifespan & Durations**: Choose email validity from 10 minutes, 1 hour, 24 hours, up to 7 days, or specify custom durations.
+- **Custom Username Creation**: Set personalized email aliases or generate randomized secure usernames.
+- **Live OTP Auto-Detection**: Verification codes and PINs sent by services (Discord, Craigslist, gaming sites, free trial platforms) are automatically extracted with a 1-click copy badge.
+- **Zero-Log Privacy Policy**: No IP address logging, no browser fingerprinting, and no tracking cookies. All emails are wiped permanently upon mailbox expiry.
+- **Progressive Web App (PWA)**: Works offline with local message caching and can be installed natively on Android, iOS, Windows, and macOS.
+
+## Key Links & Resources
+- Web Application: https://tempmailpk.com/app
+- Privacy Policy: https://tempmailpk.com/privacy
+- Privacy Stack Guide: https://tempmailpk.com/privacy-stack
+- About TempMail Pro: https://tempmailpk.com/about
+- XML Sitemap: https://tempmailpk.com/sitemap.xml
+- RSS Feed: https://tempmailpk.com/rss.xml
+
+## Contact & Organization
+- Service Name: TempMail Pro
+- Official Website: https://tempmailpk.com
+- Support Email: support@tempmailpk.com
+- Social Profiles:
+  - X (Twitter): https://x.com/tempmailpk
+  - Facebook: https://facebook.com/tempmailpk

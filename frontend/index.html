@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+  <head>
+   
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    
+    <!-- AI Studio Dev Environment: Suppress Vite HMR WebSocket connection errors (HMR disabled in cloud container) -->
+    <script>
+      (function() {
+        if (typeof window === 'undefined') return;
+        if (window.WebSocket) {
+          const OrigWS = window.WebSocket;
+          const MockViteWS = function(url, protocols) {
+            if (protocols === 'vite-hmr' || (typeof url === 'string' && url.includes('vite-hmr'))) {
+              const target = new EventTarget();
+              const wsObj = {
+                url: String(url),
+                protocol: 'vite-hmr',
+                readyState: 1, // WebSocket.OPEN
+                CONNECTING: 0,
+                OPEN: 1,
+                CLOSING: 2,
+                CLOSED: 3,
+                send: function() {},
+                close: function() { wsObj.readyState = 3; },
+                addEventListener: target.addEventListener.bind(target),
+                removeEventListener: target.removeEventListener.bind(target),
+                dispatchEvent: target.dispatchEvent.bind(target),
+                set onopen(fn) { if (typeof fn === 'function') setTimeout(fn, 0); },
+                set onmessage(fn) {},
+                set onerror(fn) {},
+                set onclose(fn) {},
+                get onopen() { return null; },
+                get onmessage() { return null; },
+                get onerror() { return null; },
+                get onclose() { return null; }
+              };
+              setTimeout(() => {
+                try {
+                  target.dispatchEvent(new Event('open'));
+                } catch (_) {}
+              }, 0);
+              return wsObj;
+            }
+            return new OrigWS(url, protocols);
+          };
+          MockViteWS.prototype = OrigWS.prototype;
+          MockViteWS.CONNECTING = 0;
+          MockViteWS.OPEN = 1;
+          MockViteWS.CLOSING = 2;
+          MockViteWS.CLOSED = 3;
+          window.WebSocket = MockViteWS;
+        }
+
+        window.addEventListener('error', function(e) {
+          if (e && e.message && (e.message.includes('WebSocket') || e.message.includes('vite'))) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return true;
+          }
+        }, true);
+      })();
+    </script>
+    
+    <!-- DNS & Preconnect Optimization for Sub-Second Mobile LCP -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    
+    <!-- Sitemaps, Feeds, and Hreflang (Canonical is dynamically managed by Helmet for 100% route uniqueness) -->
+    <link rel="sitemap" type="application/xml" href="https://tempmailpk.com/sitemap.xml" />
+    <link rel="alternate" type="application/rss+xml" title="TempMail Pro RSS Feed" href="https://tempmailpk.com/rss.xml" />
+    <link rel="alternate" hreflang="x-default" href="https://tempmailpk.com" />
+    <link rel="alternate" hreflang="en" href="https://tempmailpk.com" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#4361ee" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TempMail Pro" />
+    
+    <!-- Non-blocking Preloaded Bootstrap CSS for fast LCP & zero render-blocking delay -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    </noscript>
+    
+    <!-- SEO Meta Tags - 141 chars (Strictly between 120 and 160 characters as recommended by audit) -->
+    <title>TempMail Pro - Free Temporary Email App with Multi-Inbox &amp; Domains</title>
+    <meta name="description" content="Create free temporary email addresses with multiple inboxes, custom expiry, and instant OTP detection. Protect your real inbox with TempMail Pro." />
+    <meta name="keywords" content="temporary email app, disposable email, temp mail, spam protection, free email service, anonymous email, Mail.tm, OTP verification, 10 minute mail" />
+    
+    <!-- FIXED Open Graph -->
+    <meta property="og:title" content="TempMail Pro - Free Disposable Email App" />
+    <meta property="og:description" content="Free disposable temporary email app with multi-inbox management, custom domains, and privacy protection." />
+    <meta property="og:image" content="https://tempmailpk.com/pwa-512x512.png" />
+    <meta property="og:url" content="https://tempmailpk.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TempMail Pro" />
+    
+    <!-- FIXED Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TempMail Pro - Free Disposable Email App" />
+    <meta name="twitter:description" content="Free disposable temporary email app with multi-inbox management, custom domains, and privacy protection." />
+    <meta name="twitter:image" content="https://tempmailpk.com/pwa-512x512.png" />
+    <meta name="twitter:site" content="@tempmailpk" />
+    
+    <!-- Additional Meta Tags -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="author" content="TempMail Pro Team">
+    
+    <!-- FIXED Comprehensive Structured Data (JSON-LD) for Google, Bing & AI Engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://tempmailpk.com/#webapp",
+          "name": "TempMail Pro",
+          "url": "https://tempmailpk.com/",
+          "description": "Free disposable temporary email application with multi-inbox management, live domain selector, custom durations (10m to 7 days), and instant OTP verification code auto-detection.",
+          "applicationCategory": "CommunicationApplication",
+          "operatingSystem": "All Web Browsers (Chrome, Safari, Firefox, Edge, Android, iOS)",
+          "browserRequirements": "Requires JavaScript. Requires HTML5.",
+          "featureList": [
+            "Multi-Inbox Management (run parallel disposable addresses)",
+            "Live Domain Selector (@maxxspace.com, @uberip.com)",
+            "Instant OTP Verification Code Auto-Detection with 1-Click Copy",
+            "Custom Lifespan & Expiry Countdown (10m to 7 Days)",
+            "Custom Username Selection",
+            "Zero Registration & Zero IP Logging Policy",
+            "Progressive Web App (PWA) with Offline Mailbox Caching"
+          ],
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://tempmailpk.com/#website",
+          "url": "https://tempmailpk.com/",
+          "name": "TempMail Pro",
+          "description": "Free temporary disposable email service",
+          "publisher": {
+            "@type": "Organization",
+            "name": "TempMail Pro",
+            "url": "https://tempmailpk.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://tempmailpk.com/pwa-512x512.png"
+            }
+          }
+        }
+      ]
+    }
+    </script>
+    
+    <style>
+      :root {
+        --primary: #4361ee;
+        --secondary: #3a0ca3;
+        --accent: #f72585;
+        --light: #f8f9fa;
+        --dark: #212529;
+      }
+      
+      body {
+        font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      .brand-highlight {
+        color: var(--accent);
+      }
+      
+      .navbar {
+        background-color: var(--primary);
+      }
+      
+      .hero-section {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        padding: 100px 0;
+      }
+
+      @media (max-width: 576px) {
+        .hero-section {
+          padding: 64px 0;
+        }
+      }
+      
+      .cta-button {
+        background-color: var(--accent);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      
+      .cta-button:hover {
+        background-color: #e51276;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      }
+      
+      .feature-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(67, 97, 238, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 28px;
+        color: var(--primary);
+      }
+      
+      .feature-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+      }
+      
+      .feature-card:hover {
+        transform: translateY(-5px);
+      }
+      
+      .section-title {
+        position: relative;
+        padding-bottom: 15px;
+      }
+      
+      .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: var(--primary);
+        border-radius: 2px;
+      }
+      
+      .promo-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      }
+      
+      /* Critical Performance Optimizations */
+      
+      /* Improve badge contrast for accessibility - use darker opaque backgrounds */
+      .badge.bg-info.bg-opacity-10.text-info {
+        background-color: #004085 !important;
+        color: white !important;
+      }
+      
+      .badge.bg-success.bg-opacity-10.text-success {
+        background-color: #155724 !important;
+        color: white !important;
+      }
+      
+      .badge.bg-primary.bg-opacity-10.text-primary {
+        background-color: #004085 !important;
+        color: white !important;
+      }
+      
+      .badge.bg-danger.bg-opacity-10.text-danger {
+        background-color: #721c24 !important;
+        color: white !important;
+      }
+      
+      .badge.bg-warning.bg-opacity-10.text-warning {
+        background-color: #664d03 !important;
+        color: white !important;
+      }
+      
+      /* Improve touch target size for standard interactive buttons */
+      .btn:not(.btn-sm):not(.btn-xs) {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      .badge {
+        min-height: auto;
+        min-width: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn .badge {
+        min-width: auto;
+        min-height: auto;
+        padding: 0.2em 0.5em;
+        line-height: 1;
+      }
+      
+      /* Ensure focus indicators are visible */
+      .btn:focus, .badge:focus, a:focus {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+      }
+      
+      /* Prevent FOUC (Flash of Unstyled Content) */
+      html {
+        background: white;
+      }
+      
+      /* Optimize hero section rendering */
+      .hero-section {
+        contain: layout style paint;
+      }
+      
+      /* Critical path optimization: Load only essential fonts */
+      body {
+        font-weight: 400;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      
+      /* Remove unused font weights during initial load */
+      /* SEO Prerendered Fallback Classes (Zero Inline Styles for Audit Compliance) */
+      .seo-fallback-container {
+        padding: 30px 20px;
+        text-align: center;
+        font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      .seo-fallback-title {
+        color: #4361ee;
+        font-size: 2.2rem;
+        margin-bottom: 12px;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+      .seo-fallback-lead {
+        color: #212529;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        margin-bottom: 16px;
+      }
+      .seo-fallback-text {
+        color: #495057;
+        font-size: 0.95rem;
+        line-height: 1.65;
+        margin-bottom: 16px;
+        text-align: left;
+      }
+      .seo-fallback-nav {
+        margin: 0 0 20px;
+        color: #212529;
+      }
+      .seo-fallback-nav a {
+        color: #3a0ca3;
+        font-weight: 600;
+        text-decoration: underline;
+      }
+      .seo-fallback-fieldset {
+        border: 1px solid #4361ee;
+        border-radius: 8px;
+        padding: 18px;
+        margin-top: 20px;
+        text-align: left;
+      }
+      .seo-fallback-fieldset-purple {
+        border-color: #3a0ca3;
+      }
+      .seo-fallback-fieldset-pink {
+        border-color: #f72585;
+      }
+      .seo-fallback-legend {
+        color: #4361ee;
+        font-weight: 700;
+        padding: 0 10px;
+        font-size: 1.05rem;
+      }
+      .seo-fallback-legend-purple {
+        color: #3a0ca3;
+      }
+      .seo-fallback-legend-pink {
+        color: #f72585;
+      }
+      .seo-fallback-list {
+        padding-left: 20px;
+        line-height: 1.8;
+        margin: 0;
+      }
+      .seo-fallback-link {
+        color: #3a0ca3;
+        text-decoration: none;
+      }
+      .seo-fallback-link:hover {
+        text-decoration: underline;
+      }
+      .seo-fallback-badge {
+        background: rgba(67, 97, 238, 0.1);
+        color: #4361ee;
+        padding: 12px 24px;
+        margin-top: 25px;
+        border-radius: 30px;
+        font-weight: 700;
+        display: inline-block;
+      }
+      .seo-noscript-box {
+        text-align: center;
+        padding: 50px 20px;
+        font-family: 'Poppins', sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <header class="seo-fallback-container">
+        <div class="seo-fallback-title">TempMail Pro - Free Disposable Temporary Email App</div>
+        <p class="seo-fallback-lead">
+          Generate anonymous temporary email addresses instantly with multi-inbox management, custom duration options, and instant OTP verification delivery. No registration or credit card required.
+        </p>
+        <p class="seo-fallback-text">
+          TempMail Pro protects your personal privacy and eliminates email spam. When testing apps, registering for free trials, or buying from one-off websites, use disposable inboxes with custom domains (@maxxspace.com) and automatic expiry timers from 10 minutes to 7 days.
+        </p>
+        <p class="seo-fallback-nav">
+          Quick access: <a href="/app">Launch App</a> |
+          <a href="/blog">Privacy Blog</a> |
+          <a href="/privacy">Privacy Policy</a> |
+          <a href="/privacy-stack">Privacy Stack</a> |
+          <a href="/about">About</a> |
+          <a href="/sitemap.xml">Sitemap</a>
+        </p>
+
+        <fieldset class="seo-fallback-fieldset">
+          <legend class="seo-fallback-legend">Platform Integration and Signups</legend>
+          <ul class="seo-fallback-list">
+            <li><a href="/blog/temp-email-for-discord" class="seo-fallback-link">Temp Email for Discord</a></li>
+            <li><a href="/blog/temp-email-for-craigslist" class="seo-fallback-link">Temp Email for Craigslist</a></li>
+            <li><a href="/blog/burner-email-social-media-signups-guide" class="seo-fallback-link">Burner Email Social Media Signups Guide</a></li>
+            <li><a href="/blog/burner-email-for-social-media" class="seo-fallback-link">Burner Email for Social Media</a></li>
+            <li><a href="/blog/temp-email-for-gaming-accounts" class="seo-fallback-link">Temp Email for Gaming Accounts</a></li>
+            <li><a href="/blog/temp-mail-for-telegram-discord-and-gaming" class="seo-fallback-link">Temp Mail for Telegram Discord and Gaming</a></li>
+            <li><a href="/blog/temp-email-for-dating-apps" class="seo-fallback-link">Temp Email for Dating Apps</a></li>
+          </ul>
+        </fieldset>
+
+        <fieldset class="seo-fallback-fieldset seo-fallback-fieldset-purple">
+          <legend class="seo-fallback-legend seo-fallback-legend-purple">Trials Testing and E-Commerce</legend>
+          <ul class="seo-fallback-list">
+            <li><a href="/blog/best-temp-email-for-free-trials-no-spam-2026" class="seo-fallback-link">Best Temp Email for Free Trials No Spam 2026</a></li>
+            <li><a href="/blog/how-to-use-temp-email-for-free-trials" class="seo-fallback-link">How to Use Temp Email for Free Trials</a></li>
+            <li><a href="/blog/temp-mail-for-qa-and-account-testing-teams" class="seo-fallback-link">Temp Mail for QA and Account Testing Teams</a></li>
+            <li><a href="/blog/temp-email-for-account-testing" class="seo-fallback-link">Temp Email for Account Testing</a></li>
+            <li><a href="/blog/temp-email-for-coupon-sites" class="seo-fallback-link">Temp Email for Coupon Sites</a></li>
+            <li><a href="/blog/temp-email-for-online-shopping-without-spam-2026" class="seo-fallback-link">Temp Email for Online Shopping Without Spam 2026</a></li>
+            <li><a href="/blog/temp-email-for-online-shopping" class="seo-fallback-link">Temp Email for Online Shopping</a></li>
+            <li><a href="/blog/temp-email-for-job-applications" class="seo-fallback-link">Temp Email for Job Applications</a></li>
+            <li><a href="/blog/free-temp-email-for-job-boards-guide" class="seo-fallback-link">Free Temp Email for Job Boards Guide</a></li>
+            <li><a href="/blog/free-temp-mail-for-students-and-developers" class="seo-fallback-link">Free Temp Mail for Students and Developers</a></li>
+            <li><a href="/blog/temp-email-for-newsletters" class="seo-fallback-link">Temp Email for Newsletters</a></li>
+          </ul>
+        </fieldset>
+
+        <fieldset class="seo-fallback-fieldset seo-fallback-fieldset-pink">
+          <legend class="seo-fallback-legend seo-fallback-legend-pink">Technical Architecture and Privacy</legend>
+          <ul class="seo-fallback-list">
+            <li><a href="/blog/free-custom-name-temp-email" class="seo-fallback-link">Free Custom Name Temp Email</a></li>
+            <li><a href="/blog/best-free-temporary-email-for-days-and-weeks" class="seo-fallback-link">Best Free Temporary Email for Days and Weeks</a></li>
+            <li><a href="/blog/ten-minute-mail-vs-long-duration-temp-mail" class="seo-fallback-link">Ten Minute Mail vs Long Duration Temp Mail</a></li>
+            <li><a href="/blog/why-temp-mail-services-limit-to-10-minutes" class="seo-fallback-link">Why Temp Mail Services Limit to 10 Minutes</a></li>
+            <li><a href="/blog/free-disposable-email-with-longer-expiry" class="seo-fallback-link">Free Disposable Email with Longer Expiry</a></li>
+            <li><a href="/blog/best-temp-mail-alternatives-that-actually-last" class="seo-fallback-link">Best Temp Mail Alternatives That Actually Last</a></li>
+            <li><a href="/blog/free-temp-mail-multiple-inboxes-guide" class="seo-fallback-link">Free Temp Mail Multiple Inboxes Guide</a></li>
+            <li><a href="/blog/how-to-manage-multiple-temp-emails" class="seo-fallback-link">How to Manage Multiple Temp Emails</a></li>
+            <li><a href="/blog/private-domains-temp-email" class="seo-fallback-link">Private Domains Temp Email</a></li>
+            <li><a href="/blog/receive-sms-otp-online" class="seo-fallback-link">Receive SMS OTP Online</a></li>
+            <li><a href="/blog/tech-behind-disposable-emails" class="seo-fallback-link">Tech Behind Disposable Emails</a></li>
+            <li><a href="/blog/temporary-email-vs-email-alias-for-privacy-2026" class="seo-fallback-link">Temporary Email vs Email Alias for Privacy 2026</a></li>
+            <li><a href="/blog/temp-email-vs-email-alias" class="seo-fallback-link">Temp Email vs Email Alias</a></li>
+            <li><a href="/blog/stop-signup-spam-with-disposable-inbox-strategy" class="seo-fallback-link">Stop Signup Spam with Disposable Inbox Strategy</a></li>
+            <li><a href="/blog/temp-mail-without-login-safe-or-risky" class="seo-fallback-link">Temp Mail without Login Safe or Risky</a></li>
+            <li><a href="/blog/why-websites-block-disposable-email" class="seo-fallback-link">Why Websites Block Disposable Email</a></li>
+            <li><a href="/blog/how-to-choose-temporary-email-service-checklist" class="seo-fallback-link">How to Choose Temporary Email Service Checklist</a></li>
+            <li><a href="/blog/is-free-temp-mail-legal" class="seo-fallback-link">Is Free Temp Mail Legal</a></li>
+          </ul>
+        </fieldset>
+
+        <div class="seo-fallback-badge">
+          Initializing secure temporary mail engine...
+        </div>
+      </header>
+    </div>
+    
+    <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Deferred Non-Blocking Monetag SDK (Runs after window load so Core Web Vitals LCP & INP remain optimal) -->
+    <script>
+      (function() {
+        function loadMonetag() {
+          if (window.__monetagLoaded) return;
+          window.__monetagLoaded = true;
+          var s = document.createElement('script');
+          s.src = 'https://quge5.com/88/tag.min.js';
+          s.setAttribute('data-zone', '11505330');
+          s.setAttribute('data-cfasync', 'false');
+          s.async = true;
+          document.body.appendChild(s);
+        }
+        if (document.readyState === 'complete') {
+          setTimeout(loadMonetag, 1500);
+        } else {
+          window.addEventListener('load', function() {
+            if ('requestIdleCallback' in window) {
+              requestIdleCallback(function() { setTimeout(loadMonetag, 800); }, { timeout: 3000 });
+            } else {
+              setTimeout(loadMonetag, 1500);
+            }
+          });
+        }
+      })();
+    </script>
+
+    <!-- FIXED Fallback for users without JavaScript -->
+    <noscript>
+      <div class="seo-noscript-box">
+        <div class="seo-fallback-title">TempMail Pro Web Application</div>
+        <p class="seo-fallback-lead">Please enable JavaScript to use our temporary disposable email application.</p>
+        <p class="seo-fallback-text">TempMail Pro provides free disposable email addresses with multi-inbox tabs, custom domains, and automatic OTP verification code detection.</p>
+      </div>
+    </noscript>
+  </body>
+</html>
