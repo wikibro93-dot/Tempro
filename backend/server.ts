@@ -15,36 +15,8 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// In-memory fallback mailboxes and credentials
-const inMemoryInboxes = new Map();
+// Real Mail.tm account credentials only (for /api/email/wait). No mock/fallback mailboxes in production.
 const accountCredentials = new Map();
-
-function createWelcomeMessage(token: string, address: string) {
-  return [
-    {
-      id: 'welcome_msg_' + Date.now(),
-      token,
-      from: { address: 'support@tempmailpro.com', name: 'TempMail Pro Team' },
-      to: [{ address, name: address }],
-      subject: 'Welcome to your temporary disposable inbox!',
-      intro: 'Your temporary email address is now ready to receive emails and verification codes.',
-      text: `Welcome to TempMail Pro!\n\nYour temporary email address (${address}) is active.\n\nYou can use this address to sign up for services, test applications, or receive OTP codes while keeping your real inbox spam-free.`,
-      html: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 24px; color: #1e293b; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
-          <h2 style="color: #4361ee; margin-top: 0;">Welcome to TempMail Pro!</h2>
-          <p style="font-size: 16px; line-height: 1.6;">Your temporary disposable email address <strong>${address}</strong> is active and ready to receive incoming messages.</p>
-          <div style="background-color: #f8fafc; border-left: 4px solid #4361ee; padding: 14px 18px; margin: 18px 0; border-radius: 6px;">
-            <p style="margin: 0; font-size: 14px; color: #334155;">
-              <strong>Spam-Free Protection:</strong> Never expose your real email to untrusted websites, marketing trackers, or one-off registrations.
-            </p>
-          </div>
-          <p style="font-size: 13px; color: #64748b; margin-top: 24px;">Disposable Inbox Powered by TempMail Pro Unified Engine.</p>
-        </div>
-      `,
-      createdAt: new Date().toISOString()
-    }
-  ];
-}
 
 async function getLiveDomains(): Promise<string[]> {
   try {
@@ -67,7 +39,7 @@ async function getLiveDomains(): Promise<string[]> {
   } catch (err: any) {
     console.warn('[Backend] Could not fetch live Mail.tm domains:', err.message);
   }
-  return ['maxxspace.com'];
+  return [];
 }
 
 // Health check endpoint
@@ -81,28 +53,24 @@ app.get('/health', (req, res) => {
 
 // Domain listing endpoint
 app.get('/api/accounts/domains', async (req, res) => {
-  try {
-    const domains = await getLiveDomains();
-    res.json({
-      success: true,
-      domains
-    });
-  } catch (err: any) {
-    res.json({
-      success: true,
-      domains: ['maxxspace.com']
-    });
+  const domains = await getLiveDomains();
+  if (domains.length === 0) {
+    return res.status(502).json({ success: false, error: 'Mail.tm domains unavailable, please try again.' });
   }
+  res.json({ success: true, domains });
 });
 
 // Mailbox creation endpoint
 app.post('/api/accounts/create', async (req, res) => {
   const { username: rawUsername, domain: requestedDomain } = req.body || {};
   const liveDomains = await getLiveDomains();
-  // Ensure the domain is strictly valid on live Mail.tm servers
+  if (liveDomains.length === 0) {
+    return res.status(502).json({ error: 'Mail.tm domains unavailable, please try again.' });
+  }
+  // Use the requested domain only if Mail.tm actually offers it; otherwise a real live domain.
   const domain = (requestedDomain && liveDomains.includes(requestedDomain))
     ? requestedDomain
-    : (liveDomains[0] || 'maxxspace.com');
+    : liveDomains[0];
 
   const baseUsername = rawUsername
     ? String(rawUsername).toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 24)
@@ -159,21 +127,10 @@ app.post('/api/accounts/create', async (req, res) => {
     }
   }
 
-  // Resilient fallback mailbox only if Mail.tm network is completely unreachable
-  const fallbackToken = 'mock_' + Math.random().toString(36).slice(2, 14);
-  const fallbackAddress = `${baseUsername}@${domain}`;
-  const welcome = createWelcomeMessage(fallbackToken, fallbackAddress);
-  inMemoryInboxes.set(fallbackToken, welcome);
-
-  return res.json({
-    address: fallbackAddress,
-    email: fallbackAddress,
-    token: fallbackToken,
-    id: 'acc_' + fallbackToken,
-    domain,
-    isLive: false,
-    createdAt: new Date().toISOString()
-  });
+  // Production rule: never issue a mock/fake mailbox. If Mail.tm did not create
+  // a real account, fail honestly so the user retries instead of using an
+  // address that can never receive mail.
+  return res.status(502).json({ error: 'Could not create a real Mail.tm account, please try again.', isLive: false });
 });
 
 // Inbox message list endpoint
@@ -184,10 +141,9 @@ app.get('/api/inbox/:token', async (req, res) => {
     return res.json([]);
   }
 
-  // Handle in-memory fallback token
-  if (token.startsWith('mock_') || inMemoryInboxes.has(token)) {
-    const list = inMemoryInboxes.get(token) || [];
-    return res.json(list);
+  // Old mock_ tokens from the upgrade period are not real Mail.tm accounts.
+  if (token.startsWith('mock_')) {
+    return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
   }
 
   try {
@@ -244,15 +200,9 @@ app.post('/api/inbox/batch', async (req, res) => {
   const CONCURRENCY_LIMIT = 8; // Process 8 inboxes concurrently in bounded chunks
 
   const fetchSingleInbox = async (token: string) => {
-    // 1. In-memory check
-    if (token.startsWith('mock_') || inMemoryInboxes.has(token)) {
-      const list = inMemoryInboxes.get(token) || [];
-      return {
-        success: true,
-        count: list.length,
-        messages: list.slice(-20),
-        latestMessageAt: list[list.length - 1]?.createdAt || null
-      };
+    // Old mock_ tokens are expired, not real Mail.tm accounts.
+    if (token.startsWith('mock_')) {
+      return { success: false, error: 'EXPIRED', count: 0, messages: [] };
     }
 
     // 2. Mail.tm check
@@ -344,12 +294,10 @@ app.get('/api/inbox/stream/:token', async (req, res) => {
   const fetchCurrentInbox = async () => {
     if (isClosed) return;
     try {
-      if (token.startsWith('mock_') || inMemoryInboxes.has(token)) {
-        const list = inMemoryInboxes.get(token) || [];
-        if (list.length !== lastMessageCount) {
-          lastMessageCount = list.length;
-          res.write(`data: ${JSON.stringify({ type: 'inbox', count: list.length, messages: list })}\n\n`);
-        }
+      if (token.startsWith('mock_')) {
+        res.write(`data: ${JSON.stringify({ type: 'error', code: 'EXPIRED' })}\n\n`);
+        isClosed = true;
+        res.end();
         return;
       }
 
@@ -419,13 +367,8 @@ app.get('/api/inbox/content/:token/:messageId', async (req, res) => {
     return res.status(400).json({ error: 'Missing token or message ID' });
   }
 
-  // Fallback in-memory check
-  if (token.startsWith('mock_') || inMemoryInboxes.has(token)) {
-    const list = inMemoryInboxes.get(token) || [];
-    const found = list.find((m: any) => m.id === messageId) || list[0];
-    if (found) {
-      return res.json(found);
-    }
+  if (token.startsWith('mock_')) {
+    return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
   }
 
   try {
@@ -523,11 +466,8 @@ app.get('/api/inbox/download/:token/:messageId', async (req, res) => {
 app.delete('/api/inbox/:token/:messageId', async (req, res) => {
   const { token, messageId } = req.params;
 
-  if (token.startsWith('mock_') || inMemoryInboxes.has(token)) {
-    const list = inMemoryInboxes.get(token) || [];
-    const filtered = list.filter((m: any) => m.id !== messageId);
-    inMemoryInboxes.set(token, filtered);
-    return res.json({ success: true, messageId });
+  if (token.startsWith('mock_')) {
+    return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
   }
 
   try {

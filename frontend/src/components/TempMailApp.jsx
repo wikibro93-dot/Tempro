@@ -344,46 +344,12 @@ function TempMailApp({ onEmailCopied }) {
       }
       setMessages([]);
     } catch (err) {
-      console.warn('Backend account creation error, creating local fallback account:', err);
-      const fallbackUser = requestedUsername || ('user' + Math.random().toString(36).slice(2, 7));
-      const fallbackDomain = customDomain || 'maxxspace.com';
-      const fallbackAddr = `${fallbackUser}@${fallbackDomain}`;
-      const now = new Date();
-      const expirationTime = new Date(now.getTime() + (isAuto ? DURATIONS['1hour'] : durationMs));
-      const fallbackToken = 'mock_' + Math.random().toString(36).slice(2, 12);
-      const fallbackData = {
-        address: fallbackAddr,
-        email: fallbackAddr,
-        token: fallbackToken,
-        expiration: expirationTime.toISOString(),
-        createdAt: now.toISOString(),
-      };
-      setAccount(fallbackData);
-      setTokenValid(true);
-      if (fallbackAddr) {
-        setGeneratedEmails(prev => {
-          const filtered = prev.filter(e => (e.address || e.email) !== fallbackAddr);
-          return [fallbackData, ...filtered].slice(0, 10);
-        });
-      }
-      const welcomeMsg = [{
-        id: 'msg_welcome_' + Date.now(),
-        token: fallbackToken,
-        from: { address: 'support@tempmailpk.com', name: 'TempMail Pro Support' },
-        to: [{ address: fallbackAddr }],
-        subject: 'Welcome to TempMail Pro - Disposable Email Active',
-        intro: 'Your temporary email address is active and ready to receive messages.',
-        text: `Welcome to TempMail Pro!\n\nYour temporary address (${fallbackAddr}) is ready.\n\nUse this address to protect your personal inbox from spam and unwanted marketing.`,
-        html: `<div style="font-family: sans-serif; padding: 16px; color: #1e293b;">
-          <h3 style="color: #4361ee; margin-top: 0;">Welcome to TempMail Pro</h3>
-          <p>Your temporary email <strong>${fallbackAddr}</strong> is ready.</p>
-          <p style="color: #64748b; font-size: 14px;">Incoming emails will appear in your inbox automatically.</p>
-        </div>`,
-        createdAt: now.toISOString(),
-      }];
-      setMessages(welcomeMsg);
-      localStorage.setItem(`inbox-${fallbackToken}`, JSON.stringify(welcomeMsg));
-      setError(null);
+      // Production rule: never create a local mock mailbox. If the backend
+      // could not create a real Mail.tm account, show an error and keep
+      // the user on their previous account (if any) instead of giving them
+      // an address that can never receive mail.
+      const backendMessage = err?.response?.data?.error;
+      setError({ message: backendMessage || 'Could not create a real temporary email. Mail.tm is unreachable right now, please try again.' });
     } finally {
       setIsLoading(false);
       isCreatingRef.current = false;
