@@ -108,8 +108,12 @@ function TempMailApp({ onEmailCopied }) {
     }
   });
 
-  const [availableDomains, setAvailableDomains] = useState(['maxxspace.com']);
-  const [selectedDomain, setSelectedDomain] = useState('maxxspace.com');
+  // No hardcoded domain: the list always comes from Mail.tm via the backend.
+  // Until it loads, no domain is shown or used, so a stale domain can never
+  // be presented as if it were live.
+  const [availableDomains, setAvailableDomains] = useState([]);
+  const [selectedDomain, setSelectedDomain] = useState('');
+  const [domainsLoaded, setDomainsLoaded] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -119,6 +123,7 @@ function TempMailApp({ onEmailCopied }) {
         if (isMounted && res.data?.domains && Array.isArray(res.data.domains) && res.data.domains.length > 0) {
           setAvailableDomains(res.data.domains);
           setSelectedDomain(prev => res.data.domains.includes(prev) ? prev : res.data.domains[0]);
+          setDomainsLoaded(true);
         }
       } catch (err) {
         console.warn('Could not load domains list from unified backend:', err);
@@ -349,6 +354,12 @@ function TempMailApp({ onEmailCopied }) {
       // the user on their previous account (if any) instead of giving them
       // an address that can never receive mail.
       const backendMessage = err?.response?.data?.error;
+      const freshDomains = err?.response?.data?.availableDomains;
+      if (Array.isArray(freshDomains) && freshDomains.length > 0) {
+        setAvailableDomains(freshDomains);
+        setSelectedDomain(freshDomains[0]);
+        setDomainsLoaded(true);
+      }
       setError({ message: backendMessage || 'Could not create a real temporary email. Mail.tm is unreachable right now, please try again.' });
     } finally {
       setIsLoading(false);

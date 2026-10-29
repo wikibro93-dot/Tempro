@@ -114,7 +114,7 @@ const LandingDeferredSections = () => {
                 </span>
                 <h3 className="h5 fw-bold mb-2">Select Domain &amp; Generate</h3>
                 <p className="text-secondary small mb-0">
-                  Pick your preferred domain (@maxxspace.com or @uberip.com) and click Generate. Your inbox is created instantly on the backend.
+                  Pick your preferred domain from the live domains Mail.tm currently offers and click Generate. Your inbox is created instantly on the backend.
                 </p>
               </div>
             </div>

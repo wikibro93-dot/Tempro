@@ -227,7 +227,7 @@ const Landing = () => {
                 </h1>
 
                 <p className="landing-hero-lead text-secondary mb-4">
-                  Generate instant temporary mailboxes, pick live domains like <strong>@maxxspace.com</strong>, and receive OTP codes with sub-second delivery. No sign-in, zero logs, completely free.
+                  Generate instant temporary mailboxes, pick from the live domains Mail.tm currently offers, and receive OTP codes with sub-second delivery. No sign-in, zero logs, completely free.
                 </p>
 
                 {/* Proof badges */}

@@ -67,10 +67,23 @@ app.post('/api/accounts/create', async (req, res) => {
   if (liveDomains.length === 0) {
     return res.status(502).json({ error: 'Mail.tm domains unavailable, please try again.' });
   }
-  // Use the requested domain only if Mail.tm actually offers it; otherwise a real live domain.
-  const domain = (requestedDomain && liveDomains.includes(requestedDomain))
-    ? requestedDomain
-    : liveDomains[0];
+  // Flexible domains: Mail.tm changes its domain list. Never silently switch
+  // a user-chosen domain to another one — that would be misleading.
+  // If the user chose a domain, use it exactly or fail honestly with the
+  // current live list so the UI can update. Only when no domain was chosen
+  // (auto-generate) may the backend pick the first live domain.
+  let domain: string;
+  if (requestedDomain) {
+    if (!liveDomains.includes(requestedDomain)) {
+      return res.status(400).json({
+        error: 'Selected domain is no longer available on Mail.tm. Please choose a current domain.',
+        availableDomains: liveDomains
+      });
+    }
+    domain = requestedDomain;
+  } else {
+    domain = liveDomains[0];
+  }
 
   const baseUsername = rawUsername
     ? String(rawUsername).toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 24)

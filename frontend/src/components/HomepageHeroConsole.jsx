@@ -16,8 +16,10 @@ const HomepageHeroConsole = () => {
     }
   });
 
-  const [availableDomains, setAvailableDomains] = useState(['maxxspace.com']);
-  const [selectedDomain, setSelectedDomain] = useState('maxxspace.com');
+  // No hardcoded domain: only live Mail.tm domains from the backend are shown.
+  const [availableDomains, setAvailableDomains] = useState([]);
+  const [selectedDomain, setSelectedDomain] = useState('');
+  const [domainsLoaded, setDomainsLoaded] = useState(false);
   const [customUser, setCustomUser] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -35,6 +37,7 @@ const HomepageHeroConsole = () => {
         if (isMounted && res.data?.domains && Array.isArray(res.data.domains) && res.data.domains.length > 0) {
           setAvailableDomains(res.data.domains);
           setSelectedDomain((prev) => (res.data.domains.includes(prev) ? prev : res.data.domains[0]));
+          setDomainsLoaded(true);
         }
       })
       .catch((err) => {
@@ -57,15 +60,16 @@ const HomepageHeroConsole = () => {
     }
   }, [account]);
 
-  // Auto-generate on first visit or migrate outdated mock accounts (runs once only)
+  // Auto-generate on first visit or migrate outdated mock accounts, but only
+  // after live domains have loaded — never with a hardcoded/stale domain.
   useEffect(() => {
-    if (hasInitRef.current) return;
+    if (!domainsLoaded || hasInitRef.current) return;
     hasInitRef.current = true;
 
     if (!account || account.token?.startsWith('mock_') || account.address?.includes('uberip.com')) {
       handleCreateAccount();
     }
-  }, []);
+  }, [domainsLoaded]);
 
   const handleCreateAccount = async (opts = {}) => {
     if (isCreatingRef.current) return;
@@ -73,7 +77,7 @@ const HomepageHeroConsole = () => {
     setIsCreating(true);
 
     try {
-      const domain = opts.domain || selectedDomain;
+      const domain = opts.domain || (availableDomains.includes(selectedDomain) ? selectedDomain : null);
       const username = (opts.username !== undefined ? opts.username : customUser).trim() || null;
 
       const payload = {};
@@ -119,6 +123,12 @@ const HomepageHeroConsole = () => {
       setShowCustomize(false);
     } catch (err) {
       console.warn('Hero account generation fallback:', err);
+      const freshDomains = err?.response?.data?.availableDomains;
+      if (Array.isArray(freshDomains) && freshDomains.length > 0) {
+        setAvailableDomains(freshDomains);
+        setSelectedDomain(freshDomains[0]);
+        setDomainsLoaded(true);
+      }
     } finally {
       setIsCreating(false);
       isCreatingRef.current = false;
@@ -217,14 +227,20 @@ const HomepageHeroConsole = () => {
                   setSelectedDomain(e.target.value);
                   handleCreateAccount({ domain: e.target.value });
                 }}
-                disabled={isCreating}
+                disabled={isCreating || availableDomains.length === 0}
                 style={{ width: 'auto', fontWeight: 600, fontSize: '0.86rem', minHeight: '40px' }}
               >
-                {availableDomains.map((d) => (
-                  <option key={d} value={d}>
-                    @{d}
+                {availableDomains.length === 0 ? (
+                  <option value="" disabled>
+                    Loading live domains…
                   </option>
-                ))}
+                ) : (
+                  availableDomains.map((d) => (
+                    <option key={d} value={d}>
+                      @{d}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
 

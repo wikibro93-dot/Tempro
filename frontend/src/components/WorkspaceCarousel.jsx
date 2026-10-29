@@ -16,7 +16,7 @@ const SLIDES = [
           <div className="d-flex align-items-center gap-2 text-truncate">
             <span className="badge bg-primary rounded-circle p-2">W</span>
             <div className="text-truncate">
-              <div className="fw-bold small text-dark text-truncate">waqas@maxxspace.com</div>
+              <div className="fw-bold small text-dark text-truncate">waqas@example-domain</div>
               <small className="text-muted font-monospace">⏱ 23h 45m left</small>
             </div>
           </div>
@@ -27,7 +27,7 @@ const SLIDES = [
           <div className="d-flex align-items-center gap-2 text-truncate">
             <span className="badge bg-secondary rounded-circle p-2">S</span>
             <div className="text-truncate">
-              <div className="fw-semibold small text-dark text-truncate">shop_trial@uberip.com</div>
+              <div className="fw-semibold small text-dark text-truncate">shop_trial@example-domain</div>
               <small className="text-muted font-monospace">⏱ 6d 12h left</small>
             </div>
           </div>
@@ -38,7 +38,7 @@ const SLIDES = [
           <div className="d-flex align-items-center gap-2 text-truncate">
             <span className="badge bg-secondary rounded-circle p-2">T</span>
             <div className="text-truncate">
-              <div className="fw-semibold small text-dark text-truncate">tester_pro@maxxspace.com</div>
+              <div className="fw-semibold small text-dark text-truncate">tester_pro@example-domain</div>
               <small className="text-muted font-monospace">⏱ 52m left</small>
             </div>
           </div>
@@ -61,7 +61,7 @@ const SLIDES = [
     content: (
       <div className="carousel-preview-card p-3">
         <div className="p-2 mb-2 rounded-2 bg-light-subtle border d-flex justify-content-between align-items-center">
-          <span className="small text-muted">Inbox: waqas@maxxspace.com</span>
+          <span className="small text-muted">Inbox: waqas@example-domain</span>
           <span className="badge bg-success-subtle text-success border border-success-subtle py-1">Synced</span>
         </div>
 
@@ -94,14 +94,14 @@ const SLIDES = [
     step: '03',
     tag: 'Domain & Duration Engine',
     title: 'Custom Lifespan & Live Domain Selection',
-    description: 'Switch between @maxxspace.com, @uberip.com, and choose how long the address lives: 10 mins, 1 hour, 24 hours, or 7 full days.',
+    description: 'Switch between live domains, and choose how long the address lives: 10 mins, 1 hour, 24 hours, or 7 full days.',
     badge: 'Granular Control',
     content: (
       <div className="carousel-preview-card p-3 text-start">
         <label className="small fw-semibold text-muted mb-1">Available Live Domains:</label>
         <div className="d-flex gap-2 mb-3">
-          <span className="badge bg-primary py-2 px-3 fs-6">@maxxspace.com</span>
-          <span className="badge bg-light text-dark border py-2 px-3 fs-6">@uberip.com</span>
+          <span className="badge bg-primary py-2 px-3 fs-6">@example-domain</span>
+          <span className="badge bg-light text-dark border py-2 px-3 fs-6">@example-domain</span>
         </div>
 
         <label className="small fw-semibold text-muted mb-1">Select Custom Lifespan:</label>

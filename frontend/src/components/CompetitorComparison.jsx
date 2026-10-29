@@ -20,7 +20,7 @@ const COMPARISON_DATA = [
   },
   {
     feature: 'Domain Selector Dropdown',
-    description: 'Choose between @maxxspace.com, @uberip.com & more',
+    description: 'Choose between the live domains Mail.tm currently offers',
     tempMailPro: 'Yes (Live Engine)',
     tempMailOrg: 'Locked behind paywall',
     tenMinuteMail: 'Fixed single domain',

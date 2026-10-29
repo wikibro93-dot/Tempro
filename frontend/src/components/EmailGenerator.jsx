@@ -14,7 +14,7 @@ const UNITS = [
   { label: 'Days', value: 'day', ms: 86400 * 1000, min: 1, max: 365 },
 ];
 
-const DEFAULT_DOMAINS = ['maxxspace.com'];
+const DEFAULT_DOMAINS = []; // No hardcoded domain — only live Mail.tm domains are ever shown.
 
 const EmailGenerator = ({
   onGenerate,
@@ -60,7 +60,7 @@ const EmailGenerator = ({
       : DEFAULT_DOMAINS;
 
   const [activeDomain, setActiveDomain] = useState(
-    controlledDomain || domainsList[0] || 'maxxspace.com'
+    controlledDomain || domainsList[0] || ''
   );
 
   useEffect(() => {
@@ -142,11 +142,17 @@ const EmailGenerator = ({
                   onChange={(e) => handleDomainSelect(e.target.value)}
                   aria-label="Select domain"
                 >
-                  {domainsList.map((d) => (
-                    <option key={d} value={d}>
-                      {d}
+                  {domainsList.length === 0 ? (
+                    <option value="" disabled>
+                      Loading live domains…
                     </option>
-                  ))}
+                  ) : (
+                    domainsList.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))
+                  )}
                 </select>
                 <span className="eg-domain-chevron">
                   <AppIcon iconClass="bi bi-chevron-down" />
@@ -211,7 +217,7 @@ const EmailGenerator = ({
         <button
           className="btn btn-primary w-100 eg-generate-btn"
           onClick={handleGenerate}
-          disabled={isLoading}
+          disabled={isLoading || domainsList.length === 0}
         >
           {isLoading ? (
             <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Generating…</>
@@ -276,11 +282,17 @@ const EmailGenerator = ({
                   onChange={(e) => handleDomainSelect(e.target.value)}
                   aria-label="Select preferred email domain"
                 >
-                  {domainsList.map((d) => (
-                    <option key={d} value={d}>
-                      {d}
+                  {domainsList.length === 0 ? (
+                    <option value="" disabled>
+                      Loading live domains…
                     </option>
-                  ))}
+                  ) : (
+                    domainsList.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))
+                  )}
                 </select>
                 <span className="eg-domain-chevron">
                   <AppIcon iconClass="bi bi-chevron-down" />
@@ -377,7 +389,7 @@ const EmailGenerator = ({
         <button
           className="eg-generate-btn-hero btn btn-primary"
           onClick={handleGenerate}
-          disabled={isLoading}
+          disabled={isLoading || domainsList.length === 0}
         >
           {isLoading ? (
             <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Creating your mailbox…</>
