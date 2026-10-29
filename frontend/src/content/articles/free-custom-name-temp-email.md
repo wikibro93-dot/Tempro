@@ -60,3 +60,9 @@ These are patterns, not reserved names. Two people can reasonably want the same 
 ## When a random name is better
 
 For a truly one-off code where you do not need to recognise the address later, a random name is simpler and leaks less information. Use a custom name when you need to track where an address was used across several messages, and a random name when you need it once and then forget it.
+
+## Related reading
+
+- [Temp Mail With Multiple Inboxes Free: Complete Guide](/blog/free-temp-mail-multiple-inboxes-guide)
+- [How to Manage Multiple Temporary Emails for Different Websites](/blog/how-to-manage-multiple-temp-emails)
+- [Temp Email vs Email Alias: Which Protects Privacy Better?](/blog/temp-email-vs-email-alias)

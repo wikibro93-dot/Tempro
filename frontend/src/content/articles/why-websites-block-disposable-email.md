@@ -57,3 +57,8 @@ If the account matters, you need reliable recovery and long-term access.
 ## Bottom Line
 
 Websites block disposable email because abuse from throwaway domains is a real operational problem. The smarter privacy strategy is not to force temp mail everywhere, but to move between temp email, aliases, and private domains based on the trust level of the website.
+
+## Related reading
+
+- [Temp Email vs Email Alias: Which Protects Privacy Better?](/blog/temp-email-vs-email-alias)
+- [Is Free Temp Mail Legal? Rules, Risks, and Best Practices](/blog/is-free-temp-mail-legal)

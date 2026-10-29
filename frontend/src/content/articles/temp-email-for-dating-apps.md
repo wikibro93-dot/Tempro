@@ -102,3 +102,9 @@ A temporary email reduces tracking, but your behavior during conversations matte
 ## Bottom Line
 
 Temporary email is a powerful privacy tool for dating apps, especially if you want to explore multiple platforms or maintain separation between your dating and professional identities. Pair it with smart dating habits—meet safely, verify identities, and stay skeptical of too-good-to-be-true profiles. If you find a genuine connection, you can always switch to a more permanent contact method.
+
+## Related reading
+
+- [Why You Need a Burner Email for Social Media](/blog/burner-email-for-social-media)
+- [Temp Email vs Email Alias: Which Protects Privacy Better?](/blog/temp-email-vs-email-alias)
+- [Free Temp Email Without Login: Safe or Risky?](/blog/temp-mail-without-login-safe-or-risky)

@@ -62,3 +62,8 @@ Use this simple rule when deciding:
 ## Bottom Line
 
 Neither option is universally better. Temporary email is the cleaner tool for short-lived privacy, while aliases are better for durable account management. The real win comes from choosing the right layer of identity for the specific signup.
+
+## Related reading
+
+- [Temporary Email vs Email Alias: Which Is Better for Privacy in 2026?](/blog/temporary-email-vs-email-alias-for-privacy-2026)
+- [Private Domains: Get Your Own Temporary Email](/blog/private-domains-temp-email)

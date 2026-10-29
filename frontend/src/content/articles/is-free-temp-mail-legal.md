@@ -64,3 +64,9 @@ The United States does not have a single federal privacy law that works the same
 What stays true in the United States is the same distinction as elsewhere in this guide: using a temporary address for privacy and spam reduction, for a low-risk signup, or for testing your own signup flow is normally low risk, while fraud, impersonation, evading a ban or a lawful restriction, or abusing a promotion creates risk. If a US service's terms say disposable addresses are not allowed, it can refuse the signup or close the account, even if no law is broken.
 
 For anything with legal or financial consequences in the United States, check the service's terms and get proper legal advice. Do not rely on this guide, or on a temporary inbox, to resolve a regulated, financial, government, or medical account question.
+
+## Related reading
+
+- [Why Websites Block Disposable Email Addresses](/blog/why-websites-block-disposable-email)
+- [Temp Email vs Email Alias: Which Protects Privacy Better?](/blog/temp-email-vs-email-alias)
+- [Free Temp Email Without Login: Safe or Risky?](/blog/temp-mail-without-login-safe-or-risky)

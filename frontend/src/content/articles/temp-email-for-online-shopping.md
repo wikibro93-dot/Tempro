@@ -48,3 +48,8 @@ Retail emails often include tracking pixels and behavioral segmentation tags. Re
 ## Bottom Line
 
 Temporary email is useful for one-off shopping interactions where you want the discount or receipt but not the months of follow-up campaigns. For repeat purchases or customer support, move to an alias or permanent address once the relationship becomes important.
+
+## Related reading
+
+- [Temporary Email for Online Shopping: Keep Offers, Block Spam](/blog/temp-email-for-online-shopping-without-spam-2026)
+- [How to Get Coupons Without the Spam: Use Temporary Email](/blog/temp-email-for-coupon-sites)

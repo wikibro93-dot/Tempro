@@ -82,3 +82,8 @@ For accounts where you plan to sell multiple items over time, an alias or custom
 ## Bottom Line
 
 Temporary email is an effective privacy layer on Craigslist for one-time buyers and sellers. It protects your main inbox from harvesting, spam, and scams while keeping transactions safe and anonymous.
+
+## Related reading
+
+- [How to Stop Signup Spam Forever With Disposable Inbox Strategy](/blog/stop-signup-spam-with-disposable-inbox-strategy)
+- [Temp Email vs Email Alias: Which Protects Privacy Better?](/blog/temp-email-vs-email-alias)

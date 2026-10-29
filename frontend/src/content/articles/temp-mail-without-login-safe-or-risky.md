@@ -29,6 +29,16 @@ No-login workflows improve speed and reduce exposure of your personal inbox. The
 - [Temporary Email vs Email Alias: Which Is Better for Privacy in 2026?](/blog/temporary-email-vs-email-alias-for-privacy-2026)
 - [Private Domains: Get Your Own Temporary Email](/blog/private-domains-temp-email)
 
+## Where the risk actually comes from
+
+No-login does not mean no-risk, and login does not mean safe. The risks of a no-login inbox are specific, and naming them makes them manageable. First, recovery: without an account, there is usually no "forgot my inbox" path — if you lose the inbox name or it expires, the messages in it are gone. Second, anyone who learns or guesses the inbox address may be able to open it, which is why random or custom names you do not share matter. Third, expiry: a no-login inbox still expires on its schedule, and an account tied to it becomes unrecoverable at that point, exactly as with any temporary inbox.
+
+None of those risks matters much for a coupon code or a trial you will abandon. All of them matter for an account you intend to keep. That is the real safety line, and it has nothing to do with whether you typed a password to create the inbox.
+
+## A no-login routine that stays safe
+
+Use a fresh inbox per signup, give it a custom name tied to the task, and save anything important — codes, links, order numbers — to your notes immediately, not "later." Decide before the inbox expires whether the account behind it is a keeper: if it is, migrate it to a permanent address or an alias while you still can. If it is not, let the inbox expire and enjoy the fact that its marketing mail expires with it. The organizing habit behind that routine is described in [How to Manage Multiple Temporary Emails for Different Websites](/blog/how-to-manage-multiple-temp-emails).
+
 ## Bottom Line
 
 No-login temp email is safe for short, non-critical tasks when used with good hygiene, but it should not replace a more durable inbox for anything you need to keep long term.

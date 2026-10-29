@@ -72,3 +72,9 @@ For a US signup test, check in a dedicated temporary inbox:
 - Verification and recovery: the same five checks as above — verification arrival, link or code use once, expired-link handling, password-reset behavior, and localization — run in a fresh inbox per check.
 
 Keep the same boundaries as any other QA run: do not use temporary inboxes for real customer accounts or production data, do not reuse a test inbox across regression cycles, and record a blocked disposable-domain signup as a policy result, not as a product bug, unless your product is supposed to accept it. Do not use temp mail to test evading a ban or a fraud control.
+
+## Related reading
+
+- [Temporary Email for QA Testing and Account Testing](/blog/temp-email-for-account-testing)
+- [How to Manage Multiple Temporary Emails for Different Websites](/blog/how-to-manage-multiple-temp-emails)
+- [Free Disposable Email With Longer Expiry: What to Check Before You Choose](/blog/free-disposable-email-with-longer-expiry)

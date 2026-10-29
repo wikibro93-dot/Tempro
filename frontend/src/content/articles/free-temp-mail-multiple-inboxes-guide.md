@@ -75,3 +75,9 @@ A simple US split is:
 - US testing and QA: one inbox per test case, as described in the testing guides.
 
 Use US spelling and US date and currency formats in your own notes when you label inboxes, so you can tell at a glance which signup a message belongs to. The same limits apply in the United States as elsewhere: do not use a temporary inbox where you will need password recovery later, for banking or other sensitive accounts, or for an account you cannot afford to lose. If a US service blocks disposable domains, use a permanent address for that signup instead.
+
+## Related reading
+
+- [How to Manage Multiple Temporary Emails for Different Websites](/blog/how-to-manage-multiple-temp-emails)
+- [Temp Mail With Custom Name Free: How It Works and Why It Matters](/blog/free-custom-name-temp-email)
+- [Free Disposable Email With Longer Expiry: What to Check Before You Choose](/blog/free-disposable-email-with-longer-expiry)

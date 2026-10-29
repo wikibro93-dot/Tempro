@@ -67,3 +67,8 @@ If you're building a permanent Discord presence, see [Private Domains: Get Your 
 ## Bottom Line
 
 Temporary email is ideal for quick Discord account testing and privacy-conscious multi-accounting. Once you need an account to persist, move to a stable address before the temporary email expires to ensure uninterrupted access.
+
+## Related reading
+
+- [Temp Mail for Telegram, Discord, and Gaming Accounts](/blog/temp-mail-for-telegram-discord-and-gaming)
+- [Temporary Email for Gaming Accounts: Protect Your Game Library](/blog/temp-email-for-gaming-accounts)
