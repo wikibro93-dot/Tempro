@@ -121,6 +121,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
   const [mobileView, setMobileView] = useState('list'); // 'list' | 'viewer'
   const [searchQuery, setSearchQuery] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
   const [isOfflineContent, setIsOfflineContent] = useState(false);
   const prevCountRef = useRef(messages?.length || 0);
 
@@ -184,6 +185,11 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
         return;
       }
 
+      if (res.status >= 400) {
+        setContentError(res.data?.error || 'Message could not be loaded. Please try again.');
+        return;
+      }
+
       setMessageContent(res.data);
       setIsOfflineContent(false);
       offlineMailbox.saveMessageContent(msg.token, msg.id, res.data);
@@ -240,6 +246,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
   const handleDeleteMessage = async (msg) => {
     if (!msg?.id || !msg?.token) return;
     if (!window.confirm('Delete this message from your disposable inbox?')) return;
+    setDeleteError(null);
     setIsDeleting(true);
     try {
       await axios.delete(`${API_ROOT}/inbox/${msg.token}/${msg.id}`);
@@ -249,6 +256,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
       if (onRetry) onRetry();
     } catch (err) {
       console.warn('Could not delete message:', err);
+      setDeleteError(err.response?.data?.error || 'Could not delete this message. Please try again.');
     } finally {
       setIsDeleting(false);
     }
@@ -488,6 +496,12 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                     </button>
                   </div>
                 </div>
+
+                {deleteError && (
+                  <div className="alert alert-danger mx-3 mt-2 mb-0" role="alert">
+                    {deleteError}
+                  </div>
+                )}
 
                 <div className="inbox-detail-meta small text-secondary">
                   <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">

@@ -132,6 +132,9 @@ const Privacy = () => {
               </div>
             </div>
 
+            <p className="text-muted small mb-4">
+              Note: this list describes what TempMail Pro itself does not collect for advertising or permanent storage. Messages still exist on the mail server until they expire, and infrastructure providers may see connection metadata. See the Privacy Policy for details.
+            </p>
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-header bg-light">
                 <h4 className="mb-0">Your Rights</h4>
@@ -142,13 +145,13 @@ const Privacy = () => {
                   than relying only on account-level settings.
                 </p>
                 <ul>
-                  <li><strong>No Data Collection:</strong> We never had your data to begin with</li>
+                  <li><strong>No Sign-In Required:</strong> The service does not ask you to sign in, and it does not sell or store inbox data for advertising; infrastructure providers may see connection metadata (see Privacy Policy)</li>
                   <li><strong>Immediate Deletion:</strong> Emails expire and are gone forever</li>
                   <li><strong>No Tracking:</strong> We don't monitor or analyze your usage</li>
                   <li><strong>Anonymous Service:</strong> Use our service without any identification</li>
                 </ul>
                 <p>
-                  We also partner with Yesim to offer a privacy-respecting virtual SMS number option for OTP verification,
+                  We also link to Yesim, an affiliate partner and separate service, which offers a privacy-respecting virtual SMS number option for OTP verification,
                   so you can verify accounts without exposing your personal phone number.
                 </p>
                 <p>
@@ -161,8 +164,8 @@ const Privacy = () => {
               <div className="card-body">
                 <h4 className="mb-3">New: Yesim Virtual Number Support</h4>
                 <p className="mb-0">
-                  We also support privacy-conscious virtual number options via Yesim for OTP flows,
-                  helping you avoid exposing your personal phone number when a site requires SMS verification.
+                  We also link to privacy-conscious virtual number options from Yesim, an affiliate partner and separate service, for OTP flows,
+                  helping you avoid exposing your personal phone number when a site requires SMS verification. TempMail Pro itself handles email only; any SMS verification happens in Yesim's own service.
                 </p>
               </div>
             </div>
@@ -172,10 +175,10 @@ const Privacy = () => {
                 <h5>Questions About Privacy?</h5>
                 <p className="text-muted mb-3">
                   Our privacy practices are designed to be transparent and protective by default.
-                  Since we don't collect any data, there are no privacy concerns to address.
+                  Because the service is designed to minimise stored data, most privacy questions are answered by how inboxes expire and are deleted — and infrastructure providers may still see connection metadata, as described above.
                 </p>
                 <p className="text-muted">
-                  <strong>Privacy Guarantee:</strong> We never see, store, or share your information.
+                  <strong>Our Approach:</strong> TempMail Pro does not sell or store inbox data for advertising; messages exist on the mail server until they expire, and infrastructure providers may see connection metadata. See the Privacy Policy for details.
                 </p>
               </div>
             </div>

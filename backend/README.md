@@ -36,7 +36,9 @@ code called it. Do not reintroduce server-side password storage.
 | Mail.tm domains unavailable (domains / create) | `502 { error, }` |
 | User-chosen domain no longer live | `400 { error, availableDomains }` — the backend never silently switches domains |
 | Old `mock_` token | `401` on inbox/content/delete, `EXPIRED` on batch/SSE |
-| Inbox upstream failure (non-401) | `502 { error, code: 'UPSTREAM_ERROR' }` — never an empty `[]` |
+| Inbox upstream failure (non-401) | `502 { error, code: 'UPSTREAM_ERROR' }` — never an empty `[]` for an upstream failure |
+| Missing/empty inbox token | `400 { error, code: 'INVALID_TOKEN' }` — an empty list is never returned, even for a missing token |
+| Message content upstream/timeout failure | `502 { error, code: 'UPSTREAM_ERROR' }`; `404` is only for a genuinely not-found message |
 | Delete upstream failure | `502 { success: false, code: 'UPSTREAM_ERROR' }` — never `success: true` |
 | CORS rejection | `403 { error, code: 'CORS_FORBIDDEN' }` as JSON, not an HTML 500 page |
 | Rate limit exceeded | `429 { error, code: 'RATE_LIMITED' }` |

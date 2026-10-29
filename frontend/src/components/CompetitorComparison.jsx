@@ -28,7 +28,7 @@ const COMPARISON_DATA = [
   },
   {
     feature: 'Flexible Lifetime & Expiry',
-    description: 'Set duration from 10m to 7 days, or custom minutes',
+    description: 'Set duration from presets of 10m to 7 days, or a Custom duration up to 365 days',
     tempMailPro: '10m to 7 Days (Custom)',
     tempMailOrg: 'Fixed duration',
     tenMinuteMail: 'Strict 10 Minutes',

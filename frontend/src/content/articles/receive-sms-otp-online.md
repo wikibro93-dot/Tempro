@@ -34,7 +34,7 @@ Websites often require **OTP verification** for signups. But using your real num
 ---
 
 ### New: Yesim Virtual Number Service
-TempMail Pro now integrates Yesim virtual numbers for a stronger, more private way to receive SMS OTPs.
+Yesim, an affiliate partner and separate service, offers virtual numbers as an optional external way to receive SMS OTPs. It is not part of the TempMail Pro app, which handles email only.
 - Dedicated virtual numbers protect your real phone.
 - Ideal for signups, app verification, and services that require OTP.
 - Keep your personal number private while still completing verification quickly.

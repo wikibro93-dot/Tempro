@@ -192,7 +192,7 @@ app.get('/api/inbox/:token', inboxLimiter, async (req, res) => {
   const token = req.params.token;
 
   if (!token || token === 'undefined' || token === 'null') {
-    return res.json([]);
+    return res.status(400).json({ error: 'Missing or invalid inbox token. Please create a new email address.', code: 'INVALID_TOKEN' });
   }
 
   // Old mock_ tokens from the upgrade period are not real Mail.tm accounts.
@@ -464,11 +464,16 @@ app.get('/api/inbox/content/:token/:messageId', inboxLimiter, async (req, res) =
     if (tmRes.status === 401 || tmRes.status === 403) {
       return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
     }
+
+    if (tmRes.status === 404) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
   } catch (err: any) {
     console.warn('[Backend] Message content fetch error:', err.message);
   }
 
-  return res.status(404).json({ error: 'Message not found' });
+  // Upstream/timeout failure is not a "not found" message.
+  return res.status(502).json({ error: 'Mail.tm message unavailable, please try again.', code: 'UPSTREAM_ERROR' });
 });
 
 // Direct attachment stream proxy

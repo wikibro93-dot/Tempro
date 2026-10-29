@@ -12,14 +12,14 @@ const About = () => {
       iconColor: "text-primary",
       title: "Browser-Generated",
       description:
-        "All temporary email addresses are generated directly in your browser using secure, random algorithms. No server-side generation or storage.",
+        "Temporary email addresses are created through the TempMail Pro service: the address is requested from the mail server, and messages exist on that mail server until the inbox expires. TempMail Pro does not sell or store inbox data for advertising; infrastructure providers may see connection metadata.",
     },
     {
       iconClass: "bi bi-database-x",
       iconColor: "text-danger",
       title: "No Database Storage",
       description:
-        "We don't maintain any databases or permanent storage systems. Temporary email addresses are generated in your browser and only exist briefly on our mail server.",
+        "We do not keep permanent storage of your inboxes. Temporary email addresses exist on the mail server only until they expire, and TempMail Pro does not sell or store inbox data for advertising; infrastructure providers may see connection metadata.",
     },
     {
       iconClass: "bi bi-eye-slash",
@@ -98,8 +98,8 @@ const About = () => {
                   allowing you to access online services that require email verification.
                 </p>
                 <p>
-                  By generating temporary email addresses directly in your browser and maintaining
-                  zero permanent storage, we ensure that your online activities remain private and secure.
+                  By generating temporary email addresses through the service and keeping no permanent storage of your inboxes,
+                  we help keep your online activities more private.
                 </p>
             </SectionCard>
 
@@ -111,8 +111,8 @@ const About = () => {
               <div className="card-body">
                 <h4 className="mb-3">New: Yesim Virtual Number Service</h4>
                 <p>
-                  TempMail Pro now supports Yesim virtual numbers for secure SMS verification.
-                  This privacy-first option helps you receive OTPs without exposing your personal phone number.
+                  Through our affiliate partnership with Yesim, a separate external service, you can explore Yesim virtual numbers as an optional way to receive SMS verification. Yesim is not part of the TempMail Pro app, which handles email only.
+                  This partner option helps you receive OTPs without exposing your personal phone number.
                 </p>
               </div>
             </div>

@@ -66,7 +66,7 @@ const Landing = () => {
         <meta name="twitter:title" content="TempMail Pro – Free Disposable Email Service" />
         <meta
           name="twitter:description"
-          content="Protect your real inbox with free multi-inbox disposable emails. No logs, no sign-in."
+          content="Protect your real inbox with free multi-inbox disposable emails. No sign-in required."
         />
 
         {/* Structured Schema.org JSON-LD for rich Google indexing */}
@@ -78,7 +78,7 @@ const Landing = () => {
                 "@type": "Organization",
                 "name": "TempMail Pro",
                 "url": "https://tempmailpk.com/",
-                "logo": "https://tempmailpk.com/icon-512.png",
+                "logo": "https://tempmailpk.com/pwa-512x512.png",
                 "sameAs": [
                   "https://facebook.com/tempmailpk",
                   "https://x.com/tempmailpk"
@@ -105,7 +105,7 @@ const Landing = () => {
                 "featureList": [
                   "Multi-Inbox Tab System",
                   "Live Domain Selector",
-                  "Custom Expiry Duration (10m to 7 days)",
+                  "Custom Expiry Duration (presets 10m to 7 days; Custom can go longer, up to 365 days)",
                   "Custom Username Creation",
                   "Instant OTP Code Auto-Detection",
                   "No Sign-In Privacy Policy"

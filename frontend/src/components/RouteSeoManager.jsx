@@ -169,7 +169,7 @@ export default function RouteSeoManager() {
         '@type': 'Organization',
         name: SITE_NAME,
         url: SITE_URL,
-        logo: `${SITE_URL}/icon-512.png`,
+        logo: `${SITE_URL}/pwa-512x512.png`,
         sameAs: [
           'https://facebook.com/tempmailpk',
           'https://x.com/tempmailpk',
