@@ -157,8 +157,9 @@ export const sanitizeEmailHtml = (rawHtml) => {
 
   const purifier = getPurifier();
   if (!purifier || typeof purifier.sanitize !== 'function') {
-    // Ultra-safe fallback if purifier instance cannot be loaded
-    return normalized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    // Ultra-safe fallback if purifier instance cannot be loaded: refuse to
+    // render partially-cleaned HTML at all.
+    return '';
   }
 
   configureSecurityHooks(purifier);

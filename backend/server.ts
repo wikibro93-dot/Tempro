@@ -13,10 +13,43 @@ app.use(cors({
     return callback(new Error('Not allowed by CORS'));
   },
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 
-// Real Mail.tm account credentials only (for /api/email/wait). No mock/fallback mailboxes in production.
-const accountCredentials = new Map();
+// Minimal Helmet-like security headers for API responses (no new dependency).
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
+  next();
+});
+
+// Simple in-memory per-IP rate limiting (no new dependency). This is a
+// first layer only; Cloudflare rate limiting should be added as a second
+// layer in production. Entries expire with their window; no IP is logged.
+function rateLimit({ windowMs, max }: { windowMs: number; max: number }) {
+  const hits = new Map<string, { count: number; resetAt: number }>();
+  return (req: any, res: any, next: any) => {
+    const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+    const now = Date.now();
+    const entry = hits.get(ip);
+    if (!entry || now >= entry.resetAt) {
+      hits.set(ip, { count: 1, resetAt: now + windowMs });
+      return next();
+    }
+    entry.count += 1;
+    if (entry.count > max) {
+      return res.status(429).json({ error: 'Too many requests, please try again later.', code: 'RATE_LIMITED' });
+    }
+    return next();
+  };
+}
+const createLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10 }); // create 10/hour/IP
+const batchLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 }); // batch 30/min/IP
+const inboxLimiter = rateLimit({ windowMs: 60 * 1000, max: 60 }); // inbox reads 60/min/IP
+const sseByIp = new Map<string, number>();
+const SSE_PER_IP_MAX = 20;
+const SSE_GLOBAL_MAX = 200;
 
 async function getLiveDomains(): Promise<string[]> {
   try {
@@ -42,13 +75,22 @@ async function getLiveDomains(): Promise<string[]> {
   return [];
 }
 
-// Health check endpoint
+// Health check endpoint (liveness only — does not check Mail.tm)
 app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
     service: 'Temp Mail Pro Unified Backend'
   });
+});
+
+// Readiness endpoint: cheap Mail.tm /domains check. 503 when Mail.tm is down.
+app.get('/ready', async (req, res) => {
+  const domains = await getLiveDomains();
+  if (domains.length === 0) {
+    return res.status(503).json({ status: 'not_ready', error: 'Mail.tm domains unavailable' });
+  }
+  res.json({ status: 'ready', domains: domains.length, timestamp: new Date().toISOString() });
 });
 
 // Domain listing endpoint
@@ -61,7 +103,7 @@ app.get('/api/accounts/domains', async (req, res) => {
 });
 
 // Mailbox creation endpoint
-app.post('/api/accounts/create', async (req, res) => {
+app.post('/api/accounts/create', createLimiter, async (req, res) => {
   const { username: rawUsername, domain: requestedDomain } = req.body || {};
   const liveDomains = await getLiveDomains();
   if (liveDomains.length === 0) {
@@ -122,7 +164,6 @@ app.post('/api/accounts/create', async (req, res) => {
 
         if (tokenRes.ok) {
           const tokenData = await tokenRes.json();
-          accountCredentials.set(address, { password, token: tokenData.token });
 
           return res.json({
             address,
@@ -147,7 +188,7 @@ app.post('/api/accounts/create', async (req, res) => {
 });
 
 // Inbox message list endpoint
-app.get('/api/inbox/:token', async (req, res) => {
+app.get('/api/inbox/:token', inboxLimiter, async (req, res) => {
   const token = req.params.token;
 
   if (!token || token === 'undefined' || token === 'null') {
@@ -194,11 +235,12 @@ app.get('/api/inbox/:token', async (req, res) => {
     console.warn('[Backend] Inbox fetch error:', err.message);
   }
 
-  return res.json([]);
+  // Honest error: a non-401 upstream failure is NOT an empty inbox.
+  return res.status(502).json({ error: 'Mail.tm inbox unavailable, please try again.', code: 'UPSTREAM_ERROR' });
 });
 
 // High-concurrency Batch Processing Layer for multiple inboxes
-app.post('/api/inbox/batch', async (req, res) => {
+app.post('/api/inbox/batch', batchLimiter, async (req, res) => {
   const { tokens } = req.body || {};
   if (!Array.isArray(tokens) || tokens.length === 0) {
     return res.status(400).json({ error: 'Tokens array is required' });
@@ -207,7 +249,7 @@ app.post('/api/inbox/batch', async (req, res) => {
   // Safety cap to prevent memory exhaustion
   const sanitizedTokens = tokens
     .filter((t: any) => typeof t === 'string' && t.trim().length > 0)
-    .slice(0, 150);
+    .slice(0, 20); // batch cap: 20 tokens, not 150
 
   const results: Record<string, any> = {};
   const CONCURRENCY_LIMIT = 8; // Process 8 inboxes concurrently in bounded chunks
@@ -294,6 +336,18 @@ app.get('/api/inbox/stream/:token', async (req, res) => {
   if (!token || token === 'undefined' || token === 'null') {
     return res.status(400).end();
   }
+  const sseIp = req.ip || req.socket?.remoteAddress || 'unknown';
+  const sseCount = sseByIp.get(sseIp) || 0;
+  let sseTotal = 0;
+  sseByIp.forEach((n) => { sseTotal += n; });
+  if (sseCount >= SSE_PER_IP_MAX || sseTotal >= SSE_GLOBAL_MAX) {
+    return res.status(429).json({ error: 'Too many live streams, please try again later.', code: 'RATE_LIMITED' });
+  }
+  sseByIp.set(sseIp, sseCount + 1);
+  const releaseSse = () => {
+    const n = sseByIp.get(sseIp) || 0;
+    if (n <= 1) sseByIp.delete(sseIp); else sseByIp.set(sseIp, n - 1);
+  };
 
   // Set SSE headers
   res.setHeader('Content-Type', 'text/event-stream');
@@ -368,12 +422,13 @@ app.get('/api/inbox/stream/:token', async (req, res) => {
     isClosed = true;
     clearInterval(pollTimer);
     clearInterval(keepAliveTimer);
+    releaseSse();
   });
 });
 
 
 // Message detail & full content endpoint
-app.get('/api/inbox/content/:token/:messageId', async (req, res) => {
+app.get('/api/inbox/content/:token/:messageId', inboxLimiter, async (req, res) => {
   const { token, messageId } = req.params;
 
   if (!token || !messageId) {
@@ -434,13 +489,13 @@ app.get('/api/inbox/attachment/:token/:messageId/:attachmentId', async (req, res
     }
 
     if (fileRes.ok) {
-      const contentType = fileRes.headers.get('content-type') || 'application/octet-stream';
-      const contentDisposition = fileRes.headers.get('content-disposition');
-
-      res.setHeader('Content-Type', contentType);
-      if (contentDisposition) {
-        res.setHeader('Content-Disposition', contentDisposition);
-      }
+      // Never forward upstream headers verbatim: force download and never
+      // serve upstream HTML inline (that would be an XSS vector).
+      const upstreamType = fileRes.headers.get('content-type') || 'application/octet-stream';
+      const safeType = upstreamType.startsWith('text/html') ? 'application/octet-stream' : upstreamType;
+      const safeName = `attachment-${String(messageId).replace(/[^A-Za-z0-9._-]/g, '')}-${String(attachmentId).replace(/[^A-Za-z0-9._-]/g, '')}`;
+      res.setHeader('Content-Type', safeType);
+      res.setHeader('Content-Disposition', `attachment; filename="${safeName}"`);
 
       const buffer = await fileRes.arrayBuffer();
       return res.send(Buffer.from(buffer));
@@ -499,48 +554,30 @@ app.delete('/api/inbox/:token/:messageId', async (req, res) => {
     console.warn('[Backend] Delete error:', err.message);
   }
 
-  return res.json({ success: true, messageId });
+  // Honest error: never report success when the Mail.tm delete did not succeed.
+  return res.status(502).json({ success: false, error: 'Could not delete message, please try again.', code: 'UPSTREAM_ERROR', messageId });
 });
 
-// Long polling wait endpoint
-app.get('/api/email/wait', async (req, res) => {
-  const { address, timeout = 30 } = req.query;
-  const timeoutMs = Math.min(Number(timeout) || 30, 60) * 1000;
-  const startTime = Date.now();
-
-  const creds = accountCredentials.get(address as string);
-  if (!creds?.token) {
-    return res.json({ status: 'no_account_token', messages: [] });
+// CORS rejections (and other errors) must be JSON, not Express HTML 500 pages.
+app.use((err: any, req: any, res: any, next: any) => {
+  if (err && err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ error: 'Origin not allowed by CORS.', code: 'CORS_FORBIDDEN' });
   }
-
-  while (Date.now() - startTime < timeoutMs) {
-    try {
-      const tmRes = await fetch(`${MAIL_TM_API_BASE}/messages`, {
-        headers: {
-          Authorization: `Bearer ${creds.token}`,
-          Accept: 'application/json'
-        },
-        signal: AbortSignal.timeout(5000)
-      });
-      if (tmRes.ok) {
-        const data = await tmRes.json();
-        const list = data['hydra:member'] || data || [];
-        if (list.length > 0) {
-          return res.json({ status: 'received', count: list.length, messages: list });
-        }
-      }
-    } catch (_) {}
-
-    await new Promise(r => setTimeout(r, 3000));
-  }
-
-  return res.json({ status: 'timeout', messages: [] });
+  return res.status(500).json({ error: 'Internal server error.', code: 'INTERNAL' });
 });
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[TempMail Pro Backend] Running on http://0.0.0.0:${PORT}`);
 });
+
+function shutdown(signal: string) {
+  console.log(`[TempMail Pro Backend] ${signal} received, shutting down.`);
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(0), 5000).unref();
+}
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

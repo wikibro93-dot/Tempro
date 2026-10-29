@@ -15,9 +15,9 @@ import AppIcon from "./AppIcon";
 import batchInboxManager from "../utils/batchInboxManager";
 import offlineMailbox from "../utils/offlineMailbox";
 
-const RAW_API_BASE = import.meta.env.VITE_API_BASE || '';
-const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
-const API_ROOT = API_BASE ? `${API_BASE}/api` : '/api';
+import { getApiRoot } from '../utils/apiRoot.js';
+
+const API_ROOT = getApiRoot();
 
 const DURATIONS = {
   "10min": 10 * 60 * 1000,
@@ -622,6 +622,11 @@ function TempMailApp({ onEmailCopied }) {
                     <span>This email has expired. Use <strong>+ New</strong> to generate a fresh address.</span>
                   </div>
                 )}
+
+                <div className="alert alert-warning d-flex align-items-center gap-2 mb-2 py-2 px-3 small" role="note">
+                  <AppIcon iconClass="bi bi-exclamation-triangle-fill text-warning" />
+                  <span>Keep this inbox private: anyone with access to this inbox can read its messages. Do not share screenshots or links that expose it.</span>
+                </div>
 
                 <AccountManager
                   account={account}

@@ -122,12 +122,37 @@ function renderSimpleMarkdown(markdown) {
   return htmlParts.join('\n');
 }
 
-export function buildStaticBlogPageHtml(article, siteUrl) {
+function pickRelatedArticles(target, allArticles) {
+  if (!Array.isArray(allArticles) || allArticles.length === 0) return [];
+  const targetItem = allArticles.find((a) => a.slug === target.slug) || target;
+  const scored = allArticles
+    .filter((a) => a.slug !== target.slug)
+    .map((a) => {
+      let score = 0;
+      if (a.category && targetItem.category && a.category === targetItem.category) score += 3;
+      const t1 = new Set(targetItem.tags || []);
+      score += (a.tags || []).filter((tag) => t1.has(tag)).length * 2;
+      return { article: a, score };
+    })
+    .sort((x, y) => y.score - x.score || new Date(y.article.date || 0) - new Date(x.article.date || 0));
+  const picked = scored.filter((s) => s.score > 0).slice(0, 3).map((s) => s.article);
+  if (picked.length < 3) {
+    const rest = scored.filter((s) => !picked.some((p) => p.slug === s.article.slug)).slice(0, 3 - picked.length).map((s) => s.article);
+    picked.push(...rest);
+  }
+  return picked;
+}
+
+export function buildStaticBlogPageHtml(article, siteUrl, allArticles = []) {
   const canonicalUrl = `${siteUrl}/blog/${article.slug}`;
   const title = article.title || article.slug.replace(/-/g, ' ');
   const description = article.description || 'Learn how disposable temporary emails protect your privacy, security, and spam-free workflows.';
   const datePublished = article.date || new Date().toISOString().split('T')[0];
   const bodyHtml = renderSimpleMarkdown(article.content || '');
+  const related = pickRelatedArticles(article, allArticles);
+  const relatedHtml = related.length
+    ? `<section><h2>Related guides</h2><ul>${related.map((a) => `<li><a href="/blog/${escapeHtml(a.slug)}">${escapeHtml(a.title || a.slug)}</a></li>`).join('')}</ul><p><a href="/blog">All guides</a> · <a href="/app">Open the TempMail Pro app</a></p></section>`
+    : `<p><a href="/blog">All guides</a> · <a href="/app">Open the TempMail Pro app</a></p>`;
   const metaImage = `${siteUrl}/pwa-512x512.png`;
 
   const structuredData = {
@@ -247,6 +272,7 @@ ${JSON.stringify(structuredData, null, 2)}
         <p class="lead">${escapeHtml(description)}</p>
         <div class="meta-tag">Published on ${datePublished} by TempMail Pro Team</div>
         <article>${bodyHtml}</article>
+        ${relatedHtml}
 
         <div class="cta-box">
           <h3>Need a Free Temporary Email Address Right Now?</h3>

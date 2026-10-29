@@ -2,54 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://tempmailpk.com/app</loc>
-    <lastmod>2026-10-28</lastmod>
+    <lastmod>2026-10-29</lastmod>
     <changefreq>hourly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/app" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/app" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/</loc>
-    <lastmod>2026-10-28</lastmod>
+    <lastmod>2026-10-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog</loc>
-    <lastmod>2026-10-28</lastmod>
+    <lastmod>2026-10-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/privacy-stack</loc>
-    <lastmod>2026-10-28</lastmod>
+    <lastmod>2026-10-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/privacy-stack" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/privacy-stack" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/about</loc>
@@ -58,10 +41,6 @@
     <priority>0.75</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/about" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/about" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/privacy</loc>
@@ -70,10 +49,6 @@
     <priority>0.75</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/privacy" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/privacy" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/best-free-temporary-email-for-days-and-weeks</loc>
@@ -82,10 +57,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/best-free-temporary-email-for-days-and-weeks" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/best-free-temporary-email-for-days-and-weeks" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/free-custom-name-temp-email</loc>
@@ -94,10 +65,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/free-custom-name-temp-email" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/free-custom-name-temp-email" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/free-temp-mail-multiple-inboxes-guide</loc>
@@ -106,10 +73,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/free-temp-mail-multiple-inboxes-guide" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/free-temp-mail-multiple-inboxes-guide" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/ten-minute-mail-vs-long-duration-temp-mail</loc>
@@ -118,10 +81,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/ten-minute-mail-vs-long-duration-temp-mail" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/ten-minute-mail-vs-long-duration-temp-mail" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-mail-without-login-safe-or-risky</loc>
@@ -130,10 +89,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-mail-without-login-safe-or-risky" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-mail-without-login-safe-or-risky" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/best-temp-email-for-free-trials-no-spam-2026</loc>
@@ -142,10 +97,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/best-temp-email-for-free-trials-no-spam-2026" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/best-temp-email-for-free-trials-no-spam-2026" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-online-shopping-without-spam-2026</loc>
@@ -154,10 +105,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-for-online-shopping-without-spam-2026" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-for-online-shopping-without-spam-2026" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-mail-for-qa-and-account-testing-teams</loc>
@@ -166,10 +113,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-mail-for-qa-and-account-testing-teams" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-mail-for-qa-and-account-testing-teams" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/burner-email-social-media-signups-guide</loc>
@@ -178,10 +121,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/burner-email-social-media-signups-guide" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/burner-email-social-media-signups-guide" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/free-disposable-email-with-longer-expiry</loc>
@@ -190,10 +129,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/free-disposable-email-with-longer-expiry" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/free-disposable-email-with-longer-expiry" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-mail-for-telegram-discord-and-gaming</loc>
@@ -202,10 +137,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-mail-for-telegram-discord-and-gaming" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-mail-for-telegram-discord-and-gaming" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/why-temp-mail-services-limit-to-10-minutes</loc>
@@ -214,10 +145,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/why-temp-mail-services-limit-to-10-minutes" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/why-temp-mail-services-limit-to-10-minutes" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/best-temp-mail-alternatives-that-actually-last</loc>
@@ -226,10 +153,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/best-temp-mail-alternatives-that-actually-last" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/best-temp-mail-alternatives-that-actually-last" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/how-to-manage-multiple-temp-emails</loc>
@@ -238,10 +161,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/how-to-manage-multiple-temp-emails" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/how-to-manage-multiple-temp-emails" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temporary-email-vs-email-alias-for-privacy-2026</loc>
@@ -250,10 +169,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temporary-email-vs-email-alias-for-privacy-2026" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temporary-email-vs-email-alias-for-privacy-2026" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/free-temp-email-for-job-boards-guide</loc>
@@ -262,10 +177,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/free-temp-email-for-job-boards-guide" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/free-temp-email-for-job-boards-guide" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/is-free-temp-mail-legal</loc>
@@ -274,10 +185,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/is-free-temp-mail-legal" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/is-free-temp-mail-legal" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/stop-signup-spam-with-disposable-inbox-strategy</loc>
@@ -286,10 +193,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/stop-signup-spam-with-disposable-inbox-strategy" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/stop-signup-spam-with-disposable-inbox-strategy" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/free-temp-mail-for-students-and-developers</loc>
@@ -298,10 +201,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/free-temp-mail-for-students-and-developers" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/free-temp-mail-for-students-and-developers" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/how-to-choose-temporary-email-service-checklist</loc>
@@ -310,10 +209,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/how-to-choose-temporary-email-service-checklist" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/how-to-choose-temporary-email-service-checklist" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/how-to-use-temp-email-for-free-trials</loc>
@@ -322,10 +217,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/how-to-use-temp-email-for-free-trials" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/how-to-use-temp-email-for-free-trials" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-discord</loc>
@@ -334,10 +225,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-for-discord" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-for-discord" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-vs-email-alias</loc>
@@ -346,10 +233,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-vs-email-alias" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-vs-email-alias" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-craigslist</loc>
@@ -358,10 +241,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-for-craigslist" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-for-craigslist" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/why-websites-block-disposable-email</loc>
@@ -370,10 +249,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/why-websites-block-disposable-email" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/why-websites-block-disposable-email" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-job-applications</loc>
@@ -382,10 +257,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-for-job-applications" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-for-job-applications" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-online-shopping</loc>
@@ -394,10 +265,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-for-online-shopping" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-for-online-shopping" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/burner-email-for-social-media</loc>
@@ -406,10 +273,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/burner-email-for-social-media" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/burner-email-for-social-media" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-coupon-sites</loc>
@@ -418,10 +281,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-for-coupon-sites" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-for-coupon-sites" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-account-testing</loc>
@@ -430,10 +289,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-for-account-testing" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-for-account-testing" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-dating-apps</loc>
@@ -442,10 +297,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-for-dating-apps" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-for-dating-apps" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-gaming-accounts</loc>
@@ -454,10 +305,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-for-gaming-accounts" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-for-gaming-accounts" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-newsletters</loc>
@@ -466,10 +313,6 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/temp-email-for-newsletters" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/temp-email-for-newsletters" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/private-domains-temp-email</loc>
@@ -478,10 +321,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/private-domains-temp-email" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/private-domains-temp-email" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/receive-sms-otp-online</loc>
@@ -490,10 +329,6 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/receive-sms-otp-online" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/receive-sms-otp-online" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://tempmailpk.com/blog/tech-behind-disposable-emails</loc>
@@ -502,9 +337,5 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/blog/tech-behind-disposable-emails" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/blog/tech-behind-disposable-emails" />
-    <image:image>
-      <image:loc>https://tempmailpk.com/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>
 </urlset>

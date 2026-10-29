@@ -40,7 +40,7 @@ const escapeXml = (str) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
 
-const rssItems = articles.slice(0, 30).map((article) => {
+const rssItems = articles.map((article) => {
   const pubDate = article.date ? new Date(article.date).toUTCString() : new Date().toUTCString();
   const link = `${SITE_URL}/blog/${article.slug}`;
   return `    <item>

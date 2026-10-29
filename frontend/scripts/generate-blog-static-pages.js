@@ -3,6 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { articles as allArticles } from '../src/content/articlesData.js';
 import {
   buildStaticBlogPageHtml,
   getMarkdownFiles,
@@ -26,7 +27,7 @@ for (const filePath of markdownFiles) {
   const htmlPath = path.join(pageDir, 'index.html');
 
   fs.mkdirSync(pageDir, { recursive: true });
-  fs.writeFileSync(htmlPath, buildStaticBlogPageHtml(article, 'https://tempmailpk.com'));
+  fs.writeFileSync(htmlPath, buildStaticBlogPageHtml(article, 'https://tempmailpk.com', allArticles));
 }
 
 console.log(`✓ Generated static blog pages: ${markdownFiles.length}`);

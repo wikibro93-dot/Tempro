@@ -31,3 +31,34 @@ Many users test services across several websites in one day. A single inbox quic
 ## Bottom Line
 
 Free multi-inbox temp mail is a strong advantage because it keeps your workflow organized while maintaining privacy.
+
+## How to use multiple inboxes, step by step
+
+1. Open TempMail Pro and generate your first temporary address. No sign-in is required.
+2. Open the multi-inbox workspace and add a second inbox for a different purpose, for example one for trials and one for shopping.
+3. Name each inbox by what it is for, so you can tell at a glance which signup a message belongs to.
+4. When a verification message arrives, open that inbox only. Do not mix messages from different signups in one inbox.
+5. When you are done with a purpose, delete that inbox and generate a fresh one for the next purpose.
+
+## Expiry choices in TempMail Pro
+
+TempMail Pro offers 10 minutes, 1 hour, 24 hours, 7 days, or a custom duration. Match the expiry to the job: 10 minutes is enough for a quick code, 1 hour suits a short signup, 24 hours suits a trial that sends a follow-up, and 7 days suits a multi-day test. A custom duration is for anything in between. Do not pick 7 days by default for a 10-minute job, because a longer-lived inbox stays discoverable for longer.
+
+## Organising inboxes by purpose
+
+A simple, workable split is:
+
+- Trials: one inbox per trial, so cancellation and renewal emails do not mix.
+- Shopping and coupons: one inbox, so promo mail stays out of your real inbox.
+- Testing and QA: one inbox per test case, so verification, password-reset, and localisation checks stay separate.
+- Communities and gaming: one inbox, kept away from accounts you care about.
+
+If you use more than a handful of inboxes at once, write down which inbox was used where, in your own notes, outside the temporary inbox itself. Temporary inboxes are not a safe place to store that record.
+
+## Limitations you should know
+
+- Temporary inboxes are not permanent accounts. Do not use them where you will need password recovery later.
+- Do not use them for banking, government, medical, or other sensitive accounts.
+- Some websites block disposable email domains. If a signup matters long term, use a permanent address you control.
+- Anyone who can open an inbox can read its messages, so keep your inboxes private and do not share screenshots of them.
+- When an inbox expires, its messages are treated as unrecoverable. Save any confirmation link or code you still need before expiry.

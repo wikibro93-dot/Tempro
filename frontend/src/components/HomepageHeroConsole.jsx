@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AppIcon from './AppIcon';
+import { getApiRoot } from '../utils/apiRoot.js';
 
-const API_ROOT = '/api';
+const API_ROOT = getApiRoot();
 
 const HomepageHeroConsole = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const HomepageHeroConsole = () => {
   const [domainsLoaded, setDomainsLoaded] = useState(false);
   const [customUser, setCustomUser] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [heroError, setHeroError] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
   const [inboxCount, setInboxCount] = useState(0);
@@ -75,6 +77,7 @@ const HomepageHeroConsole = () => {
     if (isCreatingRef.current) return;
     isCreatingRef.current = true;
     setIsCreating(true);
+    setHeroError('');
 
     try {
       const domain = opts.domain || (availableDomains.includes(selectedDomain) ? selectedDomain : null);
@@ -123,6 +126,7 @@ const HomepageHeroConsole = () => {
       setShowCustomize(false);
     } catch (err) {
       console.warn('Hero account generation fallback:', err);
+      setHeroError(err?.response?.data?.error || 'Could not create a real temporary email. The backend could not be reached or Mail.tm is unavailable right now — please try again.');
       const freshDomains = err?.response?.data?.availableDomains;
       if (Array.isArray(freshDomains) && freshDomains.length > 0) {
         setAvailableDomains(freshDomains);
@@ -215,6 +219,15 @@ const HomepageHeroConsole = () => {
               </button>
             </div>
           </div>
+
+          {heroError && (
+            <div className="alert alert-danger text-start small mb-3" role="alert">
+              {heroError}
+            </div>
+          )}
+          <p className="small text-muted text-start mb-3">
+            Keep this inbox private — anyone who can open it can read its messages. Do not share it.
+          </p>
 
           {/* Secondary Controls: Domain & Username Toggle */}
           <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">

@@ -1,6 +1,8 @@
 // components/SideEffectFix.jsx
 import React, { useEffect, useState } from 'react';
 
+import { getApiRoot } from '../utils/apiRoot.js';
+
 const SideEffectFix = () => {
   const [data, setData] = useState(null);
 
@@ -13,7 +15,7 @@ const SideEffectFix = () => {
   const fetchData = async () => {
     // Your data fetching logic here
     try {
-      const response = await fetch('/api/data');
+      const response = await fetch(`${getApiRoot()}/data`);
       const result = await response.json();
       setData(result);
     } catch (error) {

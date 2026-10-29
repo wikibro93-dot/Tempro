@@ -91,7 +91,6 @@ export function generateDynamicSitemap(siteUrl = SITE_URL) {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 `;
 
   const xmlBody = allPages
@@ -103,10 +102,6 @@ export function generateDynamicSitemap(siteUrl = SITE_URL) {
     <priority>${page.priority}</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="${page.url}" />
     <xhtml:link rel="alternate" hreflang="en" href="${page.url}" />
-    <image:image>
-      <image:loc>${siteUrl}/pwa-512x512.png</image:loc>
-      <image:title>TempMail Pro Free Disposable Temporary Email</image:title>
-    </image:image>
   </url>`;
     })
     .join('\n');

@@ -63,3 +63,34 @@ Many free trials are attached to store discounts, limited launches, and flash-sa
 ## Bottom Line
 
 Temporary email is one of the easiest ways to test products without giving marketers long-term access to your main inbox. Used properly, it helps you stay focused on the trial itself rather than cleaning up the aftermath.
+
+## Step-by-step: a low-risk free-trial signup
+
+1. Before you sign up, check what the trial actually needs: just an email, or also a payment method and a cancellation step.
+2. Generate a temporary inbox in TempMail Pro and use it for the trial signup only.
+3. Open the temporary inbox, find the verification email, and complete activation.
+4. Save the trial end date and the cancellation steps in your own notes, not only in the temporary inbox.
+5. If you decide to keep the service, move it to a permanent address you control before the temporary inbox expires.
+6. If you decide not to keep it, cancel the trial through the service itself, then let the temporary inbox expire.
+
+## Choosing an expiry for a trial
+
+| Trial length | Sensible TempMail Pro expiry |
+| --- | --- |
+| A quick demo or download | 10 minutes to 1 hour |
+| A 7-day trial with email follow-ups | 24 hours to 7 days, depending on how long you need its messages |
+| A multi-week evaluation | 7 days, or a custom duration, with a note to move to a permanent address if you keep it |
+
+The expiry table above is a guide, not a promise that a service will accept a temporary address. Some services block disposable domains, and that is their policy choice.
+
+## Free-trial checklist
+
+- [ ] Trial end date and cancellation path saved outside the temporary inbox.
+- [ ] Verification email received and activation completed.
+- [ ] Any discount or coupon code from the trial saved separately.
+- [ ] Decision recorded: keep (move to a permanent address) or cancel (cancel in the service, then let the inbox expire).
+- [ ] No payment, recovery, or long-term account tied to the temporary address.
+
+## What temp mail cannot do for trials
+
+Temp mail does not make a trial free if the service requires payment, does not bypass a service's rules, and does not recover an account after the inbox expires. If a trial is for an account you will rely on, use a permanent address from the start. Temp mail is for low-risk evaluation, not for accounts you cannot afford to lose.

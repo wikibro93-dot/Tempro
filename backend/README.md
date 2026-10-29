@@ -20,13 +20,49 @@ Health check: `GET http://localhost:10000/health`
 See `.env.example`. `CORS_ORIGIN` is a comma-separated allowlist. Do not set it
 to `*` in production.
 
-## State warning
+## State
 
-Inbox and account state is still held in in-memory Maps in `server.ts`. That is
-fine for a single long-lived instance, but it is lost on restart or if the
-service scales to more than one instance. The next production step is to move
-that state to Redis (or a database) with expiry matching inbox expiry. Do not
-claim this backend is restart-safe until that move is done.
+Main flows are stateless: inbox, batch, SSE, content, attachment, download
+and delete all use the Mail.tm token supplied by the client, so a backend
+restart or a second instance does not lose mail. The former
+`GET /api/email/wait` endpoint and its in-memory `accountCredentials` Map
+(which stored plaintext Mail.tm passwords) were removed because no frontend
+code called it. Do not reintroduce server-side password storage.
+
+## API error contract
+
+| Case | Response |
+| --- | --- |
+| Mail.tm domains unavailable (domains / create) | `502 { error, }` |
+| User-chosen domain no longer live | `400 { error, availableDomains }` — the backend never silently switches domains |
+| Old `mock_` token | `401` on inbox/content/delete, `EXPIRED` on batch/SSE |
+| Inbox upstream failure (non-401) | `502 { error, code: 'UPSTREAM_ERROR' }` — never an empty `[]` |
+| Delete upstream failure | `502 { success: false, code: 'UPSTREAM_ERROR' }` — never `success: true` |
+| CORS rejection | `403 { error, code: 'CORS_FORBIDDEN' }` as JSON, not an HTML 500 page |
+| Rate limit exceeded | `429 { error, code: 'RATE_LIMITED' }` |
+
+## Rate limits (per IP, in-memory, first layer only)
+
+Create 10/hour, batch 30/minute, inbox reads 60/minute, SSE 20 concurrent
+per IP (200 global). Batch is capped at 20 tokens. Add Cloudflare rate
+limiting as a second layer in production. CORS is not an abuse control.
+
+## Endpoints
+
+`GET /health` is liveness only. `GET /ready` does a cheap Mail.tm `/domains`
+check and returns 503 when Mail.tm is down — use `/ready` for uptime checks.
+
+## Checks
+
+```bash
+npm run check      # runs the shared contract checks in ../frontend/scripts/check-contracts.js
+```
+
+## Known limitation
+
+SSE tokens stay in the URL path because `EventSource` cannot send
+`Authorization` headers. The frontend warns users to keep an inbox private.
+Do not log token-bearing URLs.
 
 ## Deploy (later, not done yet)
 

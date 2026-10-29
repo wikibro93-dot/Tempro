@@ -87,7 +87,7 @@ const Landing = () => {
                   "@type": "ContactPoint",
                   "email": "support@tempmailpk.com",
                   "contactType": "customer service",
-                  "availableLanguage": ["English", "Urdu"]
+                  "availableLanguage": ["English"]
                 }
               },
               {
@@ -111,35 +111,7 @@ const Landing = () => {
                   "Zero Logs Privacy Policy"
                 ]
               },
-              {
-                "@type": "FAQPage",
-                "mainEntity": [
-                  {
-                    "@type": "Question",
-                    "name": "What is TempMail Pro?",
-                    "acceptedAnswer": {
-                      "@type": "Answer",
-                      "text": "TempMail Pro is a free disposable temporary email service that allows you to receive incoming messages, confirmation links, and OTP codes without exposing your personal email address."
-                    }
-                  },
-                  {
-                    "@type": "Question",
-                    "name": "How does Multi-Inbox work on TempMail Pro?",
-                    "acceptedAnswer": {
-                      "@type": "Answer",
-                      "text": "Unlike competitors that charge monthly subscriptions, TempMail Pro allows you to generate and switch between multiple active inboxes simultaneously 100% free."
-                    }
-                  },
-                  {
-                    "@type": "Question",
-                    "name": "How long do temporary emails stay active?",
-                    "acceptedAnswer": {
-                      "@type": "Answer",
-                      "text": "You can select your preferred lifespan: 10 minutes, 1 hour, 24 hours, 7 days, or specify custom minutes and days."
-                    }
-                  }
-                ]
-              }
+
             ]
           })}
         </script>

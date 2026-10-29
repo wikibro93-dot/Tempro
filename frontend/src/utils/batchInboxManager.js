@@ -4,6 +4,8 @@
  * and uses non-blocking scheduler to ensure 60fps UI responsiveness even with 100+ inboxes.
  */
 
+import { getApiRoot } from './apiRoot.js';
+
 class BatchInboxManager {
   constructor() {
     this.inFlightPromise = null;
@@ -46,7 +48,7 @@ class BatchInboxManager {
     }
 
     // Split into chunks of 40 to avoid oversized HTTP bodies
-    const CHUNK_SIZE = 40;
+    const CHUNK_SIZE = 20; // matches backend batch cap
     const chunks = [];
     for (let i = 0; i < neededTokens.length; i += CHUNK_SIZE) {
       chunks.push(neededTokens.slice(i, i + CHUNK_SIZE));
@@ -57,8 +59,7 @@ class BatchInboxManager {
     await Promise.allSettled(
       chunks.map(async (chunk) => {
         try {
-          const rawBase = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? String(import.meta.env.VITE_API_BASE).replace(/\/+$/, '') : '';
-          const apiRoot = rawBase ? `${rawBase}/api` : '/api';
+          const apiRoot = getApiRoot();
           const res = await fetch(`${apiRoot}/inbox/batch`, {
             method: 'POST',
             headers: {

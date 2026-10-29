@@ -140,11 +140,12 @@ export default function RouteSeoManager() {
       }
     }
 
-    // 3. Fallback / 404 Route
+    // 3. Fallback / 404 Route — a 404 must have NO canonical (canonicalising
+    // a 404 to the homepage confuses indexing).
     return {
       title: 'Page Not Found (404) | TempMail Pro',
       description: 'The requested page could not be found. Return to TempMail Pro for free disposable temporary email addresses and multi-inbox management.',
-      canonical: `${SITE_URL}/`,
+      canonical: undefined,
       ogType: 'website',
       is404: true,
     };
@@ -177,7 +178,7 @@ export default function RouteSeoManager() {
           '@type': 'ContactPoint',
           email: 'support@tempmailpk.com',
           contactType: 'customer service',
-          availableLanguage: ['English', 'Urdu'],
+          availableLanguage: ['English'],
         },
       },
     ];
@@ -223,7 +224,7 @@ export default function RouteSeoManager() {
       {/* Primary HTML Meta Tags */}
       <title>{title}</title>
       <meta name="description" content={description} />
-      <link rel="canonical" href={canonical} />
+      {canonical && <link rel="canonical" href={canonical} />}
 
       {/* Robots Directive */}
       {is404 ? (
@@ -238,7 +239,7 @@ export default function RouteSeoManager() {
       {/* OpenGraph / Facebook */}
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:type" content={ogType || 'website'} />
-      <meta property="og:url" content={canonical} />
+      {canonical && <meta property="og:url" content={canonical} />}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={DEFAULT_IMAGE} />
@@ -246,7 +247,7 @@ export default function RouteSeoManager() {
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:site" content="@tempmailpk" />
-      <meta name="twitter:url" content={canonical} />
+      {canonical && <meta name="twitter:url" content={canonical} />}
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={DEFAULT_IMAGE} />

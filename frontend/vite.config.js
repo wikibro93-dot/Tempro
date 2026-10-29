@@ -88,18 +88,10 @@ export default defineConfig({
             },
           },
           {
+            // Mail content must never be served stale for 7 days: network only.
+            // Offline reading still works via the app's localStorage cache.
             urlPattern: /\/api\/inbox\/content\/.*/i,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'api-content-cache',
-              expiration: {
-                maxEntries: 150,
-                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
+            handler: 'NetworkOnly',
           },
           {
             urlPattern: /\/api\/(inbox|accounts)\/.*/i,
@@ -108,8 +100,8 @@ export default defineConfig({
               cacheName: 'api-mailbox-cache',
               networkTimeoutSeconds: 3,
               expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 5, // 5 minutes, not 7 days
               },
               cacheableResponse: {
                 statuses: [0, 200],

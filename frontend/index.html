@@ -5,63 +5,6 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
     
-    <!-- AI Studio Dev Environment: Suppress Vite HMR WebSocket connection errors (HMR disabled in cloud container) -->
-    <script>
-      (function() {
-        if (typeof window === 'undefined') return;
-        if (window.WebSocket) {
-          const OrigWS = window.WebSocket;
-          const MockViteWS = function(url, protocols) {
-            if (protocols === 'vite-hmr' || (typeof url === 'string' && url.includes('vite-hmr'))) {
-              const target = new EventTarget();
-              const wsObj = {
-                url: String(url),
-                protocol: 'vite-hmr',
-                readyState: 1, // WebSocket.OPEN
-                CONNECTING: 0,
-                OPEN: 1,
-                CLOSING: 2,
-                CLOSED: 3,
-                send: function() {},
-                close: function() { wsObj.readyState = 3; },
-                addEventListener: target.addEventListener.bind(target),
-                removeEventListener: target.removeEventListener.bind(target),
-                dispatchEvent: target.dispatchEvent.bind(target),
-                set onopen(fn) { if (typeof fn === 'function') setTimeout(fn, 0); },
-                set onmessage(fn) {},
-                set onerror(fn) {},
-                set onclose(fn) {},
-                get onopen() { return null; },
-                get onmessage() { return null; },
-                get onerror() { return null; },
-                get onclose() { return null; }
-              };
-              setTimeout(() => {
-                try {
-                  target.dispatchEvent(new Event('open'));
-                } catch (_) {}
-              }, 0);
-              return wsObj;
-            }
-            return new OrigWS(url, protocols);
-          };
-          MockViteWS.prototype = OrigWS.prototype;
-          MockViteWS.CONNECTING = 0;
-          MockViteWS.OPEN = 1;
-          MockViteWS.CLOSING = 2;
-          MockViteWS.CLOSED = 3;
-          window.WebSocket = MockViteWS;
-        }
-
-        window.addEventListener('error', function(e) {
-          if (e && e.message && (e.message.includes('WebSocket') || e.message.includes('vite'))) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            return true;
-          }
-        }, true);
-      })();
-    </script>
     
     <!-- DNS & Preconnect Optimization for Sub-Second Mobile LCP -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -128,7 +71,7 @@
           "browserRequirements": "Requires JavaScript. Requires HTML5.",
           "featureList": [
             "Multi-Inbox Management (run parallel disposable addresses)",
-            "Live Domain Selector (@maxxspace.com, @uberip.com)",
+            "Live Domain Selector (live domains offered by Mail.tm at the time of use)",
             "Instant OTP Verification Code Auto-Detection with 1-Click Copy",
             "Custom Lifespan & Expiry Countdown (10m to 7 Days)",
             "Custom Username Selection",
@@ -429,7 +372,7 @@
           Generate anonymous temporary email addresses instantly with multi-inbox management, custom duration options, and instant OTP verification delivery. No registration or credit card required.
         </p>
         <p class="seo-fallback-text">
-          TempMail Pro protects your personal privacy and eliminates email spam. When testing apps, registering for free trials, or buying from one-off websites, use disposable inboxes with custom domains (@maxxspace.com) and automatic expiry timers from 10 minutes to 7 days.
+          TempMail Pro protects your personal privacy and eliminates email spam. When testing apps, registering for free trials, or buying from one-off websites, use disposable inboxes with live domains offered by Mail.tm at the time of use and automatic expiry timers from 10 minutes to 7 days.
         </p>
         <p class="seo-fallback-nav">
           Quick access: <a href="/app">Launch App</a> |

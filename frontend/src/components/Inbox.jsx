@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
+import { getApiRoot } from '../utils/apiRoot.js';
 import axios from 'axios';
 import { List } from 'react-window';
 import AppIcon from './AppIcon';
@@ -123,9 +124,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
   const [isOfflineContent, setIsOfflineContent] = useState(false);
   const prevCountRef = useRef(messages?.length || 0);
 
-  const RAW_API_BASE = import.meta.env.VITE_API_BASE || '';
-  const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
-  const API_ROOT = API_BASE ? `${API_BASE}/api` : '/api';
+  const API_ROOT = getApiRoot();
 
   // Sound and dynamic tab title notification on new message
   useEffect(() => {

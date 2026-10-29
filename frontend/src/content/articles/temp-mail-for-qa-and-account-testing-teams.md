@@ -30,3 +30,32 @@ Modern product testing often needs many account states: new users, failed verifi
 ## Bottom Line
 
 Temp mail improves test speed and consistency when QA teams need reliable, repeatable account-creation workflows.
+
+## QA workflow with one inbox per test case
+
+1. Write down the test case first: signup, verification, password reset, expired link, or localisation.
+2. Generate one temporary inbox for that test case only, and label it by scenario in your test notes.
+3. Run the flow and record what arrived, when it arrived, and whether the link or code worked once.
+4. Repeat with a fresh inbox for the next scenario, so results from one case cannot pollute another.
+5. Delete or let the test inboxes expire at the end of the cycle, and keep the test notes, not the inboxes, as the record.
+
+## Five signup checks worth running
+
+- **Verification arrival:** does the verification email arrive, and does its subject and sender match what a real user would expect?
+- **Link or code use once:** does a used link or code stop working on a second attempt, as it should?
+- **Expired-link handling:** what does a user see when they open an expired link, and is the message clear?
+- **Password-reset leakage:** does the reset flow reveal whether an address exists, and does the reset email arrive in the right inbox?
+- **Localisation:** does the email content, date format, and link text match the locale under test?
+
+Run each check in its own inbox. If two checks share an inbox, a leftover message from the first check can make the second check look like it passed when it did not.
+
+## Keeping test data clean
+
+- Keep production and staging tests separate, with different inboxes for each environment.
+- Do not reuse a test inbox across regression cycles. Fresh inboxes give repeatable results.
+- Record delivery times and message counts in test notes, because temporary inboxes themselves expire.
+- Do not use temporary inboxes for real customer accounts, production data, or recovery-critical flows.
+
+## Limitations for QA teams
+
+Temp mail tests the email part of a flow, not the whole product. It does not replace testing with real inboxes for deliverability, spam-folder placement, or long-term account behaviour. Some services block disposable domains, so a blocked signup in a test may reflect that policy, not a bug in your product. Record that distinction in the test result.

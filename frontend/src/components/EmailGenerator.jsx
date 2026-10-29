@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AppIcon from './AppIcon';
+import { getApiRoot } from '../utils/apiRoot.js';
 
 const PRESETS = [
   { label: '10 min', ms: 10 * 60 * 1000 },
@@ -35,7 +36,7 @@ const EmailGenerator = ({
   useEffect(() => {
     let isMounted = true;
     if (!availableDomains || availableDomains.length === 0) {
-      fetch('/api/accounts/domains')
+      fetch(`${getApiRoot()}/accounts/domains`)
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
           if (isMounted && data?.domains && Array.isArray(data.domains) && data.domains.length > 0) {
