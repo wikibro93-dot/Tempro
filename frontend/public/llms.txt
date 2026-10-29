@@ -1,5 +1,5 @@
 # TempMail Pro
-> Free disposable temporary email service with multi-inbox management, custom durations (10m to 7 days), custom usernames, and sub-second OTP verification delivery.
+> Free disposable temporary email service with multi-inbox management, custom durations (10m to 7 days), custom usernames, and fast OTP verification delivery.
 
 ## Overview
 TempMail Pro (https://tempmailpk.com) is an anonymous, privacy-focused temporary email platform. Users can create disposable email addresses without registration, manage multiple inboxes simultaneously, choose from live domains offered by Mail.tm at the time of use, and auto-detect OTP verification codes with 1-click copy.

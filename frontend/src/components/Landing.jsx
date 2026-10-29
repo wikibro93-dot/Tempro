@@ -96,7 +96,7 @@ const Landing = () => {
                 "applicationCategory": "CommunicationApplication",
                 "operatingSystem": "All Web Browsers",
                 "url": "https://tempmailpk.com/",
-                "description": "Free disposable temporary email service with multi-inbox management, custom durations, custom usernames, and sub-second OTP verification delivery.",
+                "description": "Free disposable temporary email service with multi-inbox management, custom durations, custom usernames, and fast OTP verification delivery.",
                 "offers": {
                   "@type": "Offer",
                   "price": "0",
@@ -108,7 +108,7 @@ const Landing = () => {
                   "Custom Expiry Duration (10m to 7 days)",
                   "Custom Username Creation",
                   "Instant OTP Code Auto-Detection",
-                  "Zero Logs Privacy Policy"
+                  "No Sign-In Privacy Policy"
                 ]
               },
 
@@ -199,14 +199,14 @@ const Landing = () => {
                 </h1>
 
                 <p className="landing-hero-lead text-secondary mb-4">
-                  Generate instant temporary mailboxes, pick from the live domains Mail.tm currently offers, and receive OTP codes with sub-second delivery. No sign-in, zero logs, completely free.
+                  Generate instant temporary mailboxes, pick from the live domains Mail.tm currently offers, and receive OTP codes with fast delivery. No sign-in, completely free.
                 </p>
 
                 {/* Proof badges */}
                 <div className="d-flex flex-wrap align-items-center gap-3 pt-2 text-muted small">
                   <div className="d-flex align-items-center gap-1">
                     <AppIcon iconClass="bi bi-shield-check text-success" />
-                    <span>Zero IP Logs</span>
+                    <span>No Sign-In Required</span>
                   </div>
                   <span className="text-secondary opacity-50">·</span>
                   <div className="d-flex align-items-center gap-1">

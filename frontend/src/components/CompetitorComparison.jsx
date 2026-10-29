@@ -44,8 +44,8 @@ const COMPARISON_DATA = [
   },
   {
     feature: 'Privacy & Log Retention',
-    description: 'Zero IP logging and automatic message purge on expiry',
-    tempMailPro: 'Zero Logs Policy',
+    description: 'No sign-in required and automatic message purge on expiry',
+    tempMailPro: 'No Sign-In; Auto-Purge',
     tempMailOrg: 'Heavy telemetry & ads',
     tenMinuteMail: 'Basic',
     guerrillaMail: 'Public log ledger',
@@ -164,7 +164,7 @@ const CompetitorComparison = () => {
             <div className="p-3 rounded-3 border bg-surface d-flex align-items-center justify-content-center gap-3">
               <AppIcon iconClass="bi bi-lightning-charge-fill text-warning fs-4" />
               <div className="text-start">
-                <div className="fw-bold small">Sub-Second Delivery</div>
+                <div className="fw-bold small">Fast Delivery</div>
                 <div className="text-muted" style={{ fontSize: '0.78rem' }}>Direct live Mail.tm API pipeline</div>
               </div>
             </div>

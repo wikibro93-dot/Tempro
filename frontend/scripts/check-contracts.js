@@ -72,6 +72,45 @@ const sitemapGen = read(path.join(fe, 'src/utils/dynamicSeo.js'));
 check('sitemap has no fake logo image entries', !sitemapGen.includes('pwa-512x512.png'));
 const rssGen = read(path.join(fe, 'scripts/generate-sitemap.js'));
 check('RSS is not sliced to 30', !rssGen.includes('slice(0, 30)'));
+// 5b. Sitemap/RSS must be well-formed XML, not just regex-countable.
+// A missing '>' on the <urlset> header (the Oct 2026 defect) makes the whole
+// opening tag swallow the first <url>, so this parser must fail on it.
+const wellFormedXml = (xml, expectedRoot) => {
+  try {
+    let rest = xml.replace(/^\s*<\?xml[^>]*\?>\s*/, '');
+    const stack = [];
+    let i = 0;
+    while (i < rest.length) {
+      const lt = rest.indexOf('<', i);
+      if (lt === -1) break;
+      if (rest.slice(i, lt).trim() && stack.length === 0) return false;
+      const gt = rest.indexOf('>', lt);
+      if (gt === -1) return false;
+      const tag = rest.slice(lt + 1, gt).trim();
+      if (tag.startsWith('!--')) {
+        const end = rest.indexOf('-->', lt);
+        if (end === -1) return false;
+        i = end + 3;
+        continue;
+      }
+      if (tag.startsWith('!') || tag.startsWith('?')) { i = gt + 1; continue; }
+      if (tag.includes('<')) return false; // unclosed opening tag swallowing the next tag
+      if (tag.startsWith('/')) {
+        if (stack.pop() !== tag.slice(1).split(/\s/)[0]) return false;
+      } else if (!tag.endsWith('/')) {
+        stack.push(tag.split(/\s/)[0]);
+      }
+      i = gt + 1;
+    }
+    return stack.length === 0 && rest.includes(`<${expectedRoot}`);
+  } catch { return false; }
+};
+check('public/sitemap.xml parses as well-formed XML',
+  wellFormedXml(read(path.join(fe, 'public/sitemap.xml')), 'urlset'));
+check('public/rss.xml parses as well-formed XML',
+  wellFormedXml(read(path.join(fe, 'public/rss.xml')), 'rss'));
+check('sitemap generator closes the <urlset> header',
+  /<urlset[^>]*>\s*`/.test(sitemapGen));
 
 if (failures.length) {
   console.error('\nFAILED:');

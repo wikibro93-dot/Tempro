@@ -162,7 +162,7 @@ export const PWAInstallButton = ({ className = '', variant = 'navbar', label = '
                 <span className="text-muted opacity-50">·</span>
                 <span className="pwa-modal-perk-item">
                   <AppIcon iconClass="bi bi-shield-check text-success" />
-                  Zero Logs
+                  No Sign-In
                 </span>
                 <span className="text-muted opacity-50">·</span>
                 <span className="pwa-modal-perk-item">

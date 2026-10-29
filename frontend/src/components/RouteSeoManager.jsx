@@ -22,7 +22,7 @@ const ROUTE_SEO_REGISTRY = {
   },
   '/app': {
     title: 'TempMail Pro App – Free Disposable Multi-Inbox Workspace',
-    description: 'Generate instant disposable email inboxes with custom domains, sub-second OTP auto-detection, and zero logs. Access your temp mailbox online.',
+    description: 'Generate instant disposable email inboxes with custom domains, fast OTP auto-detection, and no sign-in required. Access your temp mailbox online.',
     canonical: `${SITE_URL}/app`,
     ogType: 'website',
     schema: {
@@ -52,14 +52,14 @@ const ROUTE_SEO_REGISTRY = {
     },
   },
   '/privacy-stack': {
-    title: 'Privacy Stack – Zero-Log Disposable Email Security Architecture',
-    description: 'Learn how TempMail Pro guarantees complete anonymity with zero IP logs, auto-purging temporary mailboxes, and cryptographic token isolation.',
+    title: 'Privacy Stack – No-Sign-In Disposable Email Security',
+    description: 'Learn how TempMail Pro protects your inbox with auto-purging temporary mailboxes and token-isolated inboxes. No sign-in required.',
     canonical: `${SITE_URL}/privacy-stack`,
     ogType: 'article',
   },
   '/privacy': {
-    title: 'Privacy Policy – TempMail Pro Zero-Log Email Protection',
-    description: 'Read the official TempMail Pro privacy policy. We enforce strict zero-log standards with no personal data retention and automatic email purging.',
+    title: 'Privacy Policy – TempMail Pro Email Protection',
+    description: 'Read the official TempMail Pro privacy policy. It does not sell or store inbox data for advertising; infrastructure providers may see connection metadata.',
     canonical: `${SITE_URL}/privacy`,
     ogType: 'article',
   },

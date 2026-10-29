@@ -135,7 +135,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/privacy" className="d-inline-flex align-items-center">
-                  <AppIcon iconClass="bi bi-shield-lock me-2" />Zero-Logs Policy
+                  <AppIcon iconClass="bi bi-shield-lock me-2" />Privacy Policy
                 </Link>
               </li>
             </ul>

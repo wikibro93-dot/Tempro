@@ -31,35 +31,35 @@ export function generateDynamicSitemap(siteUrl = SITE_URL) {
   const priorityPages = [
     {
       url: `${siteUrl}/app`,
-      lastmod: today,
-      changefreq: 'hourly',
-      priority: '1.0',
+      lastmod: '2026-10-29',
+      changefreq: 'weekly',
+      priority: '0.90',
       description: 'TempMail Pro Web Application Workspace - Multi-Inbox and Live Domain Selector'
     },
     {
       url: `${siteUrl}/`,
-      lastmod: today,
+      lastmod: '2026-10-29',
       changefreq: 'daily',
       priority: '1.0',
       description: 'TempMail Pro Homepage - Free Disposable Temporary Email'
     },
     {
       url: `${siteUrl}/blog`,
-      lastmod: today,
+      lastmod: '2026-10-29',
       changefreq: 'daily',
       priority: '0.95',
       description: 'TempMail Pro Privacy & Email Security Blog Hub'
     },
     {
       url: `${siteUrl}/privacy-stack`,
-      lastmod: today,
+      lastmod: '2026-04-18',
       changefreq: 'weekly',
       priority: '0.85',
-      description: 'TempMail Pro Zero-Log Privacy Stack Architecture'
+      description: 'TempMail Pro Privacy Stack Architecture'
     },
     {
       url: `${siteUrl}/about`,
-      lastmod: '2026-04-18',
+      lastmod: '2026-10-29',
       changefreq: 'monthly',
       priority: '0.75',
       description: 'About TempMail Pro'
@@ -69,7 +69,7 @@ export function generateDynamicSitemap(siteUrl = SITE_URL) {
       lastmod: '2026-04-18',
       changefreq: 'monthly',
       priority: '0.75',
-      description: 'TempMail Pro Zero Logs Privacy Policy'
+      description: 'TempMail Pro Privacy Policy'
     }
   ];
 
@@ -89,8 +89,7 @@ export function generateDynamicSitemap(siteUrl = SITE_URL) {
 
   const xmlHeader = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
 `;
 
   const xmlBody = allPages
@@ -146,6 +145,7 @@ Allow: /llms.txt
 Allow: /privacy-stack
 Disallow: /api/inbox/content/
 Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
 
 # ------------------------------------------------------------------------------
 # 3. OpenAI GPTBot & SearchGPT (Model indexing & citation)
@@ -171,6 +171,7 @@ Allow: /blog/*
 Allow: /llms.txt
 Disallow: /api/inbox/content/
 Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
 
 # ------------------------------------------------------------------------------
 # 5. Anthropic Claude Search & Model Retrieval
@@ -184,6 +185,7 @@ Allow: /blog/*
 Allow: /llms.txt
 Disallow: /api/inbox/content/
 Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
 
 # ------------------------------------------------------------------------------
 # 6. Perplexity AI Search Engine
@@ -196,6 +198,7 @@ Allow: /blog/*
 Allow: /llms.txt
 Disallow: /api/inbox/content/
 Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
 
 # ------------------------------------------------------------------------------
 # 7. Apple Intelligence & Safari Siri Suggestions
@@ -209,6 +212,7 @@ Allow: /blog/*
 Allow: /llms.txt
 Disallow: /api/inbox/content/
 Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
 
 # ------------------------------------------------------------------------------
 # 8. Microsoft Bing & Copilot
@@ -222,6 +226,7 @@ Allow: /blog/*
 Allow: /llms.txt
 Disallow: /api/inbox/content/
 Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
 
 # ------------------------------------------------------------------------------
 # 9. Additional Search & LLM Crawlers
@@ -237,6 +242,7 @@ Allow: /blog/*
 Allow: /llms.txt
 Disallow: /api/inbox/content/
 Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
 
 # ------------------------------------------------------------------------------
 # 10. Default Directives for All Crawlers

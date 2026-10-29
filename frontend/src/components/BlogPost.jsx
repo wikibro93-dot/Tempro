@@ -174,7 +174,7 @@ export default function BlogPost() {
     );
   }
 
-  const defaultImage = `${window.location.origin}/images/temp-mail-promo.png`;
+  const defaultImage = `https://tempmailpk.com/pwa-512x512.png`;
   const metaImage = image ? `${window.location.origin}${image}` : defaultImage;
   const canonicalUrl = `https://tempmailpk.com/blog/${slug}`;
   const relatedArticles = getRelatedArticles(slug, articles, 3);

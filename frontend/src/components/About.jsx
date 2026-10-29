@@ -24,9 +24,9 @@ const About = () => {
     {
       iconClass: "bi bi-eye-slash",
       iconColor: "text-warning",
-      title: "Complete Anonymity",
+      title: "No Sign-In Required",
       description:
-        "We have no knowledge of what emails you receive or send. Our service operates on a zero-knowledge principle.",
+        "No sign-in is required to create an inbox. TempMail Pro does not sell or store inbox data for advertising; see the Privacy Policy for what the service records.",
     },
     {
       iconClass: "bi bi-clock",
@@ -59,14 +59,14 @@ const About = () => {
         <title>About TempMail Pro - Free Temporary Email Service</title>
         <meta
           name="description"
-          content="Learn about TempMail Pro, the privacy-first temporary email service. Browser-generated emails, no databases, complete anonymity for online privacy protection."
+          content="Learn about TempMail Pro, the privacy-first temporary email service. Browser-generated emails, no sign-in required, and inboxes that expire automatically."
         />
         <meta name="keywords" content="temporary email, disposable email, privacy, anonymous email, spam protection, TempMail Pro" />
         <link rel="canonical" href="https://tempmailpk.com/about" />
 
         {/* Open Graph */}
         <meta property="og:title" content="About TempMail Pro - Free Temporary Email Service" />
-        <meta property="og:description" content="Learn about TempMail Pro, the privacy-first temporary email service. Browser-generated emails, no databases, complete anonymity." />
+        <meta property="og:description" content="Learn about TempMail Pro, the privacy-first temporary email service. Browser-generated emails, no sign-in required, and inboxes that expire automatically." />
         <meta property="og:url" content="https://tempmailpk.com/about" />
         <meta property="og:type" content="website" />
       </Helmet>

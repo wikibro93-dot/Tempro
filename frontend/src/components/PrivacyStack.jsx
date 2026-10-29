@@ -329,14 +329,14 @@ export default function PrivacyStack() {
         />
         <meta property="og:url" content="https://tempmailpk.com/privacy-stack" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://tempmailpk.com/images/temp-mail-promo.png" />
+        <meta property="og:image" content="https://tempmailpk.com/pwa-512x512.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Privacy Stack - Protect Email, Phone & Network | TempMail Pro" />
         <meta
           name="twitter:description"
           content="Use TempMail Pro as your privacy gateway, then extend protection with virtual numbers, VPN, and password management."
         />
-        <meta name="twitter:image" content="https://tempmailpk.com/images/temp-mail-promo.png" />
+        <meta name="twitter:image" content="https://tempmailpk.com/pwa-512x512.png" />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',

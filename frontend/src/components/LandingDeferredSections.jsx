@@ -50,9 +50,9 @@ const LandingDeferredSections = () => {
                   <div className="d-inline-flex p-3 rounded-3 bg-primary-subtle text-primary mb-3 fs-4">
                     <AppIcon iconClass="fas fa-user-shield" />
                   </div>
-                  <h3 className="card-title h5 fw-bold">Zero Logs &amp; True Anonymity</h3>
+                  <h3 className="card-title h5 fw-bold">No Sign-In Privacy</h3>
                   <p className="card-text text-secondary small">
-                    We never record IP addresses, user identities, or device fingerprints. Once your mailbox timer concludes, every message is wiped irreversibly.
+                    No sign-in is required, and inboxes expire automatically. TempMail Pro does not sell or store inbox data for advertising; infrastructure providers may see connection metadata — see the Privacy Policy.
                   </p>
                 </div>
               </div>
@@ -78,9 +78,9 @@ const LandingDeferredSections = () => {
                   <div className="d-inline-flex p-3 rounded-3 bg-warning-subtle text-warning mb-3 fs-4">
                     <AppIcon iconClass="fas fa-bolt" />
                   </div>
-                  <h3 className="card-title h5 fw-bold">Sub-Second Delivery Pipeline</h3>
+                  <h3 className="card-title h5 fw-bold">Fast Delivery Pipeline</h3>
                   <p className="card-text text-secondary small">
-                    Integrated directly with the unified Mail.tm API engine to deliver OTP codes, magic links, and confirmation emails with minimum latency.
+                    Integrated directly with the unified Mail.tm API engine to deliver OTP codes, magic links, and confirmation emails with fast, direct delivery.
                   </p>
                 </div>
               </div>
