@@ -180,7 +180,7 @@ function TempMailApp({ onEmailCopied }) {
   }, [account]);
 
   useEffect(() => {
-    if (error?.message?.includes('expired')) {
+    if (typeof error?.message === 'string' && error.message.includes('expired')) {
       setTokenValid(false);
       setShowExpiredCard(true);
       // Clear any stored data for this token
@@ -353,7 +353,8 @@ function TempMailApp({ onEmailCopied }) {
       // could not create a real Mail.tm account, show an error and keep
       // the user on their previous account (if any) instead of giving them
       // an address that can never receive mail.
-      const backendMessage = err?.response?.data?.error;
+      const backendRaw = err?.response?.data?.error;
+      const backendMessage = typeof backendRaw === 'string' ? backendRaw : (backendRaw?.message || null);
       const freshDomains = err?.response?.data?.availableDomains;
       if (Array.isArray(freshDomains) && freshDomains.length > 0) {
         setAvailableDomains(freshDomains);
@@ -448,7 +449,7 @@ function TempMailApp({ onEmailCopied }) {
 
       if (err.code === 'ECONNABORTED') errorMessage = 'Request timeout. Please check your connection.';
       else if (status === 401) { setTokenValid(false); setShowExpiredCard(true); errorMessage = 'Session expired. Please create a new email address.'; }
-      else if (err.response?.data?.error) errorMessage = err.response.data.error;
+      else if (err.response?.data?.error) errorMessage = typeof err.response.data.error === 'string' ? err.response.data.error : (err.response.data.error?.message || errorMessage);
       else if (err.message) errorMessage = err.message;
 
       // Handle transient gateway/server reload gracefully without tripping error listeners
