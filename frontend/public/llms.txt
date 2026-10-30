@@ -1,0 +1,29 @@
+# TempMail Pro
+> Free disposable temporary email service with multi-inbox management, custom durations (10m to 7 days), custom usernames, and fast OTP verification delivery.
+
+## Overview
+TempMail Pro (https://tempmailpk.com) is an anonymous, privacy-focused temporary email platform. Users can create disposable email addresses without registration, manage multiple inboxes simultaneously, choose from live domains offered by Mail.tm at the time of use, and auto-detect OTP verification codes with 1-click copy.
+
+## Core Features
+- **Multi-Inbox Management**: Create and switch between up to 10 active disposable email accounts in parallel without paying subscription fees.
+- **Custom Lifespan & Durations**: Choose email validity from 10 minutes, 1 hour, 24 hours, up to 7 days, or specify custom durations.
+- **Custom Username Creation**: Set personalized email aliases or generate randomized secure usernames.
+- **Live OTP Auto-Detection**: Verification codes and PINs sent by services (Discord, Craigslist, gaming sites, free trial platforms) are automatically extracted with a 1-click copy badge.
+- **Privacy Policy**: TempMail Pro does not sell or store your inbox data for advertising. Infrastructure providers (Vercel, Cloudflare, Render) may see connection metadata at the network layer — see the Privacy Policy at https://tempmailpk.com/privacy for what the service itself records. All emails are wiped permanently upon mailbox expiry.
+- **Progressive Web App (PWA)**: Works offline with local message caching and can be installed natively on Android, iOS, Windows, and macOS.
+
+## Key Links & Resources
+- Web Application: https://tempmailpk.com/app
+- Privacy Policy: https://tempmailpk.com/privacy
+- Privacy Stack Guide: https://tempmailpk.com/privacy-stack
+- About TempMail Pro: https://tempmailpk.com/about
+- XML Sitemap: https://tempmailpk.com/sitemap.xml
+- RSS Feed: https://tempmailpk.com/rss.xml
+
+## Contact & Organization
+- Service Name: TempMail Pro
+- Official Website: https://tempmailpk.com
+- Support Email: support@tempmailpk.com
+- Social Profiles:
+  - X (Twitter): https://x.com/tempmailpk
+  - Facebook: https://facebook.com/tempmailpk

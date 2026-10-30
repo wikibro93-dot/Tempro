@@ -1,0 +1,18 @@
+# Prepared for later. This file alone does not deploy anything.
+# When Render is connected, point a Render web service at this repo with
+# root directory backend/.
+services:
+  - type: web
+    name: tempmail-pro-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CORS_ORIGIN
+        sync: false
+      - key: MAIL_TM_API_BASE
+        value: https://api.mail.tm

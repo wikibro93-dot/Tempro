@@ -1,0 +1,158 @@
+# ==============================================================================
+# robots.txt for TempMail Pro (https://tempmailpk.com)
+# Prioritizes /app and /blog for Search Indexing and AI Crawler Knowledge Retrieval
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Googlebot & Google Mobile Crawlers (Search & Core Web Vitals)
+# ------------------------------------------------------------------------------
+User-agent: Googlebot
+User-agent: Googlebot-Mobile
+Allow: /
+Allow: /app
+Allow: /blog
+Allow: /blog/*
+Allow: /privacy-stack
+Allow: /llms.txt
+Allow: /sitemap.xml
+Allow: /rss.xml
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# ------------------------------------------------------------------------------
+# 2. Google AI / Gemini Grounding & AI Overviews
+# ------------------------------------------------------------------------------
+User-agent: Google-Extended
+Allow: /
+Allow: /app
+Allow: /blog
+Allow: /blog/*
+Allow: /llms.txt
+Allow: /privacy-stack
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# ------------------------------------------------------------------------------
+# 3. OpenAI GPTBot & SearchGPT (Model indexing & citation)
+# ------------------------------------------------------------------------------
+User-agent: GPTBot
+Allow: /
+Allow: /app
+Allow: /blog
+Allow: /blog/*
+Allow: /llms.txt
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# ------------------------------------------------------------------------------
+# 4. OpenAI ChatGPT-User (Real-time live browser query tool)
+# ------------------------------------------------------------------------------
+User-agent: ChatGPT-User
+Allow: /
+Allow: /app
+Allow: /blog
+Allow: /blog/*
+Allow: /llms.txt
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# ------------------------------------------------------------------------------
+# 5. Anthropic Claude Search & Model Retrieval
+# ------------------------------------------------------------------------------
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+Allow: /
+Allow: /app
+Allow: /blog
+Allow: /blog/*
+Allow: /llms.txt
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# ------------------------------------------------------------------------------
+# 6. Perplexity AI Search Engine
+# ------------------------------------------------------------------------------
+User-agent: PerplexityBot
+Allow: /
+Allow: /app
+Allow: /blog
+Allow: /blog/*
+Allow: /llms.txt
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# ------------------------------------------------------------------------------
+# 7. Apple Intelligence & Safari Siri Suggestions
+# ------------------------------------------------------------------------------
+User-agent: Applebot
+User-agent: Applebot-Extended
+Allow: /
+Allow: /app
+Allow: /blog
+Allow: /blog/*
+Allow: /llms.txt
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# ------------------------------------------------------------------------------
+# 8. Microsoft Bing & Copilot
+# ------------------------------------------------------------------------------
+User-agent: Bingbot
+User-agent: msnbot
+Allow: /
+Allow: /app
+Allow: /blog
+Allow: /blog/*
+Allow: /llms.txt
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# ------------------------------------------------------------------------------
+# 9. Additional Search & LLM Crawlers
+# ------------------------------------------------------------------------------
+User-agent: Bytespider
+User-agent: cohere-ai
+User-agent: DuckDuckBot
+User-agent: YandexBot
+Allow: /
+Allow: /app
+Allow: /blog
+Allow: /blog/*
+Allow: /llms.txt
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# ------------------------------------------------------------------------------
+# 10. Default Directives for All Crawlers
+# ------------------------------------------------------------------------------
+User-agent: *
+Allow: /
+Allow: /app
+Allow: /blog
+Allow: /blog/*
+Allow: /llms.txt
+Allow: /sitemap.xml
+Allow: /rss.xml
+# Privacy Quarantine: Never index disposable inbox message bodies or attachments
+Disallow: /api/inbox/content/
+Disallow: /api/inbox/stream/
+Disallow: /api/inbox/attachment/
+
+# Canonical Host Directive
+Host: tempmailpk.com
+
+# Machine-Readable AI Knowledge Index
+# https://tempmailpk.com/llms.txt
+
+# Dynamic Sitemaps & Feeds
+Sitemap: https://tempmailpk.com/sitemap.xml
+Sitemap: https://tempmailpk.com/rss.xml
