@@ -91,11 +91,11 @@ const CompetitorComparison = () => {
                   <th scope="col" className="comp-col-feature p-4 text-start">
                     <span className="fw-bold fs-6">Key Capability</span>
                   </th>
-                  <th scope="col" className="comp-col-ours p-4 text-center bg-primary text-white position-relative">
-                    <span className="badge bg-warning text-dark position-absolute top-0 end-0 m-2 fw-bold" style={{ fontSize: '0.68rem' }}>
+                  <th scope="col" className="comp-col-ours p-3 p-md-4 text-center bg-primary text-white">
+                    <span className="badge bg-warning text-dark fw-bold mb-1" style={{ fontSize: '0.6rem', padding: '0.2rem 0.4rem' }}>
                       RECOMMENDED
                     </span>
-                    <div className="fw-bold fs-5">TempMail Pro</div>
+                    <div className="fw-bold fs-6 fs-md-5">TempMail Pro</div>
                     <small className="opacity-75">All-in-One Engine</small>
                   </th>
                   <th scope="col" className="comp-col-other p-4 text-center">

@@ -16,7 +16,7 @@ const SLIDES = [
           <div className="d-flex align-items-center gap-2 text-truncate">
             <span className="badge bg-primary rounded-circle p-2">W</span>
             <div className="text-truncate">
-              <div className="fw-bold small text-dark text-truncate">waqas@example-domain</div>
+              <div className="fw-bold small text-dark text-truncate">wiki@example-domain</div>
               <small className="text-muted font-monospace">⏱ 23h 45m left</small>
             </div>
           </div>
@@ -61,7 +61,7 @@ const SLIDES = [
     content: (
       <div className="carousel-preview-card p-3">
         <div className="p-2 mb-2 rounded-2 bg-light-subtle border d-flex justify-content-between align-items-center">
-          <span className="small text-muted">Inbox: waqas@example-domain</span>
+          <span className="small text-muted">Inbox: wiki@example-domain</span>
           <span className="badge bg-success-subtle text-success border border-success-subtle py-1">Synced</span>
         </div>
 
@@ -166,8 +166,8 @@ const SLIDES = [
     content: (
       <div className="carousel-preview-card p-3 text-center">
         <div className="d-flex align-items-center justify-content-center gap-3 mb-2">
-          <div className="p-2 border rounded-3 bg-white shadow-xs">
-            <AppIcon iconClass="bi bi-qr-code fs-1 text-primary" />
+          <div className="p-1 border rounded-3 bg-white shadow-xs">
+            <img src="/qr-app.svg" alt="QR code — scan to open tempmailpk.com/app on your phone" width="84" height="84" loading="lazy" />
           </div>
           <div className="text-start">
             <div className="fw-bold small text-dark">Instant Mobile Sync</div>

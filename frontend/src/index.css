@@ -4867,31 +4867,32 @@ textarea:focus-visible,
   }
 }
 
-/* Mobile bottom-sheet behavior on smaller screens */
+/* Mobile: centered dialog, not a bottom sheet. The old bottom-sheet
+   version could be pushed above the viewport by mobile browser chrome
+   (dynamic viewport / URL bar) and its top would hide. dvh + centering
+   keeps the whole card visible, and the body scrolls inside it. */
 @media (max-width: 575.98px) {
   .pwa-modal-backdrop {
-    align-items: flex-end;
-    padding: 0;
+    align-items: center;
+    padding: 12px;
   }
 
   .pwa-modal-card {
-    max-width: 100%;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
+    max-width: calc(100% - 8px);
+    border-radius: 18px;
     margin: 0;
-    max-height: 82vh;
-    animation: pwaSheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: calc(100dvh - 32px);
+    animation: pwaSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .pwa-modal-drag-indicator {
-    width: 38px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 10px;
-    margin: 6px auto 2px auto;
+    display: none;
   }
+}
+
+.pwa-modal-card {
+  max-height: calc(100dvh - 24px);
+  overscroll-behavior: contain;
 }
 
 @keyframes pwaSheetUp {
@@ -5147,5 +5148,79 @@ textarea:focus-visible,
   
   .am-address-strip {
     padding: 0.25rem 0.45rem !important;
+  }
+}
+
+/* ==========================================================================
+   UI/UX compact + contrast fixes — 2 Nov 2026 (user-reported small issues)
+   ========================================================================== */
+
+/* Proof badges on the gradient hero: near-white, not muted grey, so the
+   three badges are actually readable. */
+.landing-proof-badges {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+/* Hero + console compact on mobile/small screens: the old 100px hero
+   padding plus the full console pushed the fold far below one screen. */
+@media (max-width: 991.98px) {
+  .landing-page .hero-section {
+    padding: 36px 0 28px;
+  }
+
+  .homepage-hero-console .console-body {
+    padding: 14px;
+  }
+
+  .homepage-hero-console .console-address-box {
+    margin-bottom: 0.75rem;
+  }
+
+  .homepage-hero-console .console-footer-row {
+    padding-top: 0.75rem;
+  }
+}
+
+/* Address row must not overflow a 320px screen: the address shrinks,
+   the buttons keep their size and never wrap under it. */
+.console-address-text {
+  min-width: 0;
+}
+
+.homepage-hero-console .console-copy-btn,
+.homepage-hero-console .console-action-btn {
+  flex-shrink: 0;
+}
+
+/* Comparison table compact on mobile: smaller cells, and the feature
+   descriptions (not the feature names) drop out below 576px. */
+@media (max-width: 575.98px) {
+  .comparison-table th,
+  .comparison-table td {
+    padding: 0.5rem 0.6rem;
+  }
+
+  .comparison-table .comp-col-feature .small {
+    display: none;
+  }
+}
+
+/* Workspace carousel (incl. Live Demo / QR slide) compact on mobile:
+   the stage padding and left-column padding were desktop-sized. */
+@media (max-width: 767.98px) {
+  .workspace-carousel-stage .stage-topbar {
+    padding: 0.6rem 0.9rem;
+  }
+
+  .workspace-carousel-stage .row > .col-lg-6 {
+    padding: 1rem;
+  }
+
+  .workspace-carousel-stage .stage-bottom-bar {
+    padding: 0.6rem 0.9rem;
+  }
+
+  .workspace-carousel-stage .carousel-preview-card {
+    padding: 0.75rem;
   }
 }

@@ -202,20 +202,21 @@ const Landing = () => {
                   Generate instant temporary mailboxes, pick from the live domains Mail.tm currently offers, and receive OTP codes with fast delivery. No sign-in, completely free.
                 </p>
 
-                {/* Proof badges */}
-                <div className="d-flex flex-wrap align-items-center gap-3 pt-2 text-muted small">
+                {/* Proof badges — dark text on the hero gradient for
+                    real contrast (text-muted + yellow were unreadable) */}
+                <div className="d-flex flex-wrap align-items-center gap-3 pt-2 small fw-semibold landing-proof-badges">
                   <div className="d-flex align-items-center gap-1">
-                    <AppIcon iconClass="bi bi-shield-check text-success" />
+                    <AppIcon iconClass="bi bi-shield-check" />
                     <span>No Sign-In Required</span>
                   </div>
-                  <span className="text-secondary opacity-50">·</span>
+                  <span aria-hidden="true">·</span>
                   <div className="d-flex align-items-center gap-1">
-                    <AppIcon iconClass="bi bi-lightning-charge-fill text-warning" />
+                    <AppIcon iconClass="bi bi-lightning-charge-fill" />
                     <span>Instant OTP Delivery</span>
                   </div>
-                  <span className="text-secondary opacity-50">·</span>
+                  <span aria-hidden="true">·</span>
                   <div className="d-flex align-items-center gap-1">
-                    <AppIcon iconClass="bi bi-layers-fill text-primary" />
+                    <AppIcon iconClass="bi bi-layers-fill" />
                     <span>Multi-Inbox Tabs</span>
                   </div>
                 </div>

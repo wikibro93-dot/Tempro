@@ -3,8 +3,18 @@ import { usePWAInstall } from '../hooks/usePWAInstall';
 import AppIcon from './AppIcon';
 
 export const PWAInstallButton = ({ className = '', variant = 'navbar', label = 'Install App' }) => {
-  const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
+  const { isInstallable, isInstalled, isIOS, justInstalled, install } = usePWAInstall();
   const [showModal, setShowModal] = useState(false);
+  const [showInstalledToast, setShowInstalledToast] = useState(false);
+
+  // Confirm the install visibly: previously the button simply vanished
+  // on mobile with no feedback that anything had installed.
+  useEffect(() => {
+    if (!justInstalled) return;
+    setShowInstalledToast(true);
+    const timer = setTimeout(() => setShowInstalledToast(false), 6000);
+    return () => clearTimeout(timer);
+  }, [justInstalled]);
 
   // Lock background scroll when modal is active
   useEffect(() => {
@@ -29,8 +39,12 @@ export const PWAInstallButton = ({ className = '', variant = 'navbar', label = '
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showModal]);
 
-  // If already running inside installed standalone PWA, suppress the button
-  if (isInstalled) {
+  // If already running inside installed standalone PWA, suppress the
+  // button — but still show the just-installed confirmation toast.
+  if (isInstalled && !justInstalled) {
+    return null;
+  }
+  if (isInstalled && justInstalled && !showInstalledToast) {
     return null;
   }
 
@@ -53,6 +67,7 @@ export const PWAInstallButton = ({ className = '', variant = 'navbar', label = '
 
   return (
     <>
+      {!isInstalled && (
       <button
         type="button"
         onClick={handleTrigger}
@@ -67,6 +82,45 @@ export const PWAInstallButton = ({ className = '', variant = 'navbar', label = '
         <AppIcon iconClass="bi bi-download" />
         <span>{label}</span>
       </button>
+      )}
+
+      {/* Install confirmation — visible on mobile so the user knows
+          the app actually installed and where to find it. */}
+      {showInstalledToast && (
+        <div
+          className="pwa-installed-toast"
+          role="status"
+          style={{
+            position: 'fixed',
+            left: '50%',
+            bottom: 'calc(20px + env(safe-area-inset-bottom))',
+            transform: 'translateX(-50%)',
+            zIndex: 10060,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: '#0f172a',
+            color: '#fff',
+            padding: '10px 14px',
+            borderRadius: '12px',
+            boxShadow: '0 12px 30px rgba(0,0,0,0.35)',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            maxWidth: 'calc(100vw - 32px)',
+          }}
+        >
+          <AppIcon iconClass="bi bi-check-circle-fill text-success" />
+          <span>App installed! Find TempMail Pro on your home screen.</span>
+          <button
+            type="button"
+            onClick={() => setShowInstalledToast(false)}
+            aria-label="Dismiss"
+            style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', lineHeight: 1, padding: '0 0 0 4px' }}
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* Modern Compact Mobile-Friendly PWA Install Dialog */}
       {showModal && (
@@ -81,9 +135,6 @@ export const PWAInstallButton = ({ className = '', variant = 'navbar', label = '
             className="pwa-modal-card"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Mobile Drag Indicator */}
-            <div className="pwa-modal-drag-indicator d-block d-sm-none" aria-hidden="true" />
-
             {/* High-Contrast Brand Header */}
             <div className="pwa-modal-header">
               <div className="pwa-modal-header__brand">

@@ -4,6 +4,9 @@ export function usePWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  // True only when the install completed in THIS session, so the UI can
+  // confirm it. A pre-installed app (standalone on load) does not set it.
+  const [justInstalled, setJustInstalled] = useState(false);
 
   useEffect(() => {
     // Check if already running in standalone mode (installed)
@@ -25,6 +28,7 @@ export function usePWAInstall() {
     const handleAppInstalled = () => {
       setIsInstalled(true);
       setDeferredPrompt(null);
+      setJustInstalled(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -44,6 +48,7 @@ export function usePWAInstall() {
       if (choice.outcome === 'accepted') {
         setIsInstalled(true);
         setDeferredPrompt(null);
+        setJustInstalled(true);
         return true;
       }
     } catch (err) {
@@ -56,6 +61,7 @@ export function usePWAInstall() {
     isInstallable: !!deferredPrompt,
     isInstalled,
     isIOS,
+    justInstalled,
     install,
   };
 }

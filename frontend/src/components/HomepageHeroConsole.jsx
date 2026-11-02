@@ -280,7 +280,7 @@ const HomepageHeroConsole = () => {
                   id="hero-custom-user"
                   type="text"
                   className="form-control"
-                  placeholder="e.g. waqas, shop2026…"
+                  placeholder="e.g. wiki, shop2026…"
                   value={customUser}
                   onChange={(e) => setCustomUser(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))}
                   maxLength={24}

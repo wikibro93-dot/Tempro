@@ -264,7 +264,7 @@ const EmailGenerator = ({
                   id="eg-username-input"
                   type="text"
                   className="eg-input-text"
-                  placeholder="e.g. waqas, shop2026…"
+                  placeholder="e.g. wiki, shop2026…"
                   value={customName}
                   onChange={(e) => setCustomName(sanitizeName(e.target.value))}
                   maxLength={24}
