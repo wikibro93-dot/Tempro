@@ -50,7 +50,7 @@ const batchLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 }); // batch 30/mi
 const inboxLimiter = rateLimit({ windowMs: 60 * 1000, max: 60 }); // inbox reads 60/min/IP
 const fileLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 }); // attachment/download 30/min/IP
 const deleteLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 }); // message delete 30/min/IP (tighter than inbox reads)
-const accountDeleteLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10 }); // account delete 10/hour/IP
+const accountDeleteLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 30 }); // account delete 30/hour/IP (was 10: legitimate retry loops hit it)
 
 // Per-token limiter: same shape as rateLimit, but keyed by the inbox token
 // in the URL so rotating IPs cannot dodge the cap for one inbox.
@@ -73,7 +73,7 @@ function rateLimitByToken({ windowMs, max }: { windowMs: number; max: number }) 
   };
 }
 const messageDeleteTokenLimiter = rateLimitByToken({ windowMs: 60 * 60 * 1000, max: 100 }); // 100 message deletes/hour/token
-const accountDeleteTokenLimiter = rateLimitByToken({ windowMs: 60 * 60 * 1000, max: 5 }); // 5 account deletes/hour/token
+const accountDeleteTokenLimiter = rateLimitByToken({ windowMs: 60 * 60 * 1000, max: 20 }); // 20 account deletes/hour/token (was 5: a user retrying a failing delete hit 429 on the 6th click)
 
 // Maximum proxied file size. Known oversize (Content-Length header) is
 // rejected with 413 before any body is read; unknown-length bodies are
@@ -508,12 +508,14 @@ app.delete('/api/accounts/:token', accountDeleteLimiter, accountDeleteTokenLimit
       return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
     }
     if (!meRes.ok) {
-      return res.status(502).json({ success: false, error: 'Mail.tm account unavailable, please try again.', code: 'UPSTREAM_ERROR' });
+      console.warn('[Backend] Account delete: /accounts/me upstream status', meRes.status);
+      return res.status(502).json({ success: false, error: 'Mail.tm account unavailable, please try again.', code: 'UPSTREAM_ERROR', upstreamStatus: meRes.status });
     }
     const meData: any = await meRes.json();
     const accountId = meData?.id;
     if (!accountId) {
-      return res.status(502).json({ success: false, error: 'Mail.tm account unavailable, please try again.', code: 'UPSTREAM_ERROR' });
+      console.warn('[Backend] Account delete: /accounts/me returned no id');
+      return res.status(502).json({ success: false, error: 'Mail.tm account unavailable, please try again.', code: 'UPSTREAM_ERROR', upstreamStatus: meRes.status });
     }
 
     const delRes = await fetch(`${MAIL_TM_API_BASE}/accounts/${accountId}`, {
@@ -529,7 +531,8 @@ app.delete('/api/accounts/:token', accountDeleteLimiter, accountDeleteTokenLimit
       // any 2xx is still the correct outcome.
       return res.json({ success: true, alreadyDeleted: true });
     }
-    return res.status(502).json({ success: false, error: 'Could not delete account, please try again.', code: 'UPSTREAM_ERROR' });
+    console.warn('[Backend] Account delete: upstream DELETE status', delRes.status);
+    return res.status(502).json({ success: false, error: 'Could not delete account, please try again.', code: 'UPSTREAM_ERROR', upstreamStatus: delRes.status });
   } catch (err: any) {
     console.warn('[Backend] Account delete error:', err.message);
     return res.status(502).json({ success: false, error: 'Could not delete account, please try again.', code: 'UPSTREAM_ERROR' });

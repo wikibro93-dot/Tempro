@@ -93,6 +93,7 @@ function TempMailApp({ onEmailCopied }) {
   const [isInboxLoading, setIsInboxLoading] = useState(false);
   const [isBackgroundPolling, setIsBackgroundPolling] = useState(false);
   const [tokenValid, setTokenValid] = useState(true);
+  const [deleteArmedAddress, setDeleteArmedAddress] = useState(null);
   const [showExpiredCard, setShowExpiredCard] = useState(false);
   const [showAddPanel, setShowAddPanel] = useState(false);
   const [inboxCounts, setInboxCounts] = useState(() => {
@@ -436,34 +437,89 @@ function TempMailApp({ onEmailCopied }) {
     });
   };
 
+  // Pending server deletes: tokens whose inbox is already gone from the
+  // UI but whose Mail.tm account delete has not yet been confirmed.
+  // Kept in localStorage so a failed delete is retried on the next app
+  // load, instead of either confusing the user with an error or silently
+  // abandoning the server delete. These tokens are never restored as
+  // visible inboxes.
+  const PENDING_DELETES_KEY = 'pendingInboxDeletes';
+  const readPendingDeletes = () => {
+    try {
+      const saved = localStorage.getItem(PENDING_DELETES_KEY);
+      const list = saved ? JSON.parse(saved) : [];
+      return Array.isArray(list) ? list : [];
+    } catch { return []; }
+  };
+  const writePendingDeletes = (list) => {
+    try { localStorage.setItem(PENDING_DELETES_KEY, JSON.stringify(list)); } catch {}
+  };
+  const attemptServerDelete = async (token) => {
+    try {
+      await axios.delete(`${API_ROOT}/accounts/${encodeURIComponent(token)}`);
+      return true;
+    } catch (err) {
+      // 401 / already-deleted both mean the account is already gone.
+      if (err?.response?.status === 401) return true;
+      return false;
+    }
+  };
+  const queueServerDelete = (token) => {
+    if (!token) return;
+    const list = readPendingDeletes();
+    if (!list.some((p) => p.token === token)) {
+      list.push({ token, queuedAt: Date.now() });
+      writePendingDeletes(list);
+    }
+    // Background retries in this session: immediate, 15s, 60s. No UI
+    // blocking, no error shown — the inbox is already gone from the UI.
+    const retry = async (delayMs) => {
+      if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+      const ok = await attemptServerDelete(token);
+      if (ok) writePendingDeletes(readPendingDeletes().filter((p) => p.token !== token));
+    };
+    retry(0);
+    setTimeout(() => retry(0), 15000);
+    setTimeout(() => retry(0), 60000);
+  };
+  // On load, retry any pending server deletes from earlier sessions.
+  useEffect(() => {
+    const pending = readPendingDeletes();
+    if (pending.length === 0) return;
+    const timer = setTimeout(async () => {
+      for (const p of pending) {
+        const ok = await attemptServerDelete(p.token);
+        if (ok) writePendingDeletes(readPendingDeletes().filter((x) => x.token !== p.token));
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const deleteEmail = async (emailAddress) => {
+    // Two-click confirmation, like message delete: first click arms,
+    // second click removes instantly from the UI (optimistic) and
+    // queues the server delete in the background with retries. The
+    // user is never left staring at an inbox that "failed to delete"
+    // because the free backend was waking up (502) or rate-limited
+    // (429 after repeated retries) — those were the console errors
+    // seen on 2 Nov 2026, and they no longer block the UI action.
+    if (deleteArmedAddress !== emailAddress) {
+      setDeleteArmedAddress(emailAddress);
+      return;
+    }
+    setDeleteArmedAddress(null);
     const entry = generatedEmails.find(e => e.address === emailAddress);
     const token = entry?.token || (accountRef.current && (accountRef.current.address === emailAddress || accountRef.current.email === emailAddress) ? accountRef.current.token : null);
     if (!token) {
       applyLocalRemoval(emailAddress);
       return;
     }
-    try {
-      await axios.delete(`${API_ROOT}/accounts/${encodeURIComponent(token)}`);
-      purgeLocalInbox(emailAddress, token);
-      applyLocalRemoval(emailAddress);
-    } catch (err) {
-      // 401 means the token is already dead on Mail.tm, so the account
-      // is already inaccessible — local removal IS the outcome, not a
-      // failure, and no warning should alarm the user.
-      if (err?.response?.status === 401) {
-        purgeLocalInbox(emailAddress, token);
-        applyLocalRemoval(emailAddress);
-        return;
-      }
-      // Any other failure (timeout, 502, rate limit — common on the
-      // free Render tier when the backend is waking up): KEEP the inbox
-      // in the list and show a retryable error, instead of removing it
-      // locally and showing the confusing "removed from this device
-      // only" warning. The user can click × again to retry; a retry
-      // after a lost-but-completed delete returns 404 → success.
-      setError({ message: 'Could not delete this inbox from the server. Please try again — the inbox has been kept so you can retry.' });
-    }
+    // Optimistic UI removal first.
+    purgeLocalInbox(emailAddress, token);
+    applyLocalRemoval(emailAddress);
+    // Server delete follows in the background, with retries.
+    queueServerDelete(token);
   };
 
   const fetchInbox = async (showLoading = false) => {
@@ -677,6 +733,7 @@ function TempMailApp({ onEmailCopied }) {
             isCreating={isLoading}
             onSwitch={switchAccount}
             onDelete={deleteEmail}
+            deleteArmedAddress={deleteArmedAddress}
             onCreateNew={() => setShowAddPanel(v => !v)}
           />
 

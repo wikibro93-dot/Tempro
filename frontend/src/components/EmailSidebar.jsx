@@ -8,6 +8,7 @@ const EmailSidebar = ({
   isCreating = false,
   onSwitch,
   onDelete,
+  deleteArmedAddress = null,
   onCreateNew,
 }) => {
   const [showManageModal, setShowManageModal] = useState(false);
@@ -67,15 +68,16 @@ const EmailSidebar = ({
           {onDelete && (
             <button
               type="button"
-              className="email-sidebar-delete"
+              className={`email-sidebar-delete${deleteArmedAddress === addr ? ' armed' : ''}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(addr);
               }}
-              title="Remove inbox"
-              aria-label={`Remove inbox ${addr}`}
+              title={deleteArmedAddress === addr ? 'Click again to confirm removal' : 'Remove inbox'}
+              aria-label={deleteArmedAddress === addr ? `Click again to confirm removal of ${addr}` : `Remove inbox ${addr}`}
+              style={deleteArmedAddress === addr ? { background: '#dc3545', color: '#fff' } : undefined}
             >
-              ×
+              {deleteArmedAddress === addr ? '✓' : '×'}
             </button>
           )}
         </div>
@@ -315,16 +317,16 @@ const EmailSidebar = ({
 
                       <button
                         type="button"
-                        className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 py-1 px-2 shrink-0"
+                        className={`btn btn-sm ${deleteArmedAddress === addr ? 'btn-danger' : 'btn-outline-danger'} d-inline-flex align-items-center gap-1 py-1 px-2 shrink-0`}
                         style={{ minHeight: '30px', fontSize: '0.76rem', borderRadius: '6px' }}
                         onClick={(ev) => {
                           ev.stopPropagation();
                           onDelete && onDelete(addr);
                         }}
-                        title={`Remove ${addr}`}
+                        title={deleteArmedAddress === addr ? 'Click again to confirm removal' : `Remove ${addr}`}
                       >
                         <AppIcon iconClass="bi bi-trash3" size={12} />
-                        <span>Remove</span>
+                        <span>{deleteArmedAddress === addr ? 'Confirm?' : 'Remove'}</span>
                       </button>
                     </div>
                   );
