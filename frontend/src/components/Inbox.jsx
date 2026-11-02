@@ -122,6 +122,9 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
   const [searchQuery, setSearchQuery] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
+  // Two-click delete (no native window.confirm, which automation and some
+  // browsers dismiss silently): first click arms, second click deletes.
+  const [deleteArmedId, setDeleteArmedId] = useState(null);
   const [isOfflineContent, setIsOfflineContent] = useState(false);
   const prevCountRef = useRef(messages?.length || 0);
 
@@ -245,7 +248,15 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
 
   const handleDeleteMessage = async (msg) => {
     if (!msg?.id || !msg?.token) return;
-    if (!window.confirm('Delete this message from your disposable inbox?')) return;
+    // First click arms the delete; second click actually deletes. This
+    // replaces window.confirm, which can be dismissed silently and then
+    // looks like a dead button with no error.
+    if (deleteArmedId !== msg.id) {
+      setDeleteArmedId(msg.id);
+      setDeleteError(null);
+      return;
+    }
+    setDeleteArmedId(null);
     setDeleteError(null);
     setIsDeleting(true);
     try {
@@ -485,14 +496,14 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                     </button>
                     <button
                       type="button"
-                      className="btn btn-sm btn-outline-danger py-1 px-2 d-inline-flex align-items-center gap-1"
+                      className={`btn btn-sm ${deleteArmedId === selectedMsg?.id ? 'btn-danger' : 'btn-outline-danger'} py-1 px-2 d-inline-flex align-items-center gap-1`}
                       onClick={() => handleDeleteMessage(selectedMsg)}
                       disabled={isDeleting}
-                      title="Delete this email"
+                      title={deleteArmedId === selectedMsg?.id ? 'Click again to confirm delete' : 'Delete this email'}
                       style={{ minHeight: '34px' }}
                     >
                       <AppIcon iconClass={`bi bi-trash ${isDeleting ? 'spin' : ''}`} size={14} />
-                      <span className="d-none d-sm-inline">{isDeleting ? 'Deleting…' : 'Delete'}</span>
+                      <span className={deleteArmedId === selectedMsg?.id ? '' : 'd-none d-sm-inline'}>{isDeleting ? 'Deleting…' : deleteArmedId === selectedMsg?.id ? 'Click again to confirm' : 'Delete'}</span>
                     </button>
                   </div>
                 </div>
