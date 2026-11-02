@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import AppIcon from './AppIcon';
 
@@ -84,6 +85,13 @@ export const PWAInstallButton = ({ className = '', variant = 'navbar', label = '
       </button>
       )}
 
+      {/* Modal + toast render in a portal to document.body. Without
+          this, the navbar's backdrop-filter makes it the containing
+          block for fixed descendants in Chrome, so the modal was
+          centered inside the ~60px navbar instead of the viewport and
+          its top was pushed off-screen. */}
+      {createPortal(
+        <>
       {/* Install confirmation — visible on mobile so the user knows
           the app actually installed and where to find it. */}
       {showInstalledToast && (
@@ -246,6 +254,9 @@ export const PWAInstallButton = ({ className = '', variant = 'navbar', label = '
             </div>
           </div>
         </div>
+      )}
+        </>,
+        document.body
       )}
     </>
   );
