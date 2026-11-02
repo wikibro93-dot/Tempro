@@ -591,9 +591,10 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                     {messageContent?.attachments && messageContent.attachments.length > 0 ? (
                       <div className="row g-2 mt-1">
                         {messageContent.attachments.map((att) => {
-                          // Mail.tm often omits size: never show a fake "0 KB".
+                          // Mail.tm often omits size, and small sizes round
+                          // to 0: never show a fake "0 KB" in the UI.
                           const sizeKb = att.size ? Math.round(att.size / 1024) : null;
-                          const sizeDisplay = sizeKb === null ? null : (sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`);
+                          const sizeDisplay = sizeKb === null ? null : (sizeKb === 0 ? '<1 KB' : (sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`));
                           const tokenForDownload = selectedMsg?.token || messageContent?.token || '';
                           // Pass the original filename so the backend can set
                           // a proper Content-Disposition name+extension.

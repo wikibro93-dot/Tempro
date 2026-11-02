@@ -502,7 +502,7 @@ app.delete('/api/accounts/:token', accountDeleteLimiter, accountDeleteTokenLimit
   try {
     const meRes = await fetch(`${MAIL_TM_API_BASE}/accounts/me`, {
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(20000)
     });
     if (meRes.status === 401 || meRes.status === 403) {
       return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
@@ -519,7 +519,7 @@ app.delete('/api/accounts/:token', accountDeleteLimiter, accountDeleteTokenLimit
     const delRes = await fetch(`${MAIL_TM_API_BASE}/accounts/${accountId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(20000)
     });
     if (delRes.ok || delRes.status === 204) {
       return res.json({ success: true });
