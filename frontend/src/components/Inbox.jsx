@@ -591,10 +591,15 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                     {messageContent?.attachments && messageContent.attachments.length > 0 ? (
                       <div className="row g-2 mt-1">
                         {messageContent.attachments.map((att) => {
-                          const sizeKb = att.size ? Math.round(att.size / 1024) : 0;
-                          const sizeDisplay = sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`;
+                          // Mail.tm often omits size: never show a fake "0 KB".
+                          const sizeKb = att.size ? Math.round(att.size / 1024) : null;
+                          const sizeDisplay = sizeKb === null ? null : (sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`);
                           const tokenForDownload = selectedMsg?.token || messageContent?.token || '';
-                          const downloadUrl = `${API_ROOT}/inbox/attachment/${tokenForDownload}/${selectedMsg.id}/${att.id}`;
+                          // Pass the original filename so the backend can set
+                          // a proper Content-Disposition name+extension.
+                          // Browsers ignore the cross-origin `download`
+                          // attribute, so without this the file saved as .bin.
+                          const downloadUrl = `${API_ROOT}/inbox/attachment/${tokenForDownload}/${selectedMsg.id}/${att.id}?filename=${encodeURIComponent(att.filename || 'attachment')}`;
 
                           return (
                             <div key={att.id} className="col-sm-6">
@@ -606,15 +611,13 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                                       {att.filename || 'attachment'}
                                     </div>
                                     <div className="text-muted" style={{ fontSize: '0.72rem' }}>
-                                      {sizeDisplay} · {att.contentType?.split('/')[1] || 'file'}
+                                      {sizeDisplay ? `${sizeDisplay} · ` : ''}{att.contentType?.split('/')[1] || 'file'}
                                     </div>
                                   </div>
                                 </div>
                                 <a
                                   href={downloadUrl}
                                   download={att.filename || 'attachment'}
-                                  target="_blank"
-                                  rel="noreferrer"
                                   className="btn btn-sm btn-primary py-1 px-2 d-inline-flex align-items-center"
                                   title={`Download ${att.filename || 'file'}`}
                                 >

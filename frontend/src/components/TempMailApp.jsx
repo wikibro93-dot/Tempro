@@ -448,11 +448,16 @@ function TempMailApp({ onEmailCopied }) {
       purgeLocalInbox(emailAddress, token);
       applyLocalRemoval(emailAddress);
     } catch (err) {
-      // Server delete failed: keep the previous local-only behaviour, but
-      // say so plainly instead of implying the account was deleted.
+      // Distinguish the cases: a 401 means the token is already dead on
+      // Mail.tm, so the account is already inaccessible — local removal
+      // IS the outcome, not a failure, and no warning should alarm the
+      // user. Any other failure (timeout, 502, rate limit) keeps the
+      // previous honest local-only warning.
       purgeLocalInbox(emailAddress, token);
       applyLocalRemoval(emailAddress);
-      setError({ message: 'Inbox removed from this device only. The server account could not be deleted right now — it may still exist on the mail server.' });
+      if (err?.response?.status !== 401) {
+        setError({ message: 'Inbox removed from this device only. The server account could not be deleted right now — it may still exist on the mail server.' });
+      }
     }
   };
 

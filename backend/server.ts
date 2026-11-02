@@ -613,15 +613,50 @@ app.get('/api/inbox/attachment/:token/:messageId/:attachmentId', fileLimiter, as
     if (fileRes.ok) {
       // Never forward upstream headers verbatim: force download and never
       // serve upstream HTML inline (that would be an XSS vector).
+      // Professional download: the file MUST keep its original name and
+      // extension. Previously the backend forced a name with no extension
+      // (attachment-<id>-<id>), and browsers ignore the frontend's
+      // cross-origin `download` attribute, so users received a .bin file
+      // the OS could not open as PDF/Word — even though the bytes were
+      // correct. The frontend passes ?filename=<original name>; fall back
+      // to an extension inferred from the upstream content-type.
       const upstreamType = fileRes.headers.get('content-type') || 'application/octet-stream';
-      const safeType = upstreamType.startsWith('text/html') ? 'application/octet-stream' : upstreamType;
-      const safeName = `attachment-${String(messageId).replace(/[^A-Za-z0-9._-]/g, '')}-${String(attachmentId).replace(/[^A-Za-z0-9._-]/g, '')}`;
+      const typeToExt: Record<string, string> = {
+        'application/pdf': 'pdf', 'application/msword': 'doc',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+        'application/vnd.ms-excel': 'xls',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+        'application/vnd.ms-powerpoint': 'ppt',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+        'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp',
+        'application/zip': 'zip', 'text/plain': 'txt', 'text/csv': 'csv'
+      };
+      const rawName = String((req.query as any)?.filename || '');
+      const baseName = rawName.split(/[\\/]/).pop() || '';
+      const cleanName = baseName.replace(/[^A-Za-z0-9._\- ]/g, '').replace(/^\.+/, '').slice(0, 120);
+      const hasExt = /\.[A-Za-z0-9]{1,10}$/.test(cleanName);
+      const inferredExt = typeToExt[upstreamType.split(';')[0].trim()];
+      let safeName = cleanName;
+      if (!safeName) {
+        safeName = `attachment-${String(messageId).replace(/[^A-Za-z0-9._-]/g, '')}-${String(attachmentId).replace(/[^A-Za-z0-9._-]/g, '')}`;
+      }
+      if (!hasExt && inferredExt) safeName = `${safeName}.${inferredExt}`;
+      if (!/\.[A-Za-z0-9]{1,10}$/.test(safeName)) safeName = `${safeName}.bin`;
+      let safeType = upstreamType.startsWith('text/html') ? 'application/octet-stream' : upstreamType;
+      if (safeType === 'application/octet-stream' && inferredExt) {
+        const extToType = Object.fromEntries(Object.entries(typeToExt).map(([t, e]) => [e, t]));
+        safeType = extToType[inferredExt] || safeType;
+      }
       const upstreamLength = Number(fileRes.headers.get('content-length'));
       if (Number.isFinite(upstreamLength) && upstreamLength > MAX_PROXIED_BYTES) {
         return res.status(413).json({ error: 'Attachment too large to download.', code: 'FILE_TOO_LARGE' });
       }
       res.setHeader('Content-Type', safeType);
-      res.setHeader('Content-Disposition', `attachment; filename="${safeName}"`);
+      if (Number.isFinite(upstreamLength) && upstreamLength > 0) {
+        res.setHeader('Content-Length', String(upstreamLength));
+      }
+      const asciiName = safeName.replace(/"/g, '');
+      res.setHeader('Content-Disposition', `attachment; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`);
 
       await streamUpstream(res, fileRes);
       return;
