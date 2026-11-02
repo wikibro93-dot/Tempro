@@ -574,6 +574,9 @@ function TempMailApp({ onEmailCopied }) {
 
   return (
     <>
+      <a href="#main-content" className="visually-hidden-focusable btn btn-primary position-absolute top-0 start-0 m-2" style={{ zIndex: 1050 }}>Skip to main content</a>
+      <main id="main-content">
+      <h1 className="visually-hidden">TempMail Pro App — Free Temporary Email</h1>
       <div className="container-fluid py-3 px-3 px-md-4">
         <PageNavbar />
 
@@ -664,9 +667,24 @@ function TempMailApp({ onEmailCopied }) {
         </div>
       </div>
 
-      <section className="app-seo-content container py-4" aria-label="About the TempMail Pro app">
-        <h2>How the TempMail Pro app works</h2>
-        <p>
+      <section className="app-seo-section py-5 bg-light-subtle" aria-label="About the TempMail Pro app">
+        <div className="container">
+          <div className="text-center mb-5">
+            <h2 className="fw-bold section-title display-6">How the TempMail Pro app works</h2>
+            <p className="text-muted mx-auto" style={{ maxWidth: '680px' }}>
+              Generate, use, and discard temporary inboxes — without signing in, and without polluting your real inbox.
+            </p>
+          </div>
+          <div className="row justify-content-center">
+            <div className="col-lg-10">
+              <article className="article-content bg-surface p-4 p-md-5 rounded-4 border shadow-sm">
+                <div className="p-3 mb-4 rounded-3 border-start border-4 border-primary bg-primary-subtle">
+                  <h3 className="h6 fw-bold text-primary mb-1">Key takeaway:</h3>
+                  <p className="small mb-0 text-dark">
+                    Use a separate inbox for each signup, choose an expiry longer than the task, and save anything important before the inbox expires — an expired inbox is assumed unrecoverable.
+                  </p>
+                </div>
+        <p className="text-secondary">
           TempMail Pro is a free temporary email app that gives you a working email address
           without asking you to sign in, create an account, or hand over personal details.
           You open the app, generate an address, use it for a signup or a verification, read
@@ -675,7 +693,7 @@ function TempMailApp({ onEmailCopied }) {
           offers, and test data go to the temporary inbox instead of the address you use for
           work, family, and accounts you plan to keep.
         </p>
-        <p>
+        <p className="text-secondary">
           The workflow is deliberately simple, and it follows four steps. First, you generate
           an address and choose how long it should last. Second, you copy that address and paste
           it into the signup form, trial form, newsletter form, or test form you are using.
@@ -687,15 +705,15 @@ function TempMailApp({ onEmailCopied }) {
           permanent address.
         </p>
         <h3>A short checklist before you generate an address</h3>
-        <ul>
+        <ul className="text-secondary">
           <li>Decide what the address is for: one trial, one newsletter, one test case, or one shopping signup.</li>
           <li>Choose an expiry that is longer than the task, not shorter. If a trial lasts a week, a ten-minute inbox will not help.</li>
           <li>Save anything important outside the inbox, because an expired inbox and its messages are assumed to be unrecoverable.</li>
           <li>Use a permanent address for anything you must be able to recover later, such as banking, billing, or a main work account.</li>
         </ul>
 
-        <h2>Using multiple inboxes without mixing them up</h2>
-        <p>
+        <h3 className="h5 fw-bold text-dark mt-4">Using multiple inboxes without mixing them up</h3>
+        <p className="text-secondary">
           The most useful habit in this app is also the simplest: use a separate inbox for a
           separate purpose. When every signup shares one address, every welcome message, receipt,
           and promotional email lands in the same place, and it becomes hard to tell which message
@@ -706,7 +724,7 @@ function TempMailApp({ onEmailCopied }) {
           a confirmation arrived, and to delete a whole inbox when you are done with it, without
           losing anything else.
         </p>
-        <p>
+        <p className="text-secondary">
           Switching between inboxes in the app is part of the same workflow. You generate a new
           address when you start a new signup, and you switch back to an earlier inbox when you
           need to check whether its confirmation has arrived. Keeping a short, private note of
@@ -715,15 +733,15 @@ function TempMailApp({ onEmailCopied }) {
           who can open that inbox can read its messages. Treat each temporary address as
           disposable, but treat its contents as private while it is active.
         </p>
-        <p>
+        <p className="text-secondary">
           For a fuller look at organising separate signups, see the guide on{" "}
           <a href="/blog/free-temp-mail-multiple-inboxes-guide">keeping test signups separate with multiple inboxes</a>.
           The guide explains the same idea in more detail, while this page stays focused on how
           the app itself handles switching, creating, and deleting inboxes.
         </p>
 
-        <h2>Choosing a custom name for your temporary address</h2>
-        <p>
+        <h3 className="h5 fw-bold text-dark mt-4">Choosing a custom name for your temporary address</h3>
+        <p className="text-secondary">
           A temporary address does not have to look random. TempMail Pro lets you choose a custom
           name for the part before the at sign, so the address can be easier to recognise when
           you see it in a form or in a message list. A clear name helps you remember which signup
@@ -733,7 +751,7 @@ function TempMailApp({ onEmailCopied }) {
           allows them, and avoid putting personal details, passwords, or sensitive information
           in the name itself.
         </p>
-        <p>
+        <p className="text-secondary">
           A custom name does not change what a temporary address is for. It is still a disposable
           address, it still expires, and it still should not be used for an account you need to
           recover. The name is a convenience for organisation, not a way to turn a temporary
@@ -744,8 +762,8 @@ function TempMailApp({ onEmailCopied }) {
           <a href="/blog/free-custom-name-temp-email">choosing a custom name for a temporary address</a>.
         </p>
 
-        <h2>Choosing an expiry that matches the job</h2>
-        <p>
+        <h3 className="h5 fw-bold text-dark mt-4">Choosing an expiry that matches the job</h3>
+        <p className="text-secondary">
           Expiry is the other choice that matters most in the app. TempMail Pro offers several
           preset durations and a custom option, so you can match the inbox lifetime to the task
           instead of forcing every signup into the same ten-minute window. A short expiry is right
@@ -755,7 +773,7 @@ function TempMailApp({ onEmailCopied }) {
           mistake, because a confirmation that arrives after expiry may be lost, and the inbox
           cannot be assumed to be recoverable after that point.
         </p>
-        <table>
+        <div className="table-responsive"><table className="table table-bordered table-striped align-middle">
           <caption>Temporary inbox expiry options in TempMail Pro</caption>
           <thead>
             <tr>
@@ -791,8 +809,8 @@ function TempMailApp({ onEmailCopied }) {
               <td>Pick a date after the last message you expect, not on the same day</td>
             </tr>
           </tbody>
-        </table>
-        <p>
+        </table></div>
+        <p className="text-secondary">
           As a rule, pick the shortest expiry that still covers the whole task, and then add a
           little margin. If a trial runs for seven days, a seven-day inbox is a better fit than a
           one-hour inbox, and a custom expiry that ends a day after the trial ends gives you time
@@ -800,8 +818,8 @@ function TempMailApp({ onEmailCopied }) {
           the difference between a smooth signup and a lost confirmation.
         </p>
 
-        <h2>Receiving verification codes and confirmation links</h2>
-        <p>
+        <h3 className="h5 fw-bold text-dark mt-4">Receiving verification codes and confirmation links</h3>
+        <p className="text-secondary">
           Most temporary email use comes down to one moment: waiting for a code or a link. After
           you paste your temporary address into a signup form, return to the app and open that
           inbox. New messages appear in the inbox view, and you can open a message to read its
@@ -811,7 +829,7 @@ function TempMailApp({ onEmailCopied }) {
           on the first try, check that you copied the full code, that you are using the message
           for the right signup, and that the inbox has not expired.
         </p>
-        <p>
+        <p className="text-secondary">
           If a message does not arrive, work through the problem in order rather than generating
           a new address straight away. First, refresh the inbox and give the sender a little time,
           because delivery can be delayed. Second, check that the address you pasted matches the
@@ -825,8 +843,8 @@ function TempMailApp({ onEmailCopied }) {
           the messages up.
         </p>
 
-        <h2>Testing signup flows with a separate inbox per test</h2>
-        <p>
+        <h3 className="h5 fw-bold text-dark mt-4">Testing signup flows with a separate inbox per test</h3>
+        <p className="text-secondary">
           Developers, testers, and support teams use the app in a different way from a casual
           signup, but the principle is the same: one inbox per test case. When you test a signup
           flow, create a fresh inbox for that case, run the flow, and watch that inbox only. That
@@ -837,7 +855,7 @@ function TempMailApp({ onEmailCopied }) {
           expired link was handled correctly, without guessing which message belonged to which
           run.
         </p>
-        <p>
+        <p className="text-secondary">
           A useful set of checks for a signup flow includes verification arrival, link or code use,
           expired-link handling, password-reset delivery, and localisation, such as language, date
           format, and currency format in the message. Running each check in its own inbox makes
@@ -849,8 +867,8 @@ function TempMailApp({ onEmailCopied }) {
           supports the workflow: generate, test, read, and discard, one inbox at a time.
         </p>
 
-        <h2>Free trials, coupons, and everyday signups</h2>
-        <p>
+        <h3 className="h5 fw-bold text-dark mt-4">Free trials, coupons, and everyday signups</h3>
+        <p className="text-secondary">
           Free trials are one of the most common reasons people open a temporary email app. A
           trial signup often asks for an email address before you can see whether the service is
           worth keeping, and giving your permanent address at that stage means trial reminders,
@@ -861,7 +879,7 @@ function TempMailApp({ onEmailCopied }) {
           and password-reset messages for a kept account should go to an address you control for
           the long term.
         </p>
-        <p>
+        <p className="text-secondary">
           The same idea applies to coupons, shopping signups, and newsletters. Use a temporary
           inbox to check a coupon or a shop, read its offers without polluting your real inbox,
           and keep the shop only if you actually want its messages. If you want to keep receiving
@@ -873,8 +891,8 @@ function TempMailApp({ onEmailCopied }) {
           in more detail.
         </p>
 
-        <h2>Limitations and responsible use</h2>
-        <p>
+        <h3 className="h5 fw-bold text-dark mt-4">Limitations and responsible use</h3>
+        <p className="text-secondary">
           Temporary email is a tool for low-risk signups, not a replacement for a permanent
           mailbox, and understanding its limits is part of using it well. An expired inbox and
           its messages are assumed to be unrecoverable, so you should never use a temporary
@@ -885,7 +903,7 @@ function TempMailApp({ onEmailCopied }) {
           domains, that is the service policy, and the responsible response is to use a different,
           permanent address for that service, not to look for a way around the block.
         </p>
-        <p>
+        <p className="text-secondary">
           Temporary email is also not full identity protection on its own. A website can still
           see other signals, such as your browser and connection details, even when you use a
           temporary address, and TempMail Pro does not sell or store your inbox data for
@@ -899,8 +917,8 @@ function TempMailApp({ onEmailCopied }) {
           see the <a href="/about">about page</a>.
         </p>
 
-        <h2>For users in the United States</h2>
-        <p>
+        <h3 className="h5 fw-bold text-dark mt-4">For users in the United States</h3>
+        <p className="text-secondary">
           TempMail Pro is free and works worldwide, including for users in the United States,
           with the same features and the same limits: multiple inboxes, custom names, custom
           expiry, and no sign-in required. Users in the United States can use the app for the
@@ -913,56 +931,67 @@ function TempMailApp({ onEmailCopied }) {
           if a service blocks disposable domains, use a permanent address for that service.
         </p>
 
-        <h2>Frequently asked questions about the app</h2>
-        <h3>How long does a temporary inbox last?</h3>
-        <p>
+        <h3 className="h5 fw-bold text-dark mt-4">Frequently asked questions about the app</h3>
+        <h4 className="h6 fw-bold text-dark mt-4">How long does a temporary inbox last?</h4>
+        <p className="text-secondary">
           It lasts for the expiry you choose when you generate it: 10 minutes, 1 hour, 24 hours,
           7 days, or a custom duration. Choose an expiry that covers the whole task, with a
           little margin, because an expired inbox and its messages are assumed to be unrecoverable.
         </p>
-        <h3>Do I need to sign in to use the app?</h3>
-        <p>
+        <h4 className="h6 fw-bold text-dark mt-4">Do I need to sign in to use the app?</h4>
+        <p className="text-secondary">
           No. The app does not ask you to sign in, create an account, or provide personal details
           to generate a temporary address. That is one of the reasons it is useful for quick,
           low-risk signups.
         </p>
-        <h3>Can I recover an inbox after it expires?</h3>
-        <p>
+        <h4 className="h6 fw-bold text-dark mt-4">Can I recover an inbox after it expires?</h4>
+        <p className="text-secondary">
           No, you should assume that you cannot. Save anything important outside the inbox before
           it expires, and move any account you want to keep to a permanent address in good time.
         </p>
-        <h3>Can I use more than one inbox at a time?</h3>
-        <p>
+        <h4 className="h6 fw-bold text-dark mt-4">Can I use more than one inbox at a time?</h4>
+        <p className="text-secondary">
           Yes. The app is designed for multiple inboxes, so you can keep a separate inbox for each
           signup, trial, or test case, switch between them, and delete one without affecting the
           others.
         </p>
-        <h3>Why did a site reject my temporary address?</h3>
-        <p>
+        <h4 className="h6 fw-bold text-dark mt-4">Why did a site reject my temporary address?</h4>
+        <p className="text-secondary">
           Some services block disposable domains as a matter of policy. That is not a fault in
           the app, and generating another temporary address from the same service will usually
           be blocked in the same way. Use a permanent address for that service instead.
         </p>
-        <h3>Is a temporary address safe for sensitive accounts?</h3>
-        <p>
+        <h4 className="h6 fw-bold text-dark mt-4">Is a temporary address safe for sensitive accounts?</h4>
+        <p className="text-secondary">
           No. Do not use a temporary address for banking, payments, billing, recovery, or any
           account that holds sensitive information. Those accounts belong on a permanent address
           you control for the long term.
         </p>
-        <h3>What should I do if a verification code does not arrive?</h3>
-        <p>
+        <h4 className="h6 fw-bold text-dark mt-4">What should I do if a verification code does not arrive?</h4>
+        <p className="text-secondary">
           Refresh the inbox, give the sender a little time, check that the pasted address matches
           the app address exactly, and check whether the service accepts temporary addresses. If
           it does, try once more with a fresh inbox and keep track of which inbox belongs to
           which attempt.
         </p>
-        <h3>Can I use the app for testing a signup flow?</h3>
-        <p>
+        <h4 className="h6 fw-bold text-dark mt-4">Can I use the app for testing a signup flow?</h4>
+        <p className="text-secondary">
           Yes, and one inbox per test case is the recommended approach. It keeps verification,
           password-reset, and welcome messages separated by test, so results are easier to read
           and repeat.
         </p>
+              <div className="text-center mt-5">
+          <button type="button" className="btn btn-primary btn-lg px-5 py-3 fw-bold rounded-3" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            Back to the app
+          </button>
+        </div>
+              </article>
+            </div>
+          </div>
+        </div>
       </section>
+      </main>
+      <Footer />
     </>
   );
 }

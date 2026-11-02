@@ -58,7 +58,7 @@ export const PWAInstallButton = ({ className = '', variant = 'navbar', label = '
         onClick={handleTrigger}
         className={
           isNavbar
-            ? `btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 fw-semibold px-2 px-md-3 ${className}`
+            ? `btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1 fw-semibold px-2 px-md-3 ${className}`
             : `btn btn-primary d-inline-flex align-items-center gap-2 fw-bold px-4 py-2 ${className}`
         }
         title="Install TempMail Pro as a native app on your phone or PC"

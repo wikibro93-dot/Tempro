@@ -61,7 +61,7 @@ const PageNavbar = () => {
           </ul>
           <div className="d-flex align-items-center gap-2 ms-md-2">
             <PWAInstallButton variant="navbar" label="Install App" />
-            <Link to="/app" className="page-navbar__cta" onClick={() => setMenuOpen(false)}>
+            <Link to="/app" className="page-navbar__cta" onClick={(e) => { if (pathname === '/app') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); } setMenuOpen(false); }}>
               <AppIcon iconClass="fas fa-envelope" /> Get Free Email
             </Link>
           </div>
