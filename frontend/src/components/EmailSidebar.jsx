@@ -98,7 +98,7 @@ const EmailSidebar = ({
           </div>
 
           <div className="d-flex align-items-center gap-2">
-            {generatedEmails.length > 1 && (
+            {generatedEmails.length >= 1 && (
               <button
                 type="button"
                 className="btn btn-sm btn-link text-decoration-none p-0 text-secondary"
@@ -113,7 +113,7 @@ const EmailSidebar = ({
               className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 py-0.5 px-2"
               onClick={onCreateNew}
               disabled={isCreating}
-              style={{ minHeight: '28px', fontSize: '0.78rem', borderRadius: '6px' }}
+              style={{ minHeight: '44px', fontSize: '0.85rem', borderRadius: '8px' }}
             >
               <AppIcon iconClass="bi bi-plus-lg" size={11} />
               <span>New</span>
@@ -138,7 +138,7 @@ const EmailSidebar = ({
                 }`}
                 onClick={() => onSwitch && onSwitch(addr)}
                 style={{
-                  minHeight: '34px',
+                  minHeight: '44px',
                   borderRadius: '999px',
                   padding: '3px 10px',
                   fontSize: '0.8rem',
@@ -150,7 +150,7 @@ const EmailSidebar = ({
                   style={{
                     width: '18px',
                     height: '18px',
-                    fontSize: '0.66rem',
+                    fontSize: '0.78rem',
                     fontWeight: 700,
                     background: isSelected ? 'rgba(255,255,255,0.3)' : '#e2e8f0',
                     color: isSelected ? '#ffffff' : '#334155',
@@ -168,7 +168,7 @@ const EmailSidebar = ({
                       isSelected ? 'bg-white text-primary' : 'bg-primary text-white'
                     }`}
                     style={{
-                      fontSize: '0.65rem',
+                      fontSize: '0.78rem',
                       padding: '1px 5px',
                       fontWeight: 700,
                       lineHeight: 1,
@@ -246,8 +246,6 @@ const EmailSidebar = ({
             style={{ maxWidth: '420px' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="pwa-modal-drag-indicator d-block d-sm-none" aria-hidden="true" />
-
             {/* Modal Header */}
             <div className="pwa-modal-header">
               <div className="pwa-modal-header__brand">
@@ -298,7 +296,7 @@ const EmailSidebar = ({
                       <div className="text-truncate me-2">
                         <div className="d-flex align-items-center gap-1.5">
                           {isSelected && (
-                            <span className="badge bg-primary text-white rounded-pill px-1.5" style={{ fontSize: '0.65rem' }}>
+                            <span className="badge bg-primary text-white rounded-pill px-1.5" style={{ fontSize: '0.78rem' }}>
                               Active
                             </span>
                           )}
@@ -306,7 +304,7 @@ const EmailSidebar = ({
                             {addr}
                           </span>
                         </div>
-                        <div className="text-muted" style={{ fontSize: '0.74rem' }}>
+                        <div className="text-muted" style={{ fontSize: '0.78rem' }}>
                           {isExpired ? (
                             <span className="text-danger fw-semibold">Expired</span>
                           ) : (
@@ -318,7 +316,7 @@ const EmailSidebar = ({
                       <button
                         type="button"
                         className={`btn btn-sm ${deleteArmedAddress === addr ? 'btn-danger' : 'btn-outline-danger'} d-inline-flex align-items-center gap-1 py-1 px-2 shrink-0`}
-                        style={{ minHeight: '30px', fontSize: '0.76rem', borderRadius: '6px' }}
+                        style={{ minHeight: '44px', fontSize: '0.85rem', borderRadius: '8px' }}
                         onClick={(ev) => {
                           ev.stopPropagation();
                           onDelete && onDelete(addr);

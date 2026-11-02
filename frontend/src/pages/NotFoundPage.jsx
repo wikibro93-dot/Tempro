@@ -6,7 +6,7 @@ function NotFoundPage() {
   return (
     <div className="container text-center my-5 py-5">
       <Helmet>
-        <title>404 - Page Not Found | TempMail Pk</title>
+        <title>404 - Page Not Found | TempMail Pro</title>
         <meta name="robots" content="noindex" />
       </Helmet>
       <h1 className="display-1 fw-bold">404</h1>

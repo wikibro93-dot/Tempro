@@ -85,10 +85,10 @@ const AccountManager = ({
       <div className="d-flex align-items-center justify-content-between gap-2 mb-1.5 px-1">
         <div className="d-flex align-items-center gap-1.5">
           <span className="eg-pulse-dot" style={{ width: '8px', height: '8px' }}></span>
-          <span className="badge bg-primary-subtle text-primary border border-primary-subtle py-0.5 px-2 fw-semibold" style={{ fontSize: '0.72rem' }}>
+          <span className="badge bg-primary-subtle text-primary border border-primary-subtle py-0.5 px-2 fw-semibold" style={{ fontSize: '0.78rem' }}>
             Active Address
           </span>
-          <span className="text-muted d-none d-md-inline" style={{ fontSize: '0.74rem' }}>
+          <span className="text-muted d-none d-md-inline" style={{ fontSize: '0.78rem' }}>
             Live Mail Server
           </span>
         </div>
@@ -111,7 +111,7 @@ const AccountManager = ({
             onClick={refreshInbox}
             disabled={isLoading || !account}
             title="Check mail / refresh now"
-            style={{ width: '30px', height: '30px', minHeight: '30px', minWidth: '30px', borderRadius: '7px' }}
+            style={{ width: '44px', height: '44px', minHeight: '44px', minWidth: '44px', borderRadius: '9px' }}
           >
             <AppIcon iconClass={`bi bi-arrow-clockwise ${isLoading ? 'spin' : ''}`} size={14} />
           </button>
@@ -122,7 +122,7 @@ const AccountManager = ({
             onClick={() => setShowQrModal(true)}
             disabled={!email}
             title="Scan QR code with mobile camera"
-            style={{ width: '30px', height: '30px', minHeight: '30px', minWidth: '30px', borderRadius: '7px' }}
+            style={{ width: '44px', height: '44px', minHeight: '44px', minWidth: '44px', borderRadius: '9px' }}
           >
             <AppIcon iconClass="bi bi-qr-code" size={13} />
           </button>
@@ -133,7 +133,7 @@ const AccountManager = ({
               className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center p-0"
               onClick={onNewEmailClick}
               title="Add custom name or new inbox"
-              style={{ width: '30px', height: '30px', minHeight: '30px', minWidth: '30px', borderRadius: '7px' }}
+              style={{ width: '44px', height: '44px', minHeight: '44px', minWidth: '44px', borderRadius: '9px' }}
             >
               <AppIcon iconClass="bi bi-plus-lg" size={14} />
             </button>
@@ -162,7 +162,7 @@ const AccountManager = ({
           disabled={!email || isLoading}
           title="Copy email address"
           style={{
-            minHeight: '36px',
+            minHeight: '44px',
             minWidth: '92px',
             borderRadius: '8px',
             fontSize: '0.84rem'

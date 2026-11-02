@@ -3,8 +3,10 @@ import AppIcon from './AppIcon';
 
 const QRCodeModal = ({ email, onClose }) => {
   const [copiedLink, setCopiedLink] = useState(false);
-  const shareUrl = `${window.location.origin}/app`;
-  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(shareUrl)}&margin=10`;
+  // Local QR for https://tempmailpk.com/app — same asset as the homepage
+  // carousel. Previously this depended on an external QR service, which
+  // could be slow or blocked and break the /app mobile handover.
+  const qrImageUrl = '/qr-app.svg';
 
   const copyShareLink = () => {
     navigator.clipboard.writeText(email).then(() => {
@@ -47,7 +49,7 @@ const QRCodeModal = ({ email, onClose }) => {
             <div className="d-inline-block p-3 rounded-3 border bg-white shadow-xs mb-3">
               <img
                 src={qrImageUrl}
-                alt="QR Code for Mobile Temp Mail"
+                alt="QR code — scan to open tempmailpk.com/app on your phone"
                 width={200}
                 height={200}
                 className="img-fluid rounded"

@@ -74,7 +74,7 @@ const SLIDES = [
 
           <div className="d-flex align-items-center justify-content-between p-2 rounded-2 bg-warning-subtle border border-warning-subtle">
             <div>
-              <span className="small text-muted d-block" style={{ fontSize: '0.72rem' }}>VERIFICATION CODE</span>
+              <span className="small text-muted d-block" style={{ fontSize: '0.78rem' }}>VERIFICATION CODE</span>
               <span className="fs-5 font-monospace fw-bold text-dark tracking-wider">849-204</span>
             </div>
             <span className="btn btn-sm btn-dark py-1 px-3 fw-semibold" style={{ fontSize: '0.78rem' }}>
@@ -143,7 +143,7 @@ const SLIDES = [
           </div>
           <div className="col-7 ps-2">
             <div className="small fw-bold text-dark mb-1">Confirm webhook subscription</div>
-            <div className="text-muted" style={{ fontSize: '0.72rem' }}>From: support@stripe.com</div>
+            <div className="text-muted" style={{ fontSize: '0.78rem' }}>From: support@stripe.com</div>
             <div className="p-2 rounded-2 bg-light border mt-2" style={{ fontSize: '0.75rem' }}>
               Click here to verify your endpoint URL for live event delivery.
             </div>
@@ -185,11 +185,13 @@ const SLIDES = [
   },
 ];
 
-const AUTO_INTERVAL_MS = 4000;
+const AUTO_INTERVAL_MS = 8000;
 
 const WorkspaceCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  const [hoverPaused, setHoverPaused] = useState(false);
+  const [manualPaused, setManualPaused] = useState(false);
+  const isPaused = hoverPaused || manualPaused;
   const timerRef = useRef(null);
 
   const nextSlide = () => {
@@ -220,10 +222,10 @@ const WorkspaceCarousel = () => {
   return (
     <div
       className="workspace-carousel-wrapper"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onTouchStart={() => setIsPaused(true)}
-      onTouchEnd={() => setIsPaused(false)}
+      onMouseEnter={() => setHoverPaused(true)}
+      onMouseLeave={() => setHoverPaused(false)}
+      onTouchStart={() => setHoverPaused(true)}
+      onTouchEnd={() => setHoverPaused(false)}
     >
       {/* Interactive Feature Stage */}
       <div className="workspace-carousel-stage shadow-sm border rounded-4 bg-surface overflow-hidden">
@@ -281,7 +283,7 @@ const WorkspaceCarousel = () => {
                     tempmailpk.com/app
                   </span>
                 </div>
-                <span className="badge bg-primary-subtle text-primary py-0 px-2 fw-semibold" style={{ fontSize: '0.72rem' }}>
+                <span className="badge bg-primary-subtle text-primary py-0 px-2 fw-semibold" style={{ fontSize: '0.78rem' }}>
                   Live Demo
                 </span>
               </div>
@@ -310,8 +312,18 @@ const WorkspaceCarousel = () => {
             ))}
           </div>
 
-          {/* Left / Right Arrow Controls */}
+          {/* Pause / Play + Left / Right Arrow Controls */}
           <div className="d-flex align-items-center gap-2">
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary carousel-nav-arrow"
+              onClick={() => setManualPaused((v) => !v)}
+              aria-label={manualPaused ? 'Resume auto-sliding' : 'Pause auto-sliding'}
+              title={manualPaused ? 'Resume auto-sliding' : 'Pause auto-sliding'}
+              style={{ minHeight: '44px', minWidth: '44px' }}
+            >
+              <AppIcon iconClass={manualPaused ? 'bi bi-play-fill' : 'bi bi-pause-fill'} />
+            </button>
             <button
               type="button"
               className="btn btn-sm btn-outline-secondary carousel-nav-arrow"

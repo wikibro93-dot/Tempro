@@ -2949,9 +2949,14 @@ footer.bg-light {
   line-height: 1;
   padding: 2px 4px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px;
   opacity: 0;
   transition: opacity 0.15s, color 0.15s;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .email-sidebar-row:hover .email-sidebar-delete {
@@ -5223,4 +5228,46 @@ textarea:focus-visible,
   .workspace-carousel-stage .carousel-preview-card {
     padding: 0.75rem;
   }
+}
+
+/* ==========================================================================
+   P0+P1 UI/UX batch — 2 Nov 2026
+   ========================================================================== */
+
+/* Contrast pass: muted text on light-subtle surfaces and yellow icons
+   were below readable contrast. Darken the common muted tones used
+   inside cards/panels (not the global Bootstrap muted, to avoid
+   changing the dark hero, which already uses near-white). */
+.bg-light-subtle .text-muted,
+.bg-body-tertiary .text-muted,
+.card .text-muted,
+.console-body .text-muted {
+  color: #475569 !important;
+}
+
+/* Warning icons: Bootstrap yellow (#ffc107) on white is ~1.6:1.
+   Use a darker amber wherever warning icons appear in alerts/cards. */
+.alert .text-warning,
+.card .text-warning {
+  color: #b45309 !important;
+}
+
+/* Domain selector loading skeleton: pulsing placeholder instead of a
+   bare "Loading…" option that looked like a stuck control. */
+.console-domain-loading {
+  animation: consoleDomainPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes consoleDomainPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* Carousel pause button: same 44px target as the arrows next to it. */
+.carousel-nav-arrow {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

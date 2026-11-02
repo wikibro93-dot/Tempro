@@ -77,7 +77,7 @@ const EmailRowItem = memo(({ index, style, messages, selectedId, copiedOtp, onSe
         <span className="fw-bold small text-dark text-truncate me-2" style={{ maxWidth: '180px' }}>
           {msg.from?.name || msg.from?.address || 'Unknown Sender'}
         </span>
-        <span className="text-muted font-monospace" style={{ fontSize: '0.74rem' }}>
+        <span className="text-muted font-monospace" style={{ fontSize: '0.78rem' }}>
           {formatDate(msg.createdAt)}
         </span>
       </div>
@@ -98,7 +98,8 @@ const EmailRowItem = memo(({ index, style, messages, selectedId, copiedOtp, onSe
           </span>
           <button
             type="button"
-            className={`btn btn-xs ${copiedOtp === detectedOtp ? 'btn-success' : 'btn-dark'} py-0 px-2 fw-semibold`}
+            className={`btn btn-xs ${copiedOtp === detectedOtp ? 'btn-success' : 'btn-dark'} py-2 px-3 fw-semibold`}
+                      style={{ minHeight: '44px' }}
             style={{ fontSize: '0.7rem', minHeight: '32px' }}
             onClick={(e) => onCopyOtp(detectedOtp, e)}
           >
@@ -373,7 +374,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                 {filteredMessages.length >= 10 && (
                   <span
                     className="badge bg-success-subtle text-success border border-success-subtle rounded-pill"
-                    style={{ fontSize: '0.68rem', letterSpacing: '0.02em' }}
+                    style={{ fontSize: '0.78rem', letterSpacing: '0.02em' }}
                     title="Virtualized list active: Renders only visible rows for 60fps performance with 100+ emails"
                   >
                     Virtualized ⚡
@@ -385,6 +386,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                   type="button"
                   className="btn btn-sm btn-outline-secondary py-1 px-2"
                   onClick={onRetry}
+                  style={{ minHeight: '44px' }}
                   title="Refresh inbox messages"
                 >
                   <AppIcon iconClass={`bi bi-arrow-clockwise ${isLoading ? 'spin' : ''}`} />
@@ -465,7 +467,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                     type="button"
                     className="btn btn-sm btn-outline-primary fw-semibold px-3 py-1 d-inline-flex align-items-center gap-1"
                     onClick={() => setMobileView('list')}
-                    style={{ minHeight: '38px' }}
+                    style={{ minHeight: '44px' }}
                   >
                     <AppIcon iconClass="bi bi-arrow-left" />
                     <span>Back to Messages</span>
@@ -482,7 +484,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                       type="button"
                       className={`btn btn-sm ${viewMode === 'html' ? 'btn-primary' : 'btn-outline-secondary'} py-1 px-2 small`}
                       onClick={() => setViewMode('html')}
-                      style={{ minHeight: '34px' }}
+                      style={{ minHeight: '44px' }}
                     >
                       HTML
                     </button>
@@ -490,7 +492,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                       type="button"
                       className={`btn btn-sm ${viewMode === 'text' ? 'btn-primary' : 'btn-outline-secondary'} py-1 px-2 small`}
                       onClick={() => setViewMode('text')}
-                      style={{ minHeight: '34px' }}
+                      style={{ minHeight: '44px' }}
                     >
                       Plain Text
                     </button>
@@ -500,7 +502,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                       onClick={() => handleDeleteMessage(selectedMsg)}
                       disabled={isDeleting}
                       title={deleteArmedId === selectedMsg?.id ? 'Click again to confirm delete' : 'Delete this email'}
-                      style={{ minHeight: '34px' }}
+                      style={{ minHeight: '44px' }}
                     >
                       <AppIcon iconClass={`bi bi-trash ${isDeleting ? 'spin' : ''}`} size={14} />
                       <span className={deleteArmedId === selectedMsg?.id ? '' : 'd-none d-sm-inline'}>{isDeleting ? 'Deleting…' : deleteArmedId === selectedMsg?.id ? 'Click again to confirm' : 'Delete'}</span>
@@ -530,7 +532,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                     {isOfflineContent && (
                       <span
                         className="badge rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1"
-                        style={{ backgroundColor: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d', fontSize: '0.72rem' }}
+                        style={{ backgroundColor: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d', fontSize: '0.78rem' }}
                         title="You are viewing the offline cached version of this message"
                       >
                         <AppIcon iconClass="bi bi-cloud-slash" size={12} />
@@ -574,7 +576,11 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                     <div className="d-flex align-items-center justify-content-between mb-2">
                       <h6 className="fw-bold mb-0 d-flex align-items-center gap-2">
                         <AppIcon iconClass="bi bi-paperclip fs-5 text-primary" />
-                        <span>Attached Files ({messageContent?.attachments?.length || 1})</span>
+                        <span>
+                          {messageContent?.attachments?.length
+                            ? `Attached Files (${messageContent.attachments.length})`
+                            : 'Attached Files'}
+                        </span>
                       </h6>
                       <a
                         href={`${API_ROOT}/inbox/download/${selectedMsg?.token || messageContent?.token || ''}/${selectedMsg.id}`}
@@ -611,7 +617,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                                     <div className="small fw-semibold text-truncate text-dark" title={att.filename}>
                                       {att.filename || 'attachment'}
                                     </div>
-                                    <div className="text-muted" style={{ fontSize: '0.72rem' }}>
+                                    <div className="text-muted" style={{ fontSize: '0.78rem' }}>
                                       {sizeDisplay ? `${sizeDisplay} · ` : ''}{att.contentType?.split('/')[1] || 'file'}
                                     </div>
                                   </div>
@@ -619,10 +625,12 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                                 <a
                                   href={downloadUrl}
                                   download={att.filename || 'attachment'}
-                                  className="btn btn-sm btn-primary py-1 px-2 d-inline-flex align-items-center"
+                                  className="btn btn-sm btn-primary py-2 px-3 d-inline-flex align-items-center gap-1"
+                                  style={{ minHeight: '44px' }}
                                   title={`Download ${att.filename || 'file'}`}
                                 >
                                   <AppIcon iconClass="bi bi-download" size={14} />
+                                  <span className="d-none d-sm-inline small">Download</span>
                                 </a>
                               </div>
                             </div>

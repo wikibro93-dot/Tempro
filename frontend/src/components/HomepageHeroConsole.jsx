@@ -22,6 +22,7 @@ const HomepageHeroConsole = () => {
   const [selectedDomain, setSelectedDomain] = useState('');
   const [domainsLoaded, setDomainsLoaded] = useState(false);
   const [customUser, setCustomUser] = useState('');
+  const [pendingDomain, setPendingDomain] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [heroError, setHeroError] = useState('');
   const [isCopied, setIsCopied] = useState(false);
@@ -169,7 +170,7 @@ const HomepageHeroConsole = () => {
           </div>
 
           <div className="d-flex align-items-center gap-2">
-            <span className="badge bg-success-subtle text-success border border-success-subtle py-1 px-2 fw-semibold" style={{ fontSize: '0.74rem' }}>
+            <span className="badge bg-success-subtle text-success border border-success-subtle py-1 px-2 fw-semibold" style={{ fontSize: '0.78rem' }}>
               <span className="eg-pulse-dot me-1"></span> Ready to Receive
             </span>
           </div>
@@ -178,7 +179,7 @@ const HomepageHeroConsole = () => {
         {/* Console Main Body */}
         <div className="console-body p-4 text-center">
           <div className="mb-2 text-start">
-            <span className="small text-muted text-uppercase fw-bold tracking-wider" style={{ fontSize: '0.72rem' }}>
+            <span className="small text-muted text-uppercase fw-bold tracking-wider" style={{ fontSize: '0.78rem' }}>
               Your Instant Temporary Email:
             </span>
           </div>
@@ -235,14 +236,16 @@ const HomepageHeroConsole = () => {
             <div className="d-flex align-items-center gap-2">
               <span className="small text-muted fw-semibold">Domain:</span>
               <select
-                className="form-select form-select-sm console-domain-select"
+                className={`form-select form-select-sm console-domain-select${!domainsLoaded ? ' console-domain-loading' : ''}`}
+                aria-label={domainsLoaded ? 'Select domain' : 'Loading live domains'}
                 value={selectedDomain}
                 onChange={(e) => {
-                  setSelectedDomain(e.target.value);
-                  handleCreateAccount({ domain: e.target.value });
+                  // Do not discard the current address silently: picking a
+                  // domain only arms the switch; the banner below confirms.
+                  if (e.target.value !== selectedDomain) setPendingDomain(e.target.value);
                 }}
                 disabled={isCreating || availableDomains.length === 0}
-                style={{ width: 'auto', fontWeight: 600, fontSize: '0.86rem', minHeight: '40px' }}
+                style={{ width: 'auto', fontWeight: 600, fontSize: '0.86rem', minHeight: '44px' }}
               >
                 {availableDomains.length === 0 ? (
                   <option value="" disabled>
@@ -268,6 +271,40 @@ const HomepageHeroConsole = () => {
               {showCustomize ? 'Hide custom options' : 'Customize username'}
             </button>
           </div>
+
+          {/* Domain-switch confirmation: switching creates a NEW address
+              and replaces the current one, so it must never happen on a
+              bare dropdown change. */}
+          {pendingDomain && (
+            <div className="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2 text-start small mb-3" role="alert">
+              <span>
+                Switch domain to <strong>@{pendingDomain}</strong>? This creates a new address and replaces the current one.
+              </span>
+              <span className="d-flex gap-2">
+                <button
+                  type="button"
+                  className="btn btn-sm btn-warning fw-semibold"
+                  style={{ minHeight: '44px' }}
+                  onClick={() => {
+                    const d = pendingDomain;
+                    setPendingDomain(null);
+                    setSelectedDomain(d);
+                    handleCreateAccount({ domain: d });
+                  }}
+                >
+                  Switch domain
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-secondary fw-semibold"
+                  style={{ minHeight: '44px' }}
+                  onClick={() => setPendingDomain(null)}
+                >
+                  Keep current
+                </button>
+              </span>
+            </div>
+          )}
 
           {/* Collapsible custom username row */}
           {showCustomize && (

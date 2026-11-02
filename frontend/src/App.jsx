@@ -78,6 +78,9 @@ function AppContent() {
   };
 
   const handleEmailCopied = () => {
+    // Never pop a promo over the /app workspace right after the user
+    // copies their address — that is the core task, not a promo moment.
+    if (location.pathname === '/app') return;
     if (!promoSuppressed) {
       setShowPromoCard(true);
     }
