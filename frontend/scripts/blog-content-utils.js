@@ -79,6 +79,23 @@ export function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+// Convert inline markdown links to real anchors. Only internal targets are
+// allowed (/blog/<slug> or /app); anything else is left as escaped plain
+// text, so a stray external/odd URL can never become a live link here.
+// Link text and href are both HTML-escaped. Image syntax (![...]) is not
+// converted (no article uses it) and is escaped as plain text.
+function renderInlineMarkdown(text) {
+  const parts = String(text).split(/(?<!\!)\[([^\]]+)\]\((\/blog\/[A-Za-z0-9._-]+|\/app)\)/g);
+  let out = '';
+  for (let i = 0; i < parts.length; i += 3) {
+    out += escapeHtml(parts[i] ?? '');
+    if (parts[i + 1] !== undefined) {
+      out += `<a href="${escapeHtml(parts[i + 2])}">${escapeHtml(parts[i + 1])}</a>`;
+    }
+  }
+  return out;
+}
+
 function renderSimpleMarkdown(markdown) {
   const lines = markdown.split(/\r?\n/);
   const htmlParts = [];
@@ -90,7 +107,8 @@ function renderSimpleMarkdown(markdown) {
     }
 
     const text = paragraphLines.join(' ').trim();
-    htmlParts.push(`<p>${escapeHtml(text)}</p>`);
+    const stripped = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1');
+    htmlParts.push(`<p>${renderInlineMarkdown(stripped)}</p>`);
     paragraphLines = [];
   };
 
@@ -105,17 +123,17 @@ function renderSimpleMarkdown(markdown) {
     if (headingMatch) {
       flushParagraph();
       const level = headingMatch[1].length;
-      htmlParts.push(`<h${level}>${escapeHtml(headingMatch[2])}</h${level}>`);
+      htmlParts.push(`<h${level}>${renderInlineMarkdown(headingMatch[2])}</h${level}>`);
       continue;
     }
 
     if (/^[-*]\s+/.test(line)) {
       flushParagraph();
-      htmlParts.push(`<p>• ${escapeHtml(line.replace(/^[-*]\s+/, ''))}</p>`);
+      htmlParts.push(`<p>• ${renderInlineMarkdown(line.replace(/^[-*]\s+/, ''))}</p>`);
       continue;
     }
 
-    paragraphLines.push(line.replace(/\*\*(.*?)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1'));
+    paragraphLines.push(line);
   }
 
   flushParagraph();

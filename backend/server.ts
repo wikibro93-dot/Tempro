@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import { Readable } from 'node:stream';
 
 const PORT = Number(process.env.PORT) || 10000;
 const MAIL_TM_API_BASE = (process.env.MAIL_TM_API_BASE || 'https://api.mail.tm').replace(/\/+$/, '');
@@ -47,6 +48,63 @@ function rateLimit({ windowMs, max }: { windowMs: number; max: number }) {
 const createLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10 }); // create 10/hour/IP
 const batchLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 }); // batch 30/min/IP
 const inboxLimiter = rateLimit({ windowMs: 60 * 1000, max: 60 }); // inbox reads 60/min/IP
+const fileLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 }); // attachment/download 30/min/IP
+const deleteLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 }); // message delete 30/min/IP (tighter than inbox reads)
+const accountDeleteLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10 }); // account delete 10/hour/IP
+
+// Per-token limiter: same shape as rateLimit, but keyed by the inbox token
+// in the URL so rotating IPs cannot dodge the cap for one inbox.
+function rateLimitByToken({ windowMs, max }: { windowMs: number; max: number }) {
+  const hits = new Map<string, { count: number; resetAt: number }>();
+  return (req: any, res: any, next: any) => {
+    const token = String(req.params?.token || '');
+    if (!token) return next();
+    const now = Date.now();
+    const entry = hits.get(token);
+    if (!entry || now >= entry.resetAt) {
+      hits.set(token, { count: 1, resetAt: now + windowMs });
+      return next();
+    }
+    entry.count += 1;
+    if (entry.count > max) {
+      return res.status(429).json({ error: 'Too many requests, please try again later.', code: 'RATE_LIMITED' });
+    }
+    return next();
+  };
+}
+const messageDeleteTokenLimiter = rateLimitByToken({ windowMs: 60 * 60 * 1000, max: 100 }); // 100 message deletes/hour/token
+const accountDeleteTokenLimiter = rateLimitByToken({ windowMs: 60 * 60 * 1000, max: 5 }); // 5 account deletes/hour/token
+
+// Maximum proxied file size. Known oversize (Content-Length header) is
+// rejected with 413 before any body is read; unknown-length bodies are
+// streamed and aborted once they pass this cap (headers are already sent
+// by then, so a clean 413 is impossible mid-stream).
+const MAX_PROXIED_BYTES = 25 * 1024 * 1024;
+
+// Stream an upstream response to the client without buffering it whole in
+// memory. Returns false if the stream was aborted for exceeding the cap.
+async function streamUpstream(res: any, upstream: any): Promise<boolean> {
+  if (!upstream.body) return false;
+  const stream = Readable.fromWeb(upstream.body as any);
+  let total = 0;
+  try {
+    for await (const chunk of stream as any) {
+      total += chunk.length;
+      if (total > MAX_PROXIED_BYTES) {
+        res.destroy();
+        return false;
+      }
+      if (!res.write(chunk)) {
+        await new Promise((resolve) => res.once('drain', resolve));
+      }
+    }
+    res.end();
+    return true;
+  } catch {
+    if (!res.destroyed) res.destroy();
+    return false;
+  }
+}
 const sseByIp = new Map<string, number>();
 const SSE_PER_IP_MAX = 20;
 const SSE_GLOBAL_MAX = 200;
@@ -427,6 +485,58 @@ app.get('/api/inbox/stream/:token', async (req, res) => {
 });
 
 
+// Delete a whole Mail.tm account (inbox). The frontend only holds a JWT
+// token, not the Mail.tm account id, so resolve the id via /accounts/me
+// with that token first, then delete by id with the same token. Token
+// validation follows the same pattern as the other token routes.
+app.delete('/api/accounts/:token', accountDeleteLimiter, accountDeleteTokenLimiter, async (req, res) => {
+  const { token } = req.params;
+
+  if (!token || token === 'undefined' || token === 'null') {
+    return res.status(400).json({ error: 'Missing or invalid inbox token. Please create a new email address.', code: 'INVALID_TOKEN' });
+  }
+  if (token.startsWith('mock_')) {
+    return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
+  }
+
+  try {
+    const meRes = await fetch(`${MAIL_TM_API_BASE}/accounts/me`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+      signal: AbortSignal.timeout(8000)
+    });
+    if (meRes.status === 401 || meRes.status === 403) {
+      return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
+    }
+    if (!meRes.ok) {
+      return res.status(502).json({ success: false, error: 'Mail.tm account unavailable, please try again.', code: 'UPSTREAM_ERROR' });
+    }
+    const meData: any = await meRes.json();
+    const accountId = meData?.id;
+    if (!accountId) {
+      return res.status(502).json({ success: false, error: 'Mail.tm account unavailable, please try again.', code: 'UPSTREAM_ERROR' });
+    }
+
+    const delRes = await fetch(`${MAIL_TM_API_BASE}/accounts/${accountId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(8000)
+    });
+    if (delRes.ok || delRes.status === 204) {
+      return res.json({ success: true });
+    }
+    if (delRes.status === 404) {
+      // Already gone on Mail.tm: the local purge the frontend performs on
+      // any 2xx is still the correct outcome.
+      return res.json({ success: true, alreadyDeleted: true });
+    }
+    return res.status(502).json({ success: false, error: 'Could not delete account, please try again.', code: 'UPSTREAM_ERROR' });
+  } catch (err: any) {
+    console.warn('[Backend] Account delete error:', err.message);
+    return res.status(502).json({ success: false, error: 'Could not delete account, please try again.', code: 'UPSTREAM_ERROR' });
+  }
+});
+
+
 // Message detail & full content endpoint
 app.get('/api/inbox/content/:token/:messageId', inboxLimiter, async (req, res) => {
   const { token, messageId } = req.params;
@@ -477,8 +587,15 @@ app.get('/api/inbox/content/:token/:messageId', inboxLimiter, async (req, res) =
 });
 
 // Direct attachment stream proxy
-app.get('/api/inbox/attachment/:token/:messageId/:attachmentId', async (req, res) => {
+app.get('/api/inbox/attachment/:token/:messageId/:attachmentId', fileLimiter, async (req, res) => {
   const { token, messageId, attachmentId } = req.params;
+
+  if (!token || !messageId || !attachmentId) {
+    return res.status(400).json({ error: 'Missing token, message ID or attachment ID' });
+  }
+  if (token.startsWith('mock_')) {
+    return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
+  }
 
   try {
     let fileRes = await fetch(`${MAIL_TM_API_BASE}/messages/${messageId}/attachment/${attachmentId}`, {
@@ -499,11 +616,15 @@ app.get('/api/inbox/attachment/:token/:messageId/:attachmentId', async (req, res
       const upstreamType = fileRes.headers.get('content-type') || 'application/octet-stream';
       const safeType = upstreamType.startsWith('text/html') ? 'application/octet-stream' : upstreamType;
       const safeName = `attachment-${String(messageId).replace(/[^A-Za-z0-9._-]/g, '')}-${String(attachmentId).replace(/[^A-Za-z0-9._-]/g, '')}`;
+      const upstreamLength = Number(fileRes.headers.get('content-length'));
+      if (Number.isFinite(upstreamLength) && upstreamLength > MAX_PROXIED_BYTES) {
+        return res.status(413).json({ error: 'Attachment too large to download.', code: 'FILE_TOO_LARGE' });
+      }
       res.setHeader('Content-Type', safeType);
       res.setHeader('Content-Disposition', `attachment; filename="${safeName}"`);
 
-      const buffer = await fileRes.arrayBuffer();
-      return res.send(Buffer.from(buffer));
+      await streamUpstream(res, fileRes);
+      return;
     }
 
     return res.status(fileRes.status).json({ error: 'Could not retrieve attachment' });
@@ -513,8 +634,15 @@ app.get('/api/inbox/attachment/:token/:messageId/:attachmentId', async (req, res
 });
 
 // Download raw email (.eml) endpoint
-app.get('/api/inbox/download/:token/:messageId', async (req, res) => {
+app.get('/api/inbox/download/:token/:messageId', fileLimiter, async (req, res) => {
   const { token, messageId } = req.params;
+
+  if (!token || !messageId) {
+    return res.status(400).json({ error: 'Missing token or message ID' });
+  }
+  if (token.startsWith('mock_')) {
+    return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
+  }
 
   try {
     const emlRes = await fetch(`${MAIL_TM_API_BASE}/messages/${messageId}/download`, {
@@ -523,10 +651,14 @@ app.get('/api/inbox/download/:token/:messageId', async (req, res) => {
     });
 
     if (emlRes.ok) {
+      const upstreamLength = Number(emlRes.headers.get('content-length'));
+      if (Number.isFinite(upstreamLength) && upstreamLength > MAX_PROXIED_BYTES) {
+        return res.status(413).json({ error: 'Email too large to download.', code: 'FILE_TOO_LARGE' });
+      }
       res.setHeader('Content-Type', 'message/rfc822');
       res.setHeader('Content-Disposition', `attachment; filename="email-${messageId}.eml"`);
-      const buffer = await emlRes.arrayBuffer();
-      return res.send(Buffer.from(buffer));
+      await streamUpstream(res, emlRes);
+      return;
     }
   } catch (err: any) {
     console.warn('[Backend] Download EML error:', err.message);
@@ -536,7 +668,7 @@ app.get('/api/inbox/download/:token/:messageId', async (req, res) => {
 });
 
 // Delete email message endpoint
-app.delete('/api/inbox/:token/:messageId', async (req, res) => {
+app.delete('/api/inbox/:token/:messageId', deleteLimiter, messageDeleteTokenLimiter, async (req, res) => {
   const { token, messageId } = req.params;
 
   if (token.startsWith('mock_')) {

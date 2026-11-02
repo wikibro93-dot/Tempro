@@ -100,6 +100,38 @@ export const offlineMailbox = {
   },
 
   /**
+   * Purge every local cache entry for one inbox token: the offline inbox
+   * payload, the legacy inbox key, cached message bodies whose payload
+   * belongs to this token, and this token's metadata entry. Used when an
+   * inbox is removed/deleted so no message body survives locally.
+   */
+  purgeToken(token) {
+    if (!token) return;
+    try { localStorage.removeItem(`${OFFLINE_MSG_PREFIX}${token}`); } catch {}
+    try { localStorage.removeItem(`inbox-${token}`); } catch {}
+    try {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(OFFLINE_CONTENT_PREFIX)) keys.push(key);
+      }
+      for (const key of keys) {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(key));
+          if (parsed && parsed.token === token) localStorage.removeItem(key);
+        } catch {}
+      }
+    } catch {}
+    try {
+      const meta = this.getMetadata();
+      if (meta && token in meta) {
+        delete meta[token];
+        localStorage.setItem(OFFLINE_META_KEY, JSON.stringify(meta));
+      }
+    } catch {}
+  },
+
+  /**
    * Check if a message has its content cached
    */
   hasMessageContent(msgId) {

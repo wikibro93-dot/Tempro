@@ -40,14 +40,23 @@ const isPersistentError = (message = "") => {
     text.includes("expired") ||
     text.includes("session") ||
     text.includes("token") ||
-    text.includes("unauthorized")
+    text.includes("unauthorized") ||
+    text.includes("could not create")
   );
 };
 
 function TempMailApp({ onEmailCopied }) {
   const [account, setAccount] = useState(() => {
     const saved = localStorage.getItem("tempMailAccount");
-    return saved ? JSON.parse(saved) : null;
+    if (!saved) return null;
+    try {
+      return JSON.parse(saved);
+    } catch {
+      // Corrupt stored account must never white-screen /app: drop it and
+      // fall through to normal auto-create on mount.
+      try { localStorage.removeItem("tempMailAccount"); } catch {}
+      return null;
+    }
   });
   const [generatedEmails, setGeneratedEmails] = useState(() => {
     try {
@@ -173,7 +182,12 @@ function TempMailApp({ onEmailCopied }) {
       // Load messages from localStorage if available
       const savedMessages = localStorage.getItem(`inbox-${account.token}`);
       if (savedMessages) {
-        setMessages(JSON.parse(savedMessages));
+        try {
+          setMessages(JSON.parse(savedMessages));
+        } catch {
+          try { localStorage.removeItem(`inbox-${account.token}`); } catch {}
+          setMessages([]);
+        }
       }
       fetchInbox(true); // Initial load - show loading indicator
     }
@@ -226,7 +240,10 @@ function TempMailApp({ onEmailCopied }) {
     let currentAcc = null;
     try {
       currentAcc = savedAccRaw ? JSON.parse(savedAccRaw) : null;
-    } catch {}
+    } catch {
+      try { localStorage.removeItem("tempMailAccount"); } catch {}
+      currentAcc = null;
+    }
 
     const isMockOrInactive = currentAcc && (currentAcc.token?.startsWith('mock_') || currentAcc.address?.includes('uberip.com'));
 
@@ -385,7 +402,24 @@ function TempMailApp({ onEmailCopied }) {
     }
   };
 
-  const deleteEmail = (emailAddress) => {
+  // Remove an inbox from this device, and delete the Mail.tm account on
+  // the server first when possible. If the server delete fails, the inbox
+  // is still removed locally, but the user is told honestly that it was
+  // only removed from this device (the server account may still exist).
+  const purgeLocalInbox = (emailAddress, token) => {
+    if (token) {
+      try { localStorage.removeItem(`inbox-${token}`); } catch {}
+      try { offlineMailbox.purgeToken(token); } catch {}
+    }
+    try {
+      const cur = accountRef.current;
+      if (cur && (cur.address === emailAddress || cur.email === emailAddress)) {
+        try { localStorage.removeItem("tempMailAccount"); } catch {}
+      }
+    } catch {}
+  };
+
+  const applyLocalRemoval = (emailAddress) => {
     setGeneratedEmails(prev => {
       const remaining = prev.filter(e => e.address !== emailAddress);
       const cur = accountRef.current;
@@ -400,6 +434,26 @@ function TempMailApp({ onEmailCopied }) {
       }
       return remaining;
     });
+  };
+
+  const deleteEmail = async (emailAddress) => {
+    const entry = generatedEmails.find(e => e.address === emailAddress);
+    const token = entry?.token || (accountRef.current && (accountRef.current.address === emailAddress || accountRef.current.email === emailAddress) ? accountRef.current.token : null);
+    if (!token) {
+      applyLocalRemoval(emailAddress);
+      return;
+    }
+    try {
+      await axios.delete(`${API_ROOT}/accounts/${encodeURIComponent(token)}`);
+      purgeLocalInbox(emailAddress, token);
+      applyLocalRemoval(emailAddress);
+    } catch (err) {
+      // Server delete failed: keep the previous local-only behaviour, but
+      // say so plainly instead of implying the account was deleted.
+      purgeLocalInbox(emailAddress, token);
+      applyLocalRemoval(emailAddress);
+      setError({ message: 'Inbox removed from this device only. The server account could not be deleted right now — it may still exist on the mail server.' });
+    }
   };
 
   const fetchInbox = async (showLoading = false) => {
@@ -579,6 +633,20 @@ function TempMailApp({ onEmailCopied }) {
       <h1 className="visually-hidden">TempMail Pro App — Free Temporary Email</h1>
       <div className="container-fluid py-3 px-3 px-md-4">
         <PageNavbar />
+
+        {error && (
+          <ErrorAlert
+            error={error}
+            setError={setError}
+            onRetry={() => {
+              if (accountRef.current?.token) {
+                fetchInbox(true);
+              } else {
+                createNewAccount({ durationMs: 3600000 });
+              }
+            }}
+          />
+        )}
 
         {isBackgroundPolling && (
           <div className="background-polling-indicator">
