@@ -170,10 +170,7 @@ export default function RouteSeoManager() {
         name: SITE_NAME,
         url: SITE_URL,
         logo: `${SITE_URL}/pwa-512x512.png`,
-        sameAs: [
-          'https://facebook.com/tempmailpk',
-          'https://x.com/tempmailpk',
-        ],
+        // No sameAs: no Facebook or X page exists yet for TempMail Pro.
         contactPoint: {
           '@type': 'ContactPoint',
           email: 'support@tempmailpk.com',
@@ -246,7 +243,6 @@ export default function RouteSeoManager() {
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@tempmailpk" />
       {canonical && <meta name="twitter:url" content={canonical} />}
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />

@@ -79,10 +79,8 @@ const Landing = () => {
                 "name": "TempMail Pro",
                 "url": "https://tempmailpk.com/",
                 "logo": "https://tempmailpk.com/pwa-512x512.png",
-                "sameAs": [
-                  "https://facebook.com/tempmailpk",
-                  "https://x.com/tempmailpk"
-                ],
+                // No sameAs: TempMail Pro has no Facebook or X page yet,
+                // so no social profiles are claimed in structured data.
                 "contactPoint": {
                   "@type": "ContactPoint",
                   "email": "support@tempmailpk.com",

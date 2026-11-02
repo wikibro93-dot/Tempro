@@ -119,16 +119,6 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="https://facebook.com/tempmailpk" target="_blank" rel="noopener noreferrer" className="d-inline-flex align-items-center">
-                  <AppIcon iconClass="bi bi-facebook me-2" />Facebook Page
-                </a>
-              </li>
-              <li>
-                <a href="https://x.com/tempmailpk" target="_blank" rel="noopener noreferrer" className="d-inline-flex align-items-center">
-                  <AppIcon iconClass="bi bi-twitter-x me-2" />@tempmailpk on X
-                </a>
-              </li>
-              <li>
                 <Link to="/about" className="d-inline-flex align-items-center">
                   <AppIcon iconClass="bi bi-building me-2" />Organization &amp; Team
                 </Link>

@@ -91,7 +91,6 @@ export default function BlogList({ limit, showSEO = false, showHeader = true, sh
           <meta name="twitter:title" content="TempMail Pro Blog – Disposable Email Privacy Guides" />
           <meta name="twitter:description" content="Expert guides on temporary disposable emails, spam protection, and online privacy." />
           <meta name="twitter:image" content="https://tempmailpk.com/pwa-512x512.png" />
-          <meta name="twitter:site" content="@tempmailpk" />
           <script type="application/ld+json">
             {JSON.stringify({
               '@context': 'https://schema.org',

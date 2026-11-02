@@ -212,7 +212,6 @@ export default function BlogPost() {
           content={description || 'TempMail Pro Blog article about email privacy and security'}
         />
         <meta name="twitter:image" content={metaImage} />
-        <meta name="twitter:site" content="@tempmailpk" />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',
