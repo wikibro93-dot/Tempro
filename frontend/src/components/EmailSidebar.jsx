@@ -89,23 +89,21 @@ const EmailSidebar = ({
     <>
       {/* ── Mobile Horizontal Strip (< 992px) ── */}
       <div className="d-lg-none mobile-inboxes-strip mb-2">
-        <div className="d-flex align-items-center justify-content-between mb-1.5 px-1">
-          <div className="d-flex align-items-center gap-1.5">
-            <AppIcon iconClass="bi bi-inbox-fill text-primary" size={13} />
-            <span className="fw-bold small text-dark" style={{ fontSize: '0.82rem' }}>
-              Inboxes ({activeEmails.length})
-            </span>
-          </div>
-
+        <div className="d-flex align-items-center justify-content-end mb-1.5 px-1">
           <div className="d-flex align-items-center gap-2">
+            {/* Single count only: the old "Inboxes (N)" label and the
+                "Manage (N)" button showed two counts for the same thing
+                (active vs total, so they could even disagree). Now only
+                "Inbox (N)" remains, opening the same Manage list. */}
             {generatedEmails.length >= 1 && (
               <button
                 type="button"
                 className="btn btn-sm btn-link text-decoration-none p-0 text-secondary"
                 onClick={() => setShowManageModal(true)}
-                style={{ fontSize: '0.78rem', fontWeight: 600 }}
+                style={{ fontSize: '0.85rem', fontWeight: 600, minHeight: '44px' }}
               >
-                Manage ({generatedEmails.length})
+                <AppIcon iconClass="bi bi-inbox-fill text-primary me-1" size={13} />
+                Inbox ({generatedEmails.length})
               </button>
             )}
             <button

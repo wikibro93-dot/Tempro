@@ -772,7 +772,6 @@ function TempMailApp({ onEmailCopied }) {
                   refreshInbox={() => fetchInbox(true)}
                   onEmailCopied={onEmailCopied}
                   isLoading={isLoading || isInboxLoading}
-                  onNewEmailClick={() => setShowAddPanel(v => !v)}
                 />
 
                 {/* Primary Inbox View — Directly visible on mobile screen */}

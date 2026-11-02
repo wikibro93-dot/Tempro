@@ -7,7 +7,6 @@ const AccountManager = ({
   refreshInbox,
   onEmailCopied,
   isLoading = false,
-  onNewEmailClick = null,
 }) => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -84,10 +83,10 @@ const AccountManager = ({
       {/* Top Meta Line: Status, Timer & Action Icons in 1 Tight Row */}
       <div className="d-flex align-items-center justify-content-between gap-2 mb-1.5 px-1">
         <div className="d-flex align-items-center gap-1.5">
-          <span className="eg-pulse-dot" style={{ width: '8px', height: '8px' }}></span>
-          <span className="badge bg-primary-subtle text-primary border border-primary-subtle py-0.5 px-2 fw-semibold" style={{ fontSize: '0.78rem' }}>
-            Active Address
-          </span>
+          {/* Indicator only: the "Active Address" badge text was redundant
+              next to the pulse dot and cost a full row of space. */}
+          <span className="eg-pulse-dot" style={{ width: '8px', height: '8px' }} title="Active"></span>
+          <span className="visually-hidden">Active address</span>
           <span className="text-muted d-none d-md-inline" style={{ fontSize: '0.78rem' }}>
             Live Mail Server
           </span>
@@ -104,7 +103,9 @@ const AccountManager = ({
 
           <div className="vr d-none d-sm-block mx-1" style={{ height: '14px', opacity: 0.2 }}></div>
 
-          {/* Quick Icon Actions (Refresh, QR, New) */}
+          {/* Quick Icon Actions (Refresh, QR) — the "+" New button was
+              removed here: the mobile strip's "+New" (and the desktop
+              sidebar's "New Email") already do the same thing. */}
           <button
             type="button"
             className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center p-0"
@@ -127,17 +128,6 @@ const AccountManager = ({
             <AppIcon iconClass="bi bi-qr-code" size={13} />
           </button>
 
-          {onNewEmailClick && (
-            <button
-              type="button"
-              className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center p-0"
-              onClick={onNewEmailClick}
-              title="Add custom name or new inbox"
-              style={{ width: '44px', height: '44px', minHeight: '44px', minWidth: '44px', borderRadius: '9px' }}
-            >
-              <AppIcon iconClass="bi bi-plus-lg" size={14} />
-            </button>
-          )}
         </div>
       </div>
 
