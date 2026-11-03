@@ -4,6 +4,7 @@ import axios from 'axios';
 import { List } from 'react-window';
 import AppIcon from './AppIcon';
 import SafeEmailViewer from './SafeEmailViewer';
+import MessageErrorBoundary from './MessageErrorBoundary';
 import offlineMailbox from '../utils/offlineMailbox';
 
 // Helper to extract verification/OTP codes from subject or message preview
@@ -562,12 +563,18 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                     </button>
                   </div>
                 ) : (
-                  <SafeEmailViewer
-                    html={messageContent?.html || selectedMsg?.html}
-                    text={messageContent?.text || selectedMsg?.text || selectedMsg?.intro}
-                    viewMode={viewMode}
-                    isOffline={isOfflineContent}
-                  />
+                  <MessageErrorBoundary
+                    key={`${selectedMsg.id}-${viewMode}`}
+                    onShowPlainText={() => setViewMode('text')}
+                    emlUrl={`${API_ROOT}/inbox/download/${selectedMsg?.token || messageContent?.token || ''}/${selectedMsg.id}`}
+                  >
+                    <SafeEmailViewer
+                      html={messageContent?.html || selectedMsg?.html}
+                      text={messageContent?.text || selectedMsg?.text || selectedMsg?.intro}
+                      viewMode={viewMode}
+                      isOffline={isOfflineContent}
+                    />
+                  </MessageErrorBoundary>
                 )}
 
                 {/* Attachments & Download Section */}

@@ -109,7 +109,20 @@ const sseByIp = new Map<string, number>();
 const SSE_PER_IP_MAX = 20;
 const SSE_GLOBAL_MAX = 200;
 
+// Domain cache (Phase A, Nov 2026): Mail.tm's domain pool changes rarely,
+// but every /domains, /ready and account-create call used to hit it live, so
+// a transient upstream spike left the domain dropdown empty. Cache for
+// 15 minutes and serve the stale list when a refresh fails, instead of [].
+// In-memory only: on a free-Render spin-down/restart the cache simply
+// rebuilds on the next request. Callers must treat the result as a copy.
+const DOMAIN_CACHE_TTL_MS = 15 * 60 * 1000;
+let domainCache: { domains: string[]; fetchedAt: number } = { domains: [], fetchedAt: 0 };
+
 async function getLiveDomains(): Promise<string[]> {
+  const now = Date.now();
+  if (domainCache.domains.length > 0 && now - domainCache.fetchedAt < DOMAIN_CACHE_TTL_MS) {
+    return [...domainCache.domains];
+  }
   try {
     const res = await fetch(`${MAIL_TM_API_BASE}/domains`, {
       headers: { Accept: 'application/json' },
@@ -123,14 +136,17 @@ async function getLiveDomains(): Promise<string[]> {
           .filter((d: any) => d.isActive !== false && d.domain)
           .map((d: any) => d.domain);
         if (live.length > 0) {
-          return live;
+          domainCache = { domains: live, fetchedAt: now };
+          return [...live];
         }
       }
     }
   } catch (err: any) {
     console.warn('[Backend] Could not fetch live Mail.tm domains:', err.message);
   }
-  return [];
+  // Refresh failed: serve the stale cached list (if any) rather than an
+  // empty dropdown, so the app keeps working through transient outages.
+  return [...domainCache.domains];
 }
 
 // Health check endpoint (liveness only — does not check Mail.tm)

@@ -132,8 +132,26 @@ const FAQSection = () => {
     })
   );
 
+  // FAQPage structured data (Phase A, Nov 2026). Built from the SAME
+  // coreFaqs + partnerFaqs arrays rendered below, unfiltered, so the schema
+  // always matches the visible questions and answers on this page — never
+  // hidden-only content. No ranking or CTR outcome is promised for it.
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [...coreFaqs, ...partnerFaqs].map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: { '@type': 'Answer', text: faq.a },
+    })),
+  };
+
   return (
     <section className="faq-section">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="container">
         <div className="faq-header text-center">
           <h2 className="faq-title">Frequently Asked Questions</h2>
