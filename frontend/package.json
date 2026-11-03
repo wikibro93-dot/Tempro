@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5173",
-    "build": "node scripts/generate-pwa-icons.js && node scripts/generate-blog-static-pages.js && node scripts/generate-sitemap.js && vite build",
+    "build": "node scripts/generate-pwa-icons.js && node scripts/generate-blog-static-pages.js && node scripts/generate-sitemap.js && node scripts/generate-llms.js && vite build",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "check": "node scripts/check-contracts.js",
     "test": "node --test tests/apiRoot.test.mjs",
