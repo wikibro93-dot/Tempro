@@ -34,6 +34,7 @@ const corePages = [
   ['Privacy Stack Guide', '/privacy-stack', 'Partner privacy tools and affiliate offers, clearly labelled as partners, not TempMail features.'],
   ['About TempMail Pro', '/about', 'What TempMail Pro is, what it is for, and what it is not for.'],
   ['Privacy Policy', '/privacy', 'What TempMail Pro records and what it does not.'],
+  ['Contact Us', '/contact', 'Contact form for questions, feedback, and problems with the app; replies go to the email address the visitor gives.'],
 ];
 
 const lines = [];

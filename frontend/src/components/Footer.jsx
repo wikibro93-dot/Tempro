@@ -114,9 +114,9 @@ const Footer = () => {
             <h3 className="site-footer__heading">Contact &amp; Trust</h3>
             <ul className="site-footer__links">
               <li>
-                <a href="mailto:support@tempmailpk.com" className="d-inline-flex align-items-center">
-                  <AppIcon iconClass="bi bi-envelope-fill me-2" />support@tempmailpk.com
-                </a>
+                <Link to="/contact" className="d-inline-flex align-items-center">
+                  <AppIcon iconClass="bi bi-envelope-fill me-2" />Contact Us
+                </Link>
               </li>
               <li>
                 <Link to="/about" className="d-inline-flex align-items-center">

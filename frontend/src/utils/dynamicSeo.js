@@ -70,6 +70,13 @@ export function generateDynamicSitemap(siteUrl = SITE_URL) {
       changefreq: 'monthly',
       priority: '0.75',
       description: 'TempMail Pro Privacy Policy'
+    },
+    {
+      url: `${siteUrl}/contact`,
+      lastmod: '2026-11-04',
+      changefreq: 'monthly',
+      priority: '0.70',
+      description: 'Contact TempMail Pro support via form'
     }
   ];
 

@@ -14,6 +14,7 @@ const BlogPost = lazy(() => import("./components/BlogPost"));
 const Privacy = lazy(() => import("./components/Privacy"));
 const PrivacyStack = lazy(() => import("./components/PrivacyStack"));
 const About = lazy(() => import("./components/About.jsx"));
+const Contact = lazy(() => import("./components/Contact.jsx"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 const PROMO_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
@@ -109,6 +110,7 @@ function AppContent() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/privacy-stack" element={<PrivacyStack />} />
           <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>

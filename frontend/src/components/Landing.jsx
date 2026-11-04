@@ -83,7 +83,7 @@ const Landing = () => {
                 // so no social profiles are claimed in structured data.
                 "contactPoint": {
                   "@type": "ContactPoint",
-                  "email": "support@tempmailpk.com",
+                  "url": "https://tempmailpk.com/contact",
                   "contactType": "customer service",
                   "availableLanguage": ["English"]
                 }

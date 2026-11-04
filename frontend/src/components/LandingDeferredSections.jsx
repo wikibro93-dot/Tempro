@@ -35,7 +35,7 @@ const LandingDeferredSections = () => {
           <div className="text-center mb-5">
             <div className="d-inline-flex align-items-center gap-2 mb-2 text-primary fw-semibold small text-uppercase tracking-wider">
               <AppIcon iconClass="bi bi-shield-check" />
-              <span>Engineered For Total Privacy</span>
+              <span>Built for Everyday Privacy</span>
             </div>
             <h2 className="fw-bold section-title display-6">Why Industry Professionals Choose TempMail Pro</h2>
             <p className="text-muted mx-auto" style={{ maxWidth: '600px' }}>
@@ -64,7 +64,7 @@ const LandingDeferredSections = () => {
                   <div className="d-inline-flex p-3 rounded-3 bg-success-subtle text-success mb-3 fs-4">
                     <AppIcon iconClass="fas fa-shield-alt" />
                   </div>
-                  <h3 className="card-title h5 fw-bold">100% Spam Quarantine</h3>
+                  <h3 className="card-title h5 fw-bold">Spam Quarantine</h3>
                   <p className="card-text text-secondary small">
                     Keep marketing spam, data broker harvesting, and untrusted newsletters quarantined away from your personal Gmail or Outlook accounts.
                   </p>
@@ -138,7 +138,7 @@ const LandingDeferredSections = () => {
                 </span>
                 <h3 className="h5 fw-bold mb-2">Auto-Purge &amp; Stay Private</h3>
                 <p className="text-secondary small mb-0">
-                  When your timer expires, the mailbox is automatically destroyed. No digital footprints, zero marketing spam left behind.
+                  When your timer expires, the mailbox is automatically destroyed, so nothing more arrives in it and its messages are gone.
                 </p>
               </div>
             </div>
@@ -152,7 +152,7 @@ const LandingDeferredSections = () => {
           <div className="text-center mb-5">
             <h2 className="fw-bold section-title display-6">The Definitive Guide to Disposable Temporary Email</h2>
             <p className="text-muted mx-auto" style={{ maxWidth: '680px' }}>
-              How disposable mailboxes safeguard your digital footprint, stop aggressive marketing trackers, and prevent account correlation.
+              How disposable mailboxes safeguard your personal inbox, reduce aggressive marketing mail, and make it harder to link your signups together.
             </p>
           </div>
 
@@ -162,13 +162,13 @@ const LandingDeferredSections = () => {
                 <div className="p-3 mb-4 rounded-3 border-start border-4 border-primary bg-primary-subtle">
                   <h4 className="h6 fw-bold text-primary mb-1">Key Takeaway for Online Safety:</h4>
                   <p className="small mb-0 text-dark">
-                    Your personal email is a permanent digital identifier tied to banking, personal messages, and cloud accounts. Exposing it to one-off web signups increases phishing risk by over 300%.
+                    Your personal email is a permanent digital identifier tied to banking, personal messages, and cloud accounts. Exposing it to one-off web signups puts that identifier into more databases, which means more phishing attempts and marketing mail reaching you.
                   </p>
                 </div>
 
                 <h3 className="h5 fw-bold text-dark mt-4">Why Temporary Email Is Essential Today</h3>
                 <p className="text-secondary">
-                  Temporary disposable email acts as an impenetrable shield between your true identity and online services. When trying a new tool, testing a prototype, or accessing a gated whitepaper, TempMail Pro absorbs the confirmation link and subsequent marketing drip campaigns so your personal inbox remains pristine.
+                  Temporary disposable email acts as a buffer between your personal inbox and online services. When trying a new tool, testing a prototype, or accessing a gated whitepaper, TempMail Pro absorbs the confirmation link and subsequent marketing mail so your personal inbox stays clean.
                 </p>
 
                 <h3 className="h5 fw-bold text-dark mt-4">What TempMail Pro Protects You From</h3>

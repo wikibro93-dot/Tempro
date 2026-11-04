@@ -69,6 +69,12 @@ const ROUTE_SEO_REGISTRY = {
     canonical: `${SITE_URL}/about`,
     ogType: 'website',
   },
+  '/contact': {
+    title: 'Contact TempMail Pro – Support & Feedback',
+    description: 'Contact TempMail Pro support with questions, feedback, or problems using the app. Fill in the form and we will reply to your email address.',
+    canonical: `${SITE_URL}/contact`,
+    ogType: 'website',
+  },
 };
 
 /**
@@ -173,7 +179,10 @@ export default function RouteSeoManager() {
         // No sameAs: no Facebook or X page exists yet for TempMail Pro.
         contactPoint: {
           '@type': 'ContactPoint',
-          email: 'support@tempmailpk.com',
+          // No email: the old Hostinger professional mailbox was never
+          // activated for tempmailpk.com, so contact goes through the
+          // /contact form (Web3Forms → wikibro93@gmail.com) instead.
+          url: `${SITE_URL}/contact`,
           contactType: 'customer service',
           availableLanguage: ['English'],
         },

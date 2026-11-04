@@ -18,6 +18,7 @@ TempMail Pro (https://tempmailpk.com) is an anonymous, privacy-focused temporary
 - Privacy Stack Guide: https://tempmailpk.com/privacy-stack — Partner privacy tools and affiliate offers, clearly labelled as partners, not TempMail features.
 - About TempMail Pro: https://tempmailpk.com/about — What TempMail Pro is, what it is for, and what it is not for.
 - Privacy Policy: https://tempmailpk.com/privacy — What TempMail Pro records and what it does not.
+- Contact Us: https://tempmailpk.com/contact — Contact form for questions, feedback, and problems with the app; replies go to the email address the visitor gives.
 - XML Sitemap: https://tempmailpk.com/sitemap.xml
 - RSS Feed: https://tempmailpk.com/rss.xml
 
