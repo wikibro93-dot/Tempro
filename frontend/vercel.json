@@ -102,6 +102,17 @@
       ],
       "permanent": true,
       "source": "/(.*)"
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "tempro-i1it.vercel.app"
+        }
+      ],
+      "destination": "https://tempmailpk.com/$1",
+      "permanent": true
     }
   ],
   "rewrites": [

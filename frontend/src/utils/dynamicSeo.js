@@ -31,42 +31,42 @@ export function generateDynamicSitemap(siteUrl = SITE_URL) {
   const priorityPages = [
     {
       url: `${siteUrl}/app`,
-      lastmod: '2026-10-29',
+      lastmod: '2026-11-04',
       changefreq: 'weekly',
       priority: '0.90',
       description: 'TempMail Pro Web Application Workspace - Multi-Inbox and Live Domain Selector'
     },
     {
       url: `${siteUrl}/`,
-      lastmod: '2026-10-29',
+      lastmod: '2026-11-04',
       changefreq: 'daily',
       priority: '1.0',
       description: 'TempMail Pro Homepage - Free Disposable Temporary Email'
     },
     {
       url: `${siteUrl}/blog`,
-      lastmod: '2026-10-29',
+      lastmod: '2026-11-04',
       changefreq: 'daily',
       priority: '0.95',
       description: 'TempMail Pro Privacy & Email Security Blog Hub'
     },
     {
       url: `${siteUrl}/privacy-stack`,
-      lastmod: '2026-04-18',
+      lastmod: '2026-11-04',
       changefreq: 'weekly',
       priority: '0.85',
       description: 'TempMail Pro Privacy Stack Architecture'
     },
     {
       url: `${siteUrl}/about`,
-      lastmod: '2026-10-29',
+      lastmod: '2026-11-04',
       changefreq: 'monthly',
       priority: '0.75',
       description: 'About TempMail Pro'
     },
     {
       url: `${siteUrl}/privacy`,
-      lastmod: '2026-04-18',
+      lastmod: '2026-11-04',
       changefreq: 'monthly',
       priority: '0.75',
       description: 'TempMail Pro Privacy Policy'
