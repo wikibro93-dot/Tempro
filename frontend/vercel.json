@@ -92,6 +92,12 @@
     },
     {
       "source": "/(.*)",
+      "has": [{ "type": "host", "value": "tempro-i1it.vercel.app" }],
+      "destination": "https://tempmailpk.com/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "www.tempmailpk.com" }],
       "destination": "https://tempmailpk.com/$1",
       "permanent": true
@@ -106,6 +112,7 @@
     { "source": "/privacy-stack", "destination": "/index.html" },
     { "source": "/privacy", "destination": "/index.html" },
     { "source": "/about", "destination": "/index.html" },
+    { "source": "/contact", "destination": "/index.html" },
     { "source": "/sw.js", "destination": "/sw.js" },
     { "source": "/registerSW.js", "destination": "/registerSW.js" },
     { "source": "/manifest.webmanifest", "destination": "/manifest.webmanifest" },

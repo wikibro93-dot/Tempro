@@ -66,6 +66,13 @@ check('404 fallback has no homepage canonical', seo.includes('canonical: undefin
 const vercel = read(path.join(fe, 'vercel.json'));
 check('vercel.json redirects both partner URLs to /privacy-stack',
   vercel.includes('pst-net-premium-virtual-cards-free-trials-ads') && vercel.includes('cashmaal-virtual-visa-cards-online-privacy'));
+// Every React route in App.jsx must have a matching vercel.json rewrite, or
+// the path 404s on Vercel despite the client route existing (this bit us
+// with /contact in Nov 2026: route added, rewrite forgotten, live 404).
+const appJsx = read(path.join(fe, 'src/App.jsx'));
+const routePaths = [...appJsx.matchAll(/path="([^"]+)"/g)].map((m) => m[1]).filter((p) => p !== '*');
+const missingRewrites = routePaths.filter((p) => !vercel.includes(`"source": "${p}"`));
+check('every App.jsx route has a vercel.json rewrite', missingRewrites.length === 0, missingRewrites.join(', '));
 check('vercel CSP has no unsafe-eval', !vercel.includes('unsafe-eval'));
 check('vercel CSP has no api.mail.tm/mercure', !vercel.includes('api.mail.tm') && !vercel.includes('mercure.mail.tm'));
 const sitemapGen = read(path.join(fe, 'src/utils/dynamicSeo.js'));

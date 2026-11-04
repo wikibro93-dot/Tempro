@@ -32,6 +32,12 @@ In `frontend/vercel.json` (verified by the contract checks):
   after `tempmailpk.com` is connected to the new Vercel project. Pushing it
   earlier would redirect staging visitors to a domain that still serves the
   old stack.
+- **Rewrites parity:** every React route in `App.jsx` MUST have a matching
+  rewrite in `vercel.json` (to `/index.html`, except `/blog/:slug` which
+  maps to its static page). The client route alone is not enough — without
+  the rewrite, Vercel's catch-all sends the path to `/api/not-found` and
+  the page 404s live even though it works in dev. This bit us with
+  `/contact` in Nov 2026. The contract checks now enforce this parity.
 
 ## 3. Sitemap, RSS, llms.txt — generated, never hand-edited
 
