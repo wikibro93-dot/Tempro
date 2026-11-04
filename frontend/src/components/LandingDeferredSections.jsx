@@ -80,7 +80,7 @@ const LandingDeferredSections = () => {
                   </div>
                   <h3 className="card-title h5 fw-bold">Fast Delivery Pipeline</h3>
                   <p className="card-text text-secondary small">
-                    Integrated directly with the unified Mail.tm API engine to deliver OTP codes, magic links, and confirmation emails with fast, direct delivery.
+                    Integrated directly with our unified delivery engine to deliver OTP codes, magic links, and confirmation emails with fast, direct delivery.
                   </p>
                 </div>
               </div>
@@ -114,7 +114,7 @@ const LandingDeferredSections = () => {
                 </span>
                 <h3 className="h5 fw-bold mb-2">Select Domain &amp; Generate</h3>
                 <p className="text-secondary small mb-0">
-                  Pick your preferred domain from the live domains Mail.tm currently offers and click Generate. Your inbox is created instantly on the backend.
+                  Pick your preferred domain from the live domains currently available and click Generate. Your inbox is created instantly on the backend.
                 </p>
               </div>
             </div>

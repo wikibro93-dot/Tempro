@@ -157,6 +157,9 @@ const Privacy = () => {
                 <p>
                   Third-Party Partners &amp; Cookies: To support our free service, we may participate in affiliate marketing programs. When you click on a referral link on our site, a &ldquo;cookie&rdquo; may be placed in your browser by the partner service to track the referral for commission purposes. These third-party services have their own privacy policies, which we encourage you to review.
                 </p>
+                <p>
+                  <strong>Mail Infrastructure Provider:</strong> Temporary email delivery is provided by Mail.tm (mail.tm). Your messages pass through Mail.tm&apos;s mail servers and exist there until they expire, and Mail.tm may see connection metadata. TempMail Pro itself does not sell or store inbox data for advertising.
+                </p>
               </div>
             </div>
 

@@ -20,7 +20,7 @@ const COMPARISON_DATA = [
   },
   {
     feature: 'Domain Selector Dropdown',
-    description: 'Choose between the live domains Mail.tm currently offers',
+    description: 'Choose between the live domains currently available',
     tempMailPro: 'Yes (Live Engine)',
     tempMailOrg: 'Locked behind paywall',
     tenMinuteMail: 'Fixed single domain',
@@ -165,7 +165,7 @@ const CompetitorComparison = () => {
               <AppIcon iconClass="bi bi-lightning-charge-fill text-warning fs-4" />
               <div className="text-start">
                 <div className="fw-bold small">Fast Delivery</div>
-                <div className="text-muted" style={{ fontSize: '0.78rem' }}>Direct live Mail.tm API pipeline</div>
+                <div className="text-muted" style={{ fontSize: '0.78rem' }}>Direct live delivery pipeline</div>
               </div>
             </div>
           </div>

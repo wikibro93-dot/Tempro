@@ -128,7 +128,7 @@ const HomepageHeroConsole = () => {
     } catch (err) {
       console.warn('Hero account generation fallback:', err);
       const heroRaw = err?.response?.data?.error;
-      setHeroError(typeof heroRaw === 'string' ? heroRaw : (heroRaw?.message || 'Could not create a real temporary email. The backend could not be reached or Mail.tm is unavailable right now — please try again.'));
+      setHeroError(typeof heroRaw === 'string' ? heroRaw : (heroRaw?.message || 'Could not create a real temporary email. The backend could not be reached or the mail service is unavailable right now — please try again.'));
       const freshDomains = err?.response?.data?.availableDomains;
       if (Array.isArray(freshDomains) && freshDomains.length > 0) {
         setAvailableDomains(freshDomains);
@@ -165,7 +165,7 @@ const HomepageHeroConsole = () => {
             <span className="console-dot bg-warning"></span>
             <span className="console-dot bg-success"></span>
             <span className="console-title ms-2 fw-semibold text-muted" style={{ fontSize: '0.8rem' }}>
-              Instant Disposable Address · Mail.tm Engine
+              Instant Disposable Address
             </span>
           </div>
 

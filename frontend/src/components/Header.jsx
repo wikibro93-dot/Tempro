@@ -16,8 +16,8 @@ const Header = () => {
             </span>
           </Link>
           <span className="text-muted d-none d-sm-inline">|</span>
-          <span className="badge bg-success-subtle text-success border border-success-subtle py-1 px-2 fw-semibold d-none d-sm-inline-flex align-items-center gap-1" style={{ fontSize: '0.74rem' }}>
-            <span className="eg-pulse-dot"></span> Live Mail.tm Engine
+          <span className="badge bg-success-subtle text-success border border-success-subtle py-1 px-2 fw-semibold d-none d-sm-inline-flex align-items-center gap-1" style={{ fontSize: '0.78rem' }}>
+            <span className="eg-pulse-dot"></span> Live
           </span>
         </div>
 

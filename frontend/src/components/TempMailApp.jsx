@@ -379,7 +379,7 @@ function TempMailApp({ onEmailCopied }) {
         setSelectedDomain(freshDomains[0]);
         setDomainsLoaded(true);
       }
-      setError({ message: backendMessage || 'Could not create a real temporary email. Mail.tm is unreachable right now, please try again.' });
+      setError({ message: backendMessage || 'Could not create a real temporary email. The mail service is unreachable right now, please try again.' });
     } finally {
       setIsLoading(false);
       isCreatingRef.current = false;
