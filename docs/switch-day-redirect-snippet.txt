@@ -1,0 +1,20 @@
+# Switch-day redirect snippet — DO NOT ADD BEFORE SWITCH DAY
+
+On switch day, AFTER tempmailpk.com has been connected to the tempro-i1it
+Vercel project, add this block to the `redirects` array in
+`frontend/vercel.json` (alongside the www → apex redirect) and push it:
+
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "tempro-i1it.vercel.app" }],
+      "destination": "https://tempmailpk.com/$1",
+      "permanent": true
+    }
+
+Why it lives here and not in vercel.json: the block went live accidentally
+on 4 Nov 2026 when vercel.json was pushed for the /contact rewrite fix
+(commit d769548). Every staging URL then 308-redirected to tempmailpk.com,
+which still served the old stack, so staging became unusable for checks.
+It was reverted the same day. This file is under docs/ (repo root), which
+Vercel never deploys (its Root Directory is frontend/), so the snippet
+cannot leak into a deployment again.

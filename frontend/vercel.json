@@ -90,18 +90,7 @@
       "destination": "https://tempmailpk.com/$1",
       "permanent": true
     },
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "tempro-i1it.vercel.app" }],
-      "destination": "https://tempmailpk.com/$1",
-      "permanent": true
-    },
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "www.tempmailpk.com" }],
-      "destination": "https://tempmailpk.com/$1",
-      "permanent": true
-    }
+{"destination":"https://tempmailpk.com/$1","has":[{"type":"host","value":"www.tempmailpk.com"}],"permanent":true,"source":"/(.*)"}
   ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" },

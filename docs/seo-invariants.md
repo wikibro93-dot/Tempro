@@ -28,10 +28,14 @@ In `frontend/vercel.json` (verified by the contract checks):
 - Host-based: `tempmailpk.vercel.app` → `https://tempmailpk.com/$1`
   (permanent), `www.tempmailpk.com` → apex (permanent).
 - **HELD, NOT LIVE:** the `tempro-i1it.vercel.app` → `https://tempmailpk.com/$1`
-  redirect exists in the local working copy only. Push it ONLY on switch day,
-  after `tempmailpk.com` is connected to the new Vercel project. Pushing it
-  earlier would redirect staging visitors to a domain that still serves the
-  old stack.
+  redirect must NOT be in `frontend/vercel.json` before switch day. It lives
+  only in `docs/switch-day-redirect-snippet.txt` (repo root, never deployed).
+  Add it to vercel.json ONLY on switch day, after `tempmailpk.com` is
+  connected to the new Vercel project. WARNING from 4 Nov 2026: pushing
+  vercel.json for an unrelated fix (the /contact rewrite, commit d769548)
+  accidentally carried this redirect live, and every staging URL 308'd to
+  the old live site until it was reverted the same day. Never push
+  vercel.json without diffing its redirects list first.
 - **Rewrites parity:** every React route in `App.jsx` MUST have a matching
   rewrite in `vercel.json` (to `/index.html`, except `/blog/:slug` which
   maps to its static page). The client route alone is not enough — without
