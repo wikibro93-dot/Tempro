@@ -75,6 +75,18 @@ const ROUTE_SEO_REGISTRY = {
     canonical: `${SITE_URL}/contact`,
     ogType: 'website',
   },
+  '/terms': {
+    title: 'Terms of Service – TempMail Pro',
+    description: 'Terms of Service for TempMail Pro: what the free temporary email service is, how inboxes and messages are handled, acceptable use, and limits of liability.',
+    canonical: `${SITE_URL}/terms`,
+    ogType: 'website',
+  },
+  '/dmca': {
+    title: 'DMCA Policy – TempMail Pro',
+    description: 'DMCA and copyright policy for TempMail Pro: how to report allegedly infringing material processed through the temporary email service, and the limits of what can be removed.',
+    canonical: `${SITE_URL}/dmca`,
+    ogType: 'website',
+  },
 };
 
 /**

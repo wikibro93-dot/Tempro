@@ -35,6 +35,8 @@ const corePages = [
   ['About TempMail Pro', '/about', 'What TempMail Pro is, what it is for, and what it is not for.'],
   ['Privacy Policy', '/privacy', 'What TempMail Pro records and what it does not.'],
   ['Contact Us', '/contact', 'Contact form for questions, feedback, and problems with the app; replies go to the email address the visitor gives.'],
+  ['Terms of Service', '/terms', 'What the free temporary email service is, how inboxes and messages are handled, acceptable use, and limits of liability.'],
+  ['DMCA Policy', '/dmca', 'How to report allegedly infringing material processed through the service, and the limits of what can be removed.'],
 ];
 
 const lines = [];

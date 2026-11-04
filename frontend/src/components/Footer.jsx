@@ -128,6 +128,16 @@ const Footer = () => {
                   <AppIcon iconClass="bi bi-shield-lock me-2" />Privacy Policy
                 </Link>
               </li>
+              <li>
+                <Link to="/terms" className="d-inline-flex align-items-center">
+                  <AppIcon iconClass="bi bi-file-text me-2" />Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link to="/dmca" className="d-inline-flex align-items-center">
+                  <AppIcon iconClass="bi bi-copyright me-2" />DMCA Policy
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -137,6 +147,12 @@ const Footer = () => {
         <div className="site-footer__bottom">
           <p className="site-footer__copyright">
             &copy; {year} TempMail Pro &mdash; All rights reserved.
+          </p>
+          <p className="site-footer__copyright">
+            Powered by{" "}
+            <a href="https://mail.tm" target="_blank" rel="noopener noreferrer">
+              Mail.tm
+            </a>
           </p>
         </div>
       </div>

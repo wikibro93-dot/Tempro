@@ -77,6 +77,20 @@ export function generateDynamicSitemap(siteUrl = SITE_URL) {
       changefreq: 'monthly',
       priority: '0.70',
       description: 'Contact TempMail Pro support via form'
+    },
+    {
+      url: `${siteUrl}/terms`,
+      lastmod: '2026-11-04',
+      changefreq: 'monthly',
+      priority: '0.60',
+      description: 'TempMail Pro Terms of Service'
+    },
+    {
+      url: `${siteUrl}/dmca`,
+      lastmod: '2026-11-04',
+      changefreq: 'monthly',
+      priority: '0.60',
+      description: 'TempMail Pro DMCA Policy'
     }
   ];
 

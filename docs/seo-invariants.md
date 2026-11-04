@@ -46,8 +46,8 @@ In `frontend/vercel.json` (verified by the contract checks):
 ## 3. Sitemap, RSS, llms.txt — generated, never hand-edited
 
 - `frontend/scripts/generate-sitemap.js`, `generate-rss.js`, and
-  `generate-llms.js` run during the build. The live counts are: sitemap 57
-  URLs (7 core + 50 articles), RSS 50 items, llms.txt 50 blog links + 6 core
+  `generate-llms.js` run during the build. The live counts are: sitemap 59
+  URLs (9 core + 50 articles), RSS 50 items, llms.txt 50 blog links + 8 core
   pages.
 - Never hand-edit `public/sitemap.xml`, `public/rss.xml`, or `public/llms.txt`
   — the next build overwrites them. Fix the generator or the article data
@@ -114,12 +114,12 @@ In `frontend/vercel.json` (verified by the contract checks):
   lives in `frontend/src/components/Contact.jsx` — it is an alias for the
   destination inbox, not a secret, so do not "protect" it by moving it
   somewhere the browser cannot read it (that would break the form).
-- The sitemap count in section 3 already includes `/contact`.
+- The sitemap count in section 3 already includes `/contact`, `/terms`, and `/dmca`.
 
 ## 9. After every change
 
 1. `npm run build` in `frontend/` (contract checks included).
-2. Confirm the sitemap still parses with 57 URLs (or the new correct count
+2. Confirm the sitemap still parses with 59 URLs (or the new correct count
    after a genuine article add/remove).
 3. Spot-check one live route's canonical and one redirect after deploy.
 4. After the domain switch, re-check Search Console's Page Indexing report
