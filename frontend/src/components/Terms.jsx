@@ -109,7 +109,7 @@ const Terms = () => {
             <p>
               Mail.tm provides the mail infrastructure and has its own
               policies. The partners listed on the Privacy Stack page (Yesim,
-              PST.NET, CashMaal) are separate affiliate services with their own
+              NordVPN, NordPass) are separate affiliate services with their own
               policies; following a partner link leaves TempMail Pro.
             </p>
 

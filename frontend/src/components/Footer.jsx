@@ -41,7 +41,7 @@ const Footer = () => {
             </Link>
             <p className="site-footer__tagline">
               Free disposable email service — protect your real inbox from spam, tracking, and data leaks.
-              No registration. No storage. No nonsense.
+              No sign-in. No server database. No nonsense.
             </p>
             <Link to="/app" className="site-footer__cta" onClick={handleAppCtaClick}>
               <AppIcon iconClass="fas fa-bolt me-2" />Get Free Temp Email
@@ -62,7 +62,6 @@ const Footer = () => {
               <li><Link to="/privacy-stack"><AppIcon iconClass="fas fa-layer-group me-2" />Privacy Stack</Link></li>
               <li><Link to="/blog"><AppIcon iconClass="fas fa-newspaper me-2" />Blog</Link></li>
               <li><Link to="/about"><AppIcon iconClass="fas fa-info-circle me-2" />About</Link></li>
-              <li><Link to="/privacy"><AppIcon iconClass="fas fa-shield-alt me-2" />Privacy Policy</Link></li>
             </ul>
           </div>
 
@@ -105,7 +104,6 @@ const Footer = () => {
               </li>
               <li><Link to="/blog/how-to-use-temp-email-for-free-trials"><AppIcon iconClass="fas fa-book me-2" />How to Use Temp Email</Link></li>
               <li><Link to="/blog/is-free-temp-mail-legal"><AppIcon iconClass="fas fa-balance-scale me-2" />Is Temp Mail Legal?</Link></li>
-              <li><Link to="/privacy-stack"><AppIcon iconClass="fas fa-shield-virus me-2" />Privacy Stack Guide</Link></li>
             </ul>
           </div>
 
@@ -116,11 +114,6 @@ const Footer = () => {
               <li>
                 <Link to="/contact" className="d-inline-flex align-items-center">
                   <AppIcon iconClass="bi bi-envelope-fill me-2" />Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="d-inline-flex align-items-center">
-                  <AppIcon iconClass="bi bi-building me-2" />Organization &amp; Team
                 </Link>
               </li>
               <li>
