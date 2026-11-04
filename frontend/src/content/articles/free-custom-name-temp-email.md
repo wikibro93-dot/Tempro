@@ -29,13 +29,13 @@ Free custom-name temp email gives you better control than random throwaway addre
 
 ## How custom names work in TempMail Pro
 
-Instead of accepting a random address, you choose the local part — the part before the @ sign — and TempMail Pro pairs it with a live domain offered by Mail.tm at the time of use. Custom names in the app use letters, numbers, dots, and hyphens, up to 24 characters. If the name you want is already taken for that domain, try a variation rather than reusing a name tied to someone else's account.
+Instead of accepting a random address, you choose the local part — the part before the @ sign — and TempMail Pro pairs it with a live domain available at the time of use. Custom names in the app use letters, numbers, dots, and hyphens, up to 24 characters. If the name you want is already taken for that domain, try a variation rather than reusing a name tied to someone else's account.
 
 ## Step-by-step: choosing a useful custom name
 
 1. Decide the purpose first: a trial, a shop, a test case, or a community signup.
 2. Pick a name that describes that purpose, for example `shop-spring`, `trial-design`, or `qa-flow-a`.
-3. Pair it with a live domain from the dropdown. Do not assume a domain from an old screenshot is still live — the dropdown only shows domains Mail.tm currently offers.
+3. Pair it with a live domain from the dropdown. Do not assume a domain from an old screenshot is still live — the dropdown only shows domains currently available.
 4. Use that address for that purpose only, so follow-up messages stay easy to identify.
 5. When the purpose ends, let the inbox expire and use a fresh name for the next purpose.
 
