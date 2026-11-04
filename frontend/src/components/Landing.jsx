@@ -221,7 +221,7 @@ const Landing = () => {
               </div>
 
               {/* Right Column: Instant Live Email Console */}
-              <div className="col-lg-6">
+              <div className="col-lg-6 landing-hero-console-col">
                 <HomepageHeroConsole />
               </div>
             </div>

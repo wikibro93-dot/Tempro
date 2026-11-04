@@ -184,7 +184,8 @@ const Contact = () => {
                   <div className="form-text mb-2">
                     For sponsorships, please include your website, what you want
                     to promote, the placement and duration you have in mind,
-                    and your budget.
+                    and your budget. You can also share banner or logo links
+                    (Google Drive, Imgur, or similar) in your message.
                   </div>
                 )}
                 <textarea

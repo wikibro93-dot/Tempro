@@ -5192,6 +5192,17 @@ textarea:focus-visible,
   min-width: 0;
 }
 
+/* Mobile hero: the instant-address console comes FIRST visually (above the
+   headline), so a visitor sees the product immediately on landing without
+   scrolling — the pattern top temp-mail services use. DOM order is
+   unchanged (H1 still first) so SEO and screen-reader order are unaffected.
+   Desktop two-column layout is untouched. */
+@media (max-width: 991.98px) {
+  .landing-page .landing-hero-console-col {
+    order: -1;
+  }
+}
+
 .homepage-hero-console .console-copy-btn,
 .homepage-hero-console .console-action-btn {
   flex-shrink: 0;
