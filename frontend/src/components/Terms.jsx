@@ -9,7 +9,9 @@ import Footer from "./Footer";
  * inboxes/tokens live in the visitor's browser, messages live on Mail.tm
  * under Mail.tm's retention, in-app expiry hides an inbox but does not by
  * itself delete the Mail.tm account (only an explicit inbox delete requests
- * that). The service is receive-only and runs no inbox database.
+ * that). Requests reach Mail.tm through TempMail Pro's own backend service,
+ * and the backend may process an IP address transiently for rate limiting.
+ * The service is receive-only and runs no inbox database.
  */
 const Terms = () => {
   return (
@@ -31,7 +33,10 @@ const Terms = () => {
       <div className="container py-5">
         <div className="row justify-content-center">
           <div className="col-lg-8">
-            <h1 className="text-center mb-5">Terms of Service</h1>
+            <h1 className="text-center mb-2">Terms of Service</h1>
+            <p className="text-muted text-center mb-5">
+              Last updated: November 2026
+            </p>
             <p className="lead">
               By accessing or using TempMail Pro (tempmailpk.com), you agree to
               these Terms of Service. If you do not agree, please do not use
@@ -44,7 +49,9 @@ const Terms = () => {
               to protect your personal inbox from spam and unwanted marketing.
               You can create multiple inboxes, choose custom names, and pick an
               expiry (10 minutes, 1 hour, 24 hours, 7 days, or a custom
-              duration). No sign-in is required. The service is{" "}
+              duration of up to 365 days). No sign-in is required. The
+              service is intended for users aged 18 and over; if you are
+              under 18, please do not use the service. The service is{" "}
               <strong>receive-only</strong>: you cannot send email from a
               TempMail Pro address.
             </p>
@@ -69,6 +76,14 @@ const Terms = () => {
               is requested. Expired inboxes and their messages are assumed
               unrecoverable, so save anything important before an inbox
               expires.
+            </p>
+            <p>
+              Requests from your browser reach Mail.tm through TempMail
+              Pro&apos;s own backend service, which forwards them to Mail.tm;
+              Mail.tm is the mail provider, not TempMail Pro. To enforce rate
+              limits and prevent abuse, the backend may process your IP
+              address transiently; it is not kept as a long-term log and is
+              not used to build a profile of you.
             </p>
 
             <h2 className="mt-5">3. Acceptable Use</h2>
@@ -110,27 +125,36 @@ const Terms = () => {
               Mail.tm provides the mail infrastructure and has its own
               policies. The partners listed on the Privacy Stack page (Yesim,
               NordVPN, NordPass) are separate affiliate services with their own
-              policies; following a partner link leaves TempMail Pro.
+              policies; following a partner link leaves TempMail Pro. How we
+              handle data is described in our{" "}
+              <Link to="/privacy">Privacy Policy</Link>, and how to report
+              copyright issues is described in our{" "}
+              <Link to="/dmca">DMCA Policy</Link>.
             </p>
 
             <h2 className="mt-5">7. Changes to These Terms</h2>
             <p>
-              We may update these terms from time to time. Continued use of
-              the service after an update means you accept the updated terms.
+              We may update these terms from time to time. Updates are posted
+              on this page, and the &ldquo;Last updated&rdquo; date above is
+              changed to match. Continued use of the service after an update
+              means you accept the updated terms.
             </p>
 
             <h2 className="mt-5">8. Governing Law</h2>
             <p>
-              These terms are governed by the laws of Pakistan. Any dispute
-              arising from the use of the service shall be handled under the
-              jurisdiction of the local courts.
+              These terms are governed by the applicable laws. Any dispute
+              arising from the use of the service shall be handled by the
+              courts with jurisdiction over the matter.
             </p>
 
             <h2 className="mt-5">9. Contact</h2>
             <p>
               For questions about these terms, or to report abuse of the
               service, please use the{" "}
-              <Link to="/contact">Contact Us</Link> form.
+              <Link to="/contact">Contact Us</Link> form. For privacy
+              questions, see our <Link to="/privacy">Privacy Policy</Link>;
+              for copyright reports, see our{" "}
+              <Link to="/dmca">DMCA Policy</Link>.
             </p>
           </div>
         </div>
