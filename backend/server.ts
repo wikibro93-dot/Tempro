@@ -18,7 +18,12 @@ app.use(cors({
     return callback(new Error('Not allowed by CORS'));
   },
 }));
-app.use(express.json({ limit: '10kb' }));
+// Global JSON parser (10kb), but skip the Postmark inbound webhook — it has
+// its own larger (10mb) parser because inbound emails can be megabytes.
+app.use((req: any, res: any, next: any) => {
+  if (req.path && req.path.startsWith('/api/inbound/postmark/')) return next();
+  return express.json({ limit: '10kb' })(req, res, next);
+});
 
 // Minimal Helmet-like security headers for API responses (no new dependency).
 app.use((req, res, next) => {
@@ -751,6 +756,153 @@ app.delete('/api/inbox/:token/:messageId', deleteLimiter, messageDeleteTokenLimi
 
   // Honest error: never report success when the Mail.tm delete did not succeed.
   return res.status(502).json({ success: false, error: 'Could not delete message, please try again.', code: 'UPSTREAM_ERROR', messageId });
+});
+
+// ---------------------------------------------------------------------------
+// Postmark inbound (custom-domain mail) — PROOF OF CONCEPT, in-memory only.
+// Postmark POSTs received mail for inbound.tempmailpk.com to the webhook
+// below. Messages are held in memory keyed by recipient address until the
+// frontend pulls them into localStorage. They are LOST on backend restart
+// (free Render spins down) — this proves the webhook end-to-end only.
+// For Premium durability, replace this store with Firestore.
+// ---------------------------------------------------------------------------
+const POSTMARK_INBOUND_DOMAIN = 'inbound.tempmailpk.com';
+const POSTMARK_WEBHOOK_SECRET = process.env.POSTMARK_WEBHOOK_SECRET || '';
+
+type InboundAttachment = {
+  name: string;
+  contentType: string;
+  contentLength: number;
+  contentId: string;
+  // base64 content; omitted when the attachment is too large to hold.
+  content?: string;
+  tooLarge?: boolean;
+};
+type InboundMessage = {
+  id: string;
+  to: string;
+  from: string;
+  fromName: string;
+  subject: string;
+  date: string;
+  textBody: string;
+  htmlBody: string;
+  receivedAt: number;
+  attachments: InboundAttachment[];
+};
+
+const inboundStore = new Map<string, InboundMessage[]>();
+const INBOUND_MAX_PER_ADDRESS = 50;
+const INBOUND_MAX_TOTAL = 500;
+const INBOUND_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const INBOUND_MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024; // 5 MB per attachment
+
+function inboundTotalCount(): number {
+  let n = 0;
+  for (const list of inboundStore.values()) n += list.length;
+  return n;
+}
+
+function pruneInbound() {
+  const now = Date.now();
+  for (const [addr, list] of inboundStore) {
+    const kept = list.filter((m) => now - m.receivedAt < INBOUND_TTL_MS);
+    if (kept.length === 0) inboundStore.delete(addr);
+    else if (kept.length !== list.length) inboundStore.set(addr, kept);
+  }
+}
+
+// Extract the recipient address from a Postmark inbound payload.
+function postmarkRecipient(body: any): string {
+  const raw =
+    (typeof body?.OriginalRecipient === 'string' && body.OriginalRecipient) ||
+    (Array.isArray(body?.ToFull) && body.ToFull[0]?.Email) ||
+    (typeof body?.To === 'string' && body.To) ||
+    '';
+  // "Name" <addr@domain> -> addr@domain
+  const m = raw.match(/<([^>]+)>/);
+  const addr = (m ? m[1] : raw).trim().toLowerCase();
+  return addr;
+}
+
+// POST /api/inbound/postmark/:secret — Postmark inbound webhook.
+// The secret is a path segment so only Postmark (which holds the URL) can
+// post here. It must match POSTMARK_WEBHOOK_SECRET (Render env var).
+// Returns 2xx fast; Postmark retries 5xx.
+app.post(
+  '/api/inbound/postmark/:secret',
+  express.json({ limit: '10mb' }),
+  (req: any, res: any) => {
+    if (!POSTMARK_WEBHOOK_SECRET || req.params.secret !== POSTMARK_WEBHOOK_SECRET) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const body = req.body || {};
+    const to = postmarkRecipient(body);
+    if (!to || !to.endsWith('@' + POSTMARK_INBOUND_DOMAIN)) {
+      return res.status(400).json({ error: 'Recipient is not on the inbound domain' });
+    }
+    const attachments: InboundAttachment[] = Array.isArray(body.Attachments)
+      ? body.Attachments.map((a: any) => {
+          const content = typeof a?.Content === 'string' ? a.Content : '';
+          const tooLarge = content.length > INBOUND_MAX_ATTACHMENT_BYTES * 1.4; // base64 overhead
+          return {
+            name: String(a?.Name || 'attachment'),
+            contentType: String(a?.ContentType || 'application/octet-stream'),
+            contentLength: Number(a?.ContentLength) || 0,
+            contentId: String(a?.ContentID || ''),
+            ...(tooLarge ? { tooLarge: true } : { content }),
+          };
+        })
+      : [];
+    const msg: InboundMessage = {
+      id: String(body.MessageID || `pm-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`),
+      to,
+      from: String(body.From || ''),
+      fromName: String(body.FromName || ''),
+      subject: String(body.Subject || '(no subject)'),
+      date: String(body.Date || new Date().toISOString()),
+      textBody: String(body.TextBody || ''),
+      htmlBody: String(body.HtmlBody || ''),
+      receivedAt: Date.now(),
+      attachments,
+    };
+    pruneInbound();
+    const list = inboundStore.get(to) || [];
+    // Deduplicate by Postmark MessageID (Postmark may retry a delivery).
+    if (list.some((m) => m.id === msg.id)) {
+      return res.json({ ok: true, duplicate: true });
+    }
+    list.unshift(msg);
+    if (list.length > INBOUND_MAX_PER_ADDRESS) list.length = INBOUND_MAX_PER_ADDRESS;
+    inboundStore.set(to, list);
+    // Hard cap on total stored messages (drop the oldest across addresses).
+    while (inboundTotalCount() > INBOUND_MAX_TOTAL) {
+      let oldestAddr = '';
+      let oldestAt = Infinity;
+      for (const [addr, l] of inboundStore) {
+        const last = l[l.length - 1];
+        if (last && last.receivedAt < oldestAt) { oldestAt = last.receivedAt; oldestAddr = addr; }
+      }
+      if (!oldestAddr) break;
+      const l = inboundStore.get(oldestAddr)!;
+      l.pop();
+      if (l.length === 0) inboundStore.delete(oldestAddr);
+    }
+    console.log(`[Postmark inbound] ${msg.from} -> ${to} (${msg.subject})`);
+    return res.json({ ok: true, id: msg.id });
+  }
+);
+
+// GET /api/inbound/messages/:address — the frontend polls this for a
+// custom-domain inbox. Returns stored messages (newest first).
+app.get('/api/inbound/messages/:address', inboxLimiter, (req: any, res: any) => {
+  const address = String(req.params.address || '').trim().toLowerCase();
+  if (!address || !address.endsWith('@' + POSTMARK_INBOUND_DOMAIN)) {
+    return res.status(400).json({ error: 'Invalid address' });
+  }
+  pruneInbound();
+  const messages = inboundStore.get(address) || [];
+  return res.json({ address, messages, count: messages.length });
 });
 
 // CORS rejections (and other errors) must be JSON, not Express HTML 500 pages.
