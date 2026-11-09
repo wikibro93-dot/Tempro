@@ -8,6 +8,10 @@ const CORS_ORIGINS = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://l
   .split(',').map((o) => o.trim()).filter(Boolean);
 
 const app = express();
+// Trust Render's first proxy so req.ip is the real client IP (from
+// X-Forwarded-For) instead of Render's router IP. Without this, the
+// per-IP rate limiters and the SSE per-IP cap are effectively global.
+app.set('trust proxy', 1);
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || CORS_ORIGINS.includes(origin)) return callback(null, true);

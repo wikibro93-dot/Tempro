@@ -112,6 +112,33 @@ async function generate() {
     .png()
     .toFile(path.join(publicDir, 'apple-touch-icon.png'));
   console.log('✓ Generated public/apple-touch-icon.png');
+
+  // Generate favicon.ico (32x32 PNG embedded in an ICO container) so the
+  // default /favicon.ico request does not 404. Modern browsers accept a
+  // PNG-backed .ico. ICO layout: 6-byte header + 16-byte directory entry
+  // + the PNG bytes (offset 22).
+  const faviconPng = await sharp(Buffer.from(brandSvg))
+    .resize(32, 32)
+    .png()
+    .toBuffer();
+  const icoHeader = Buffer.alloc(6);
+  icoHeader.writeUInt16LE(0, 0); // reserved
+  icoHeader.writeUInt16LE(1, 2); // type: 1 = ICO
+  icoHeader.writeUInt16LE(1, 4); // count: 1 image
+  const icoEntry = Buffer.alloc(16);
+  icoEntry.writeUInt8(32, 0); // width
+  icoEntry.writeUInt8(32, 1); // height
+  icoEntry.writeUInt8(0, 2); // color count (0 = 256+)
+  icoEntry.writeUInt8(0, 3); // reserved
+  icoEntry.writeUInt16LE(1, 4); // color planes
+  icoEntry.writeUInt16LE(32, 6); // bits per pixel
+  icoEntry.writeUInt32LE(faviconPng.length, 8); // image size
+  icoEntry.writeUInt32LE(22, 12); // image offset (6 header + 16 entry)
+  fs.writeFileSync(
+    path.join(publicDir, 'favicon.ico'),
+    Buffer.concat([icoHeader, icoEntry, faviconPng])
+  );
+  console.log('✓ Wrote public/favicon.ico');
 }
 
 generate().catch((err) => {

@@ -49,7 +49,6 @@
     <meta name="twitter:title" content="TempMail Pro - Free Disposable Email App" />
     <meta name="twitter:description" content="Free disposable temporary email app with multi-inbox management, custom domains, and privacy protection." />
     <meta name="twitter:image" content="https://tempmailpk.com/pwa-512x512.png" />
-    <meta name="twitter:site" content="@tempmailpk" />
     
     <!-- Additional Meta Tags -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -445,33 +444,6 @@
     
     <script type="module" src="/src/main.jsx"></script>
     
-    <!-- Deferred Non-Blocking Monetag SDK (Runs after window load so Core Web Vitals LCP & INP remain optimal) -->
-    <script>
-      (function() {
-        function loadMonetag() {
-          if (window.__monetagLoaded) return;
-          window.__monetagLoaded = true;
-          var s = document.createElement('script');
-          s.src = 'https://quge5.com/88/tag.min.js';
-          s.setAttribute('data-zone', '11505330');
-          s.setAttribute('data-cfasync', 'false');
-          s.async = true;
-          document.body.appendChild(s);
-        }
-        if (document.readyState === 'complete') {
-          setTimeout(loadMonetag, 1500);
-        } else {
-          window.addEventListener('load', function() {
-            if ('requestIdleCallback' in window) {
-              requestIdleCallback(function() { setTimeout(loadMonetag, 800); }, { timeout: 3000 });
-            } else {
-              setTimeout(loadMonetag, 1500);
-            }
-          });
-        }
-      })();
-    </script>
-
     <!-- FIXED Fallback for users without JavaScript -->
     <noscript>
       <div class="seo-noscript-box">
