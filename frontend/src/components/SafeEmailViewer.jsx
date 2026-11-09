@@ -51,14 +51,17 @@ const SafeEmailViewer = ({
           </div>
         </div>
 
-        {/* Remote Images Blocked Banner */}
+        {/* Remote Images Blocked Banner — compact single row so it does not
+            push the message down or wrap into a tall block. */}
         {showImageBanner && (
-          <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 px-3 py-2 mb-2 rounded-2 bg-warning-subtle border border-warning-subtle">
-            <div className="d-flex align-items-center gap-1.5 text-warning-emphasis" style={{ fontSize: '0.78rem' }}>
-              <AppIcon iconClass="bi bi-image text-warning fs-6" />
-              <span>
-                <span className="fw-semibold">Remote images blocked</span>
-                <span className="text-muted"> · {blockedRemoteImages} image{blockedRemoteImages === 1 ? '' : 's'} hidden to protect your privacy — senders can track opens with them.</span>
+          <div
+            className="d-flex align-items-center justify-content-between gap-2 px-3 py-1.5 mb-2 rounded-2 bg-warning-subtle border border-warning-subtle"
+            title="Remote images are hidden to protect your privacy — senders can track opens with them."
+          >
+            <div className="d-flex align-items-center gap-1.5 text-warning-emphasis min-w-0" style={{ fontSize: '0.78rem' }}>
+              <AppIcon iconClass="bi bi-image text-warning fs-6 flex-shrink-0" />
+              <span className="fw-semibold text-truncate">
+                Remote images blocked · {blockedRemoteImages} hidden
               </span>
             </div>
             <button

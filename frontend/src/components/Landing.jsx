@@ -196,7 +196,7 @@ const Landing = () => {
                   Disposable Email With <span className="brand-highlight">Multi-Inbox</span> Power
                 </h1>
 
-                <p className="landing-hero-lead text-secondary mb-4">
+                <p className="landing-hero-lead text-white mb-4">
                   Generate instant temporary mailboxes, pick from the live domains currently available, and receive OTP codes with fast delivery. No sign-in, completely free.
                 </p>
 

@@ -48,6 +48,19 @@ function AppContent() {
   const location = useLocation();
   const [showPromoCard, setShowPromoCard] = useState(false);
   const [promoSuppressed, setPromoSuppressed] = useState(() => isPromoSuppressed());
+  // The promo is a fixed card at the bottom-right; it must not cover the
+  // hero console / address card while the reader is still at the top of
+  // the page. So it only becomes eligible once the reader has scrolled
+  // past the hero (500px), and the 7s timer starts from there.
+  const [hasScrolled, setHasScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => {
+      if (window.scrollY > 500) setHasScrolled(true);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   const shouldAutoShowPromo = location.pathname !== "/app";
 
   const promotablePage = ["/", "/blog"].includes(location.pathname) ||
@@ -66,13 +79,13 @@ function AppContent() {
   }, [location.pathname, promoSuppressed]);
 
   useEffect(() => {
-    if (!promotablePage || promoSuppressed || !shouldAutoShowPromo) {
+    if (!promotablePage || promoSuppressed || !shouldAutoShowPromo || !hasScrolled) {
       return undefined;
     }
 
     const timer = setTimeout(() => setShowPromoCard(true), 7000);
     return () => clearTimeout(timer);
-  }, [promotablePage, promoSuppressed, shouldAutoShowPromo]);
+  }, [promotablePage, promoSuppressed, shouldAutoShowPromo, hasScrolled]);
 
   const handlePromoClose = () => {
     setShowPromoCard(false);

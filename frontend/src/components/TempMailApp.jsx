@@ -764,7 +764,7 @@ function TempMailApp({ onEmailCopied }) {
 
                 <div className="alert alert-warning d-flex align-items-center gap-2 mb-2 py-2 px-3 small" role="note">
                   <AppIcon iconClass="bi bi-exclamation-triangle-fill text-warning" />
-                  <span>Keep this inbox private: anyone with access to this inbox can read its messages. Do not share screenshots or links that expose it.</span>
+                  <span>Keep this inbox private — anyone with access can read its messages. Don’t share screenshots or links.</span>
                 </div>
 
                 <AccountManager

@@ -114,7 +114,7 @@ const AccountManager = ({
             title="Check mail / refresh now"
             style={{ width: '44px', height: '44px', minHeight: '44px', minWidth: '44px', borderRadius: '9px' }}
           >
-            <AppIcon iconClass={`bi bi-arrow-clockwise ${isLoading ? 'spin' : ''}`} size={14} />
+            <AppIcon iconClass={`bi bi-arrow-clockwise text-dark ${isLoading ? 'spin' : ''}`} size={18} />
           </button>
 
           <button
@@ -125,7 +125,7 @@ const AccountManager = ({
             title="Scan QR code with mobile camera"
             style={{ width: '44px', height: '44px', minHeight: '44px', minWidth: '44px', borderRadius: '9px' }}
           >
-            <AppIcon iconClass="bi bi-qr-code" size={13} />
+            <AppIcon iconClass="bi bi-qr-code text-dark" size={18} />
           </button>
 
         </div>

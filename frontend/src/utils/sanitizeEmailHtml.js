@@ -7,9 +7,14 @@ import DOMPurify from 'dompurify';
 const SANITIZATION_CACHE = new Map();
 const MAX_CACHE_SIZE = 60;
 
-/** 1x1 transparent GIF used as a stand-in for a blocked remote image. */
-const TRANSPARENT_PLACEHOLDER =
-  'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+/** Visible "Image blocked" placeholder shown in place of a blocked remote image.
+ * A grey dashed box with an image icon and a short label, so a blocked image
+ * reads as intentionally hidden — not as a broken email. Rendered as an SVG
+ * data URI so it needs no network fetch. Scales to the image's own size. */
+const BLOCKED_IMAGE_PLACEHOLDER = (() => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="120" viewBox="0 0 320 120"><rect width="320" height="120" fill="#f1f3f5" stroke="#dee2e6" stroke-width="1" stroke-dasharray="6 4"/><g fill="none" stroke="#868e96" stroke-width="2"><rect x="138" y="28" width="44" height="34" rx="4"/><circle cx="150" cy="39" r="4"/><path d="M138 56 L156 40 L168 50 L178 42 L182 46 L182 62 L138 62 Z"/></g><text x="160" y="86" font-family="sans-serif" font-size="13" fill="#868e96" text-anchor="middle">Image blocked</text><text x="160" y="104" font-family="sans-serif" font-size="11" fill="#adb5bd" text-anchor="middle">Tap "Load images" to show it</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+})();
 
 /** True when a URL would fetch from a third-party server (tracking-pixel risk). */
 const isRemoteUrl = (value) => {
@@ -90,7 +95,7 @@ const configureSecurityHooks = (instance) => {
         const src = node.getAttribute('src');
         if (src && isRemoteUrl(src)) {
           node.setAttribute('data-remote-src', src);
-          node.setAttribute('src', TRANSPARENT_PLACEHOLDER);
+          node.setAttribute('src', BLOCKED_IMAGE_PLACEHOLDER);
           currentBlockedRemoteImages += 1;
         }
         const srcset = node.getAttribute('srcset');

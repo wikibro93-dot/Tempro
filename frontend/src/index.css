@@ -277,18 +277,18 @@ footer {
 
 .promo-card-container {
   position: fixed;
-  right: 20px;
-  bottom: 24px;
+  right: 16px;
+  bottom: 16px;
   z-index: 9999;
-  width: min(320px, calc(100vw - 32px));
+  width: min(300px, calc(100vw - 32px));
 }
 
 .promo-card {
   position: relative;
   background: #ffffff;
-  border-radius: 20px;
-  padding: 18px 18px 16px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.14);
+  border-radius: 16px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
   animation: fadeInUp 0.35s ease;
   border: 1px solid rgba(67, 97, 238, 0.12);
 }
@@ -2560,7 +2560,7 @@ button:focus,
 }
 
 .landing-hero-title {
-  font-size: clamp(2.05rem, 4.8vw, 3.4rem);
+  font-size: clamp(1.9rem, 4.2vw, 2.85rem);
   font-weight: 800;
   line-height: 1.15;
   margin-bottom: 1.5rem;
