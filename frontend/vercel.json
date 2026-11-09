@@ -193,6 +193,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/premium",
+      "destination": "/index.html"
+    },
+    {
       "source": "/((?!assets/|fonts/|images/|icons/|api/|sw\\.js|registerSW\\.js|manifest\\.webmanifest|workbox-.*\\.js|cache-worker\\.js|robots\\.txt|sitemap\\.xml|rss\\.xml|llms\\.txt|pwa-.*|apple-touch-icon\\.png|icon\\.svg|favicon\\.ico).*)",
       "destination": "/api/not-found"
     }
