@@ -1,4 +1,6 @@
 import express from 'express';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import cors from 'cors';
 import { Readable } from 'node:stream';
 
@@ -759,12 +761,13 @@ app.delete('/api/inbox/:token/:messageId', deleteLimiter, messageDeleteTokenLimi
 });
 
 // ---------------------------------------------------------------------------
-// Postmark inbound (custom-domain mail) — PROOF OF CONCEPT, in-memory only.
+// Postmark inbound (custom-domain mail).
 // Postmark POSTs received mail for inbound.tempmailpk.com to the webhook
-// below. Messages are held in memory keyed by recipient address until the
-// frontend pulls them into localStorage. They are LOST on backend restart
-// (free Render spins down) — this proves the webhook end-to-end only.
-// For Premium durability, replace this store with Firestore.
+// below. Messages are stored in Firestore (collection "inbound_messages")
+// so they survive backend restarts, and the frontend pulls them into
+// localStorage. If FIREBASE_SERVICE_ACCOUNT_JSON is not set, the store
+// falls back to in-memory (messages lost on restart) so the webhook still
+// works for testing.
 // ---------------------------------------------------------------------------
 const POSTMARK_INBOUND_DOMAIN = 'inbound.tempmailpk.com';
 const POSTMARK_WEBHOOK_SECRET = process.env.POSTMARK_WEBHOOK_SECRET || '';
@@ -791,25 +794,103 @@ type InboundMessage = {
   attachments: InboundAttachment[];
 };
 
-const inboundStore = new Map<string, InboundMessage[]>();
 const INBOUND_MAX_PER_ADDRESS = 50;
-const INBOUND_MAX_TOTAL = 500;
 const INBOUND_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const INBOUND_MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024; // 5 MB per attachment
+const INBOUND_MAX_BODY_CHARS = 400 * 1024; // 400KB per body field (Firestore doc limit is 1 MiB)
 
-function inboundTotalCount(): number {
-  let n = 0;
-  for (const list of inboundStore.values()) n += list.length;
-  return n;
+// --- Firestore init (optional; falls back to in-memory) ---
+let inboundDb: any = null;
+try {
+  const svcJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON || '';
+  if (svcJson) {
+    if (!getApps().length) {
+      initializeApp({ credential: cert(JSON.parse(svcJson)) });
+    }
+    inboundDb = getFirestore();
+    console.log('[Postmark inbound] Firestore store enabled.');
+  } else {
+    console.log('[Postmark inbound] FIREBASE_SERVICE_ACCOUNT_JSON not set — using in-memory store (messages lost on restart).');
+  }
+} catch (err: any) {
+  console.warn('[Postmark inbound] Firestore init failed, using in-memory store:', err?.message);
+  inboundDb = null;
 }
 
-function pruneInbound() {
+// --- In-memory fallback store ---
+const inboundMemory = new Map<string, InboundMessage[]>();
+const INBOUND_MEMORY_MAX_TOTAL = 500;
+
+function memoryPrune() {
   const now = Date.now();
-  for (const [addr, list] of inboundStore) {
+  for (const [addr, list] of inboundMemory) {
     const kept = list.filter((m) => now - m.receivedAt < INBOUND_TTL_MS);
-    if (kept.length === 0) inboundStore.delete(addr);
-    else if (kept.length !== list.length) inboundStore.set(addr, kept);
+    if (kept.length === 0) inboundMemory.delete(addr);
+    else if (kept.length !== list.length) inboundMemory.set(addr, kept);
   }
+}
+
+function truncateBody(s: string): string {
+  return s.length > INBOUND_MAX_BODY_CHARS ? s.slice(0, INBOUND_MAX_BODY_CHARS) : s;
+}
+
+// Save a message. Returns 'saved' | 'duplicate'.
+async function saveInboundMessage(msg: InboundMessage): Promise<'saved' | 'duplicate'> {
+  if (inboundDb) {
+    const docRef = inboundDb.collection('inbound_messages').doc(msg.id);
+    const existing = await docRef.get();
+    if (existing.exists) return 'duplicate';
+    const stored: InboundMessage = {
+      ...msg,
+      textBody: truncateBody(msg.textBody),
+      htmlBody: truncateBody(msg.htmlBody),
+    };
+    await docRef.set(stored);
+    return 'saved';
+  }
+  memoryPrune();
+  const list = inboundMemory.get(msg.to) || [];
+  if (list.some((m) => m.id === msg.id)) return 'duplicate';
+  list.unshift(msg);
+  if (list.length > INBOUND_MAX_PER_ADDRESS) list.length = INBOUND_MAX_PER_ADDRESS;
+  inboundMemory.set(msg.to, list);
+  let total = 0;
+  for (const l of inboundMemory.values()) total += l.length;
+  while (total > INBOUND_MEMORY_MAX_TOTAL) {
+    let oldestAddr = '';
+    let oldestAt = Infinity;
+    for (const [addr, l] of inboundMemory) {
+      const last = l[l.length - 1];
+      if (last && last.receivedAt < oldestAt) { oldestAt = last.receivedAt; oldestAddr = addr; }
+    }
+    if (!oldestAddr) break;
+    const l = inboundMemory.get(oldestAddr)!;
+    l.pop();
+    if (l.length === 0) inboundMemory.delete(oldestAddr);
+    total -= 1;
+  }
+  return 'saved';
+}
+
+// Fetch messages for an address (newest first, last 7 days, max 50).
+async function getInboundMessages(address: string): Promise<InboundMessage[]> {
+  const cutoff = Date.now() - INBOUND_TTL_MS;
+  if (inboundDb) {
+    const snap = await inboundDb
+      .collection('inbound_messages')
+      .where('to', '==', address)
+      .limit(100)
+      .get();
+    const messages: InboundMessage[] = [];
+    snap.forEach((doc: any) => {
+      const d = doc.data() as InboundMessage;
+      if (d && d.receivedAt > cutoff) messages.push(d);
+    });
+    messages.sort((a, b) => b.receivedAt - a.receivedAt);
+    return messages.slice(0, INBOUND_MAX_PER_ADDRESS);
+  }
+  memoryPrune();
+  return (inboundMemory.get(address) || []).slice(0, INBOUND_MAX_PER_ADDRESS);
 }
 
 // Extract the recipient address from a Postmark inbound payload.
@@ -832,7 +913,7 @@ function postmarkRecipient(body: any): string {
 app.post(
   '/api/inbound/postmark/:secret',
   express.json({ limit: '10mb' }),
-  (req: any, res: any) => {
+  async (req: any, res: any) => {
     if (!POSTMARK_WEBHOOK_SECRET || req.params.secret !== POSTMARK_WEBHOOK_SECRET) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -866,27 +947,12 @@ app.post(
       receivedAt: Date.now(),
       attachments,
     };
-    pruneInbound();
-    const list = inboundStore.get(to) || [];
-    // Deduplicate by Postmark MessageID (Postmark may retry a delivery).
-    if (list.some((m) => m.id === msg.id)) {
-      return res.json({ ok: true, duplicate: true });
-    }
-    list.unshift(msg);
-    if (list.length > INBOUND_MAX_PER_ADDRESS) list.length = INBOUND_MAX_PER_ADDRESS;
-    inboundStore.set(to, list);
-    // Hard cap on total stored messages (drop the oldest across addresses).
-    while (inboundTotalCount() > INBOUND_MAX_TOTAL) {
-      let oldestAddr = '';
-      let oldestAt = Infinity;
-      for (const [addr, l] of inboundStore) {
-        const last = l[l.length - 1];
-        if (last && last.receivedAt < oldestAt) { oldestAt = last.receivedAt; oldestAddr = addr; }
-      }
-      if (!oldestAddr) break;
-      const l = inboundStore.get(oldestAddr)!;
-      l.pop();
-      if (l.length === 0) inboundStore.delete(oldestAddr);
+    try {
+      const result = await saveInboundMessage(msg);
+      if (result === 'duplicate') return res.json({ ok: true, duplicate: true });
+    } catch (err: any) {
+      console.warn('[Postmark inbound] Save failed:', err?.message);
+      return res.status(500).json({ error: 'Could not store message' });
     }
     console.log(`[Postmark inbound] ${msg.from} -> ${to} (${msg.subject})`);
     return res.json({ ok: true, id: msg.id });
@@ -895,14 +961,18 @@ app.post(
 
 // GET /api/inbound/messages/:address — the frontend polls this for a
 // custom-domain inbox. Returns stored messages (newest first).
-app.get('/api/inbound/messages/:address', inboxLimiter, (req: any, res: any) => {
+app.get('/api/inbound/messages/:address', inboxLimiter, async (req: any, res: any) => {
   const address = String(req.params.address || '').trim().toLowerCase();
   if (!address || !address.endsWith('@' + POSTMARK_INBOUND_DOMAIN)) {
     return res.status(400).json({ error: 'Invalid address' });
   }
-  pruneInbound();
-  const messages = inboundStore.get(address) || [];
-  return res.json({ address, messages, count: messages.length });
+  try {
+    const messages = await getInboundMessages(address);
+    return res.json({ address, messages, count: messages.length });
+  } catch (err: any) {
+    console.warn('[Postmark inbound] Fetch failed:', err?.message);
+    return res.status(500).json({ error: 'Could not fetch messages' });
+  }
 });
 
 // CORS rejections (and other errors) must be JSON, not Express HTML 500 pages.
