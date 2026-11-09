@@ -2,6 +2,8 @@ import express from 'express';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import cors from 'cors';
+import dns from 'node:dns/promises';
+import crypto from 'node:crypto';
 import { Readable } from 'node:stream';
 
 const PORT = Number(process.env.PORT) || 10000;
@@ -21,9 +23,11 @@ app.use(cors({
   },
 }));
 // Global JSON parser (10kb), but skip the Postmark inbound webhook — it has
-// its own larger (10mb) parser because inbound emails can be megabytes.
+// its own larger (10mb) parser because inbound emails can be megabytes —
+// and the Creem webhook, which needs the raw body to verify its HMAC
+// signature (parsing it first would destroy the bytes the signature covers).
 app.use((req: any, res: any, next: any) => {
-  if (req.path && req.path.startsWith('/api/inbound/postmark/')) return next();
+  if (req.path && (req.path.startsWith('/api/inbound/postmark/') || req.path.startsWith('/api/webhooks/creem'))) return next();
   return express.json({ limit: '10kb' })(req, res, next);
 });
 
@@ -62,6 +66,7 @@ const inboxLimiter = rateLimit({ windowMs: 60 * 1000, max: 60 }); // inbox reads
 const fileLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 }); // attachment/download 30/min/IP
 const deleteLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 }); // message delete 30/min/IP (tighter than inbox reads)
 const accountDeleteLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 30 }); // account delete 30/hour/IP (was 10: legitimate retry loops hit it)
+const premiumLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 }); // premium key/domain/dns 30/min/IP
 
 // Per-token limiter: same shape as rateLimit, but keyed by the inbox token
 // in the URL so rotating IPs cannot dodge the cap for one inbox.
@@ -919,8 +924,11 @@ app.post(
     }
     const body = req.body || {};
     const to = postmarkRecipient(body);
-    if (!to || !to.endsWith('@' + POSTMARK_INBOUND_DOMAIN)) {
-      return res.status(400).json({ error: 'Recipient is not on the inbound domain' });
+    // Accept the plumbing domain (inbound.tempmailpk.com) and any customer
+    // domain that is registered AND DNS-verified (see isAcceptedInboundDomain
+    // in the Premium section below). Anything else is not ours to store.
+    if (!to || !(await isAcceptedInboundDomain(to))) {
+      return res.status(400).json({ error: 'Recipient is not on a registered inbound domain' });
     }
     const attachments: InboundAttachment[] = Array.isArray(body.Attachments)
       ? body.Attachments.map((a: any) => {
@@ -960,10 +968,11 @@ app.post(
 );
 
 // GET /api/inbound/messages/:address — the frontend polls this for a
-// custom-domain inbox. Returns stored messages (newest first).
+// custom-domain inbox. Returns stored messages (newest first). Accepts the
+// plumbing domain and any registered + DNS-verified customer domain.
 app.get('/api/inbound/messages/:address', inboxLimiter, async (req: any, res: any) => {
   const address = String(req.params.address || '').trim().toLowerCase();
-  if (!address || !address.endsWith('@' + POSTMARK_INBOUND_DOMAIN)) {
+  if (!address || !address.includes('@') || !(await isAcceptedInboundDomain(address))) {
     return res.status(400).json({ error: 'Invalid address' });
   }
   try {
@@ -974,6 +983,493 @@ app.get('/api/inbound/messages/:address', inboxLimiter, async (req: any, res: an
     return res.status(500).json({ error: 'Could not fetch messages' });
   }
 });
+
+// ---------------------------------------------------------------------------
+// TempMail Pro Premium — bring-your-own-domain (BYOD), license-key gated.
+// No login, no account. A customer pays on Creem ($5/month or $48/year),
+// Creem issues a license key (email receipt + customer portal + the
+// checkout.completed webhook), and the customer pastes that key into /app
+// to unlock the custom-domain section. One key = one domain.
+//
+// How the pieces fit:
+//  * Creem webhook (below) receives checkout.completed (with license_keys[])
+//    and subscription lifecycle events, and upserts Firestore collection
+//    "premium_subscriptions" (doc id = normalized license key).
+//  * POST /api/premium/verify-key checks that record — the browser flag
+//    (?subscribed=1) is never trusted on its own.
+//  * POST /api/premium/register-domain stores the domain in Firestore
+//    collection "custom_domains" and creates a dedicated Postmark server
+//    for it (one inbound stream per server, one domain per stream), so
+//    mail for that domain is POSTed to our inbound webhook.
+//  * GET /api/premium/verify-dns/:domain checks the domain's MX records
+//    and marks it verified when an MX points at inbound.postmarkapp.com.
+//  * The inbound webhook + fetch above accept mail for the plumbing domain
+//    and for any registered + verified customer domain.
+//
+// Env vars this section reads (all optional except as noted):
+//  * POSTMARK_API_TOKEN — Postmark ACCOUNT token (API Tokens tab, account
+//    owner only). Required to create a Postmark server per customer domain.
+//    Without it, domains are stored as "pending" and the app says plainly
+//    that Postmark is not connected yet. Obtain it in the Postmark
+//    dashboard and set it in Render — see the verification note.
+//  * CREEM_WEBHOOK_SECRET — from Creem dashboard (Developers > Webhooks)
+//    when the webhook URL is registered. Required to verify the HMAC-SHA256
+//    signature on incoming Creem events. Without it the webhook rejects
+//    everything with a 500 (unsigned webhooks are never trusted).
+//  * BACKEND_PUBLIC_URL — public base URL of this backend, used to build
+//    the Postmark webhook URL for new customer servers. Defaults to the
+//    Render URL.
+// ---------------------------------------------------------------------------
+const PREMIUM_PRODUCT_IDS = new Set([
+  'prod_5rlysHo03p4e5czTOZFe02', // TempMail Pro Premium — Monthly ($5)
+  'prod_7LDR5lYmCrzoHqjIDtO2K', // TempMail Pro Premium — Yearly ($48)
+]);
+const PREMIUM_DOMAINS_PER_KEY = 1;
+const POSTMARK_MX_HOST = 'inbound.postmarkapp.com';
+const POSTMARK_API_TOKEN = process.env.POSTMARK_API_TOKEN || '';
+const CREEM_WEBHOOK_SECRET = process.env.CREEM_WEBHOOK_SECRET || '';
+const BACKEND_PUBLIC_URL = (process.env.BACKEND_PUBLIC_URL || 'https://tempro.onrender.com').replace(/\/+$/, '');
+const POSTMARK_WEBHOOK_URL = `${BACKEND_PUBLIC_URL}/api/inbound/postmark/${POSTMARK_WEBHOOK_SECRET}`;
+
+// The MX record every customer adds (same for everyone).
+const PREMIUM_MX_RECORDS = [
+  { type: 'MX', host: '@', priority: 10, value: POSTMARK_MX_HOST },
+];
+const PREMIUM_MX_NOTE =
+  'Add this MX record at your domain registrar (wherever your domain DNS lives). ' +
+  'If your root domain already receives business mail elsewhere, use a subdomain instead ' +
+  '(for example, mail.yourdomain.com) and enter that subdomain as your domain here.';
+
+// --- Premium stores: Firestore when available, in-memory otherwise ---
+// (Same pattern as the inbound store above.)
+const premiumSubsMemory = new Map<string, any>();
+const customDomainsMemory = new Map<string, any>();
+const creemEventsMemory = new Set<string>();
+
+async function getSubscription(key: string): Promise<any | null> {
+  if (inboundDb) {
+    const snap = await inboundDb.collection('premium_subscriptions').doc(key).get();
+    return snap.exists ? snap.data() : null;
+  }
+  return premiumSubsMemory.get(key) || null;
+}
+
+async function upsertSubscription(key: string, data: any): Promise<void> {
+  const record = { ...data, key, updatedAt: new Date().toISOString() };
+  if (inboundDb) {
+    await inboundDb.collection('premium_subscriptions').doc(key).set(record, { merge: true });
+    return;
+  }
+  premiumSubsMemory.set(key, { ...(premiumSubsMemory.get(key) || {}), ...record });
+}
+
+async function getCustomDomain(domain: string): Promise<any | null> {
+  if (inboundDb) {
+    const snap = await inboundDb.collection('custom_domains').doc(domain).get();
+    return snap.exists ? snap.data() : null;
+  }
+  return customDomainsMemory.get(domain) || null;
+}
+
+async function upsertCustomDomain(domain: string, data: any): Promise<void> {
+  const record = { ...data, domain, updatedAt: new Date().toISOString() };
+  if (inboundDb) {
+    await inboundDb.collection('custom_domains').doc(domain).set(record, { merge: true });
+    return;
+  }
+  customDomainsMemory.set(domain, { ...(customDomainsMemory.get(domain) || {}), ...record });
+}
+
+async function isCreemEventProcessed(eventId: string): Promise<boolean> {
+  if (inboundDb) {
+    const snap = await inboundDb.collection('creem_webhook_events').doc(eventId).get();
+    return snap.exists;
+  }
+  return creemEventsMemory.has(eventId);
+}
+
+async function markCreemEventProcessed(eventId: string): Promise<void> {
+  if (inboundDb) {
+    await inboundDb.collection('creem_webhook_events').doc(eventId).set({
+      eventId,
+      processedAt: new Date().toISOString(),
+    });
+    return;
+  }
+  creemEventsMemory.add(eventId);
+}
+
+// Is this recipient address on a domain we accept inbound mail for? The
+// plumbing domain always counts; a customer domain counts only once it is
+// registered AND DNS-verified. (Function declaration so it is hoisted and
+// usable by the inbound webhook defined above this section.)
+async function isAcceptedInboundDomain(address: string): Promise<boolean> {
+  const at = address.lastIndexOf('@');
+  if (at < 0) return false;
+  const domain = address.slice(at + 1).toLowerCase();
+  if (domain === POSTMARK_INBOUND_DOMAIN) return true;
+  try {
+    const rec = await getCustomDomain(domain);
+    return Boolean(rec && rec.status === 'verified');
+  } catch {
+    return false;
+  }
+}
+
+function normalizeLicenseKey(raw: any): string {
+  return String(raw || '').trim().toUpperCase().replace(/[\s-]/g, (m) => (m === '-' ? '-' : ''));
+}
+
+// A key is usable while its subscription is active, or while a cancelled
+// subscription is still inside the period the customer paid for.
+function subscriptionIsUsable(sub: any): boolean {
+  if (!sub) return false;
+  if (sub.status === 'active') return true;
+  if (sub.status === 'cancelled' && sub.expiresAt) {
+    return new Date(sub.expiresAt).getTime() > Date.now();
+  }
+  return false;
+}
+
+function isValidDomainName(domain: string): boolean {
+  // Labels of letters/digits/hyphens (not leading/trailing hyphen), dots
+  // between, a TLD of at least 2 letters. No scheme, path, port, or @.
+  if (!domain || domain.length > 253) return false;
+  if (domain.includes('/') || domain.includes(':') || domain.includes('@') || domain.includes('_')) return false;
+  const labels = domain.split('.');
+  if (labels.length < 2) return false;
+  const tld = labels[labels.length - 1];
+  if (!/^[a-z]{2,}$/.test(tld)) return false;
+  return labels.every((l) => /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(l));
+}
+
+// POST /api/premium/verify-key {key} — server-side license check. The
+// browser never decides on its own; only a record written by the verified
+// Creem webhook counts.
+app.post('/api/premium/verify-key', premiumLimiter, async (req: any, res: any) => {
+  const key = normalizeLicenseKey(req.body?.key);
+  if (!key) return res.status(400).json({ error: 'Enter your license key.' });
+  try {
+    const sub = await getSubscription(key);
+    if (!sub) {
+      return res.status(404).json({
+        ok: false,
+        error: 'This license key was not found. Check the key from your Creem receipt email — it is five groups of five characters.',
+      });
+    }
+    if (!subscriptionIsUsable(sub)) {
+      return res.status(403).json({
+        ok: false,
+        error:
+          sub.status === 'cancelled'
+            ? 'This subscription has ended. Renew it in Creem to use your custom domain again.'
+            : 'This license key is not active right now. If you just paid, give the payment a minute to register, then try again.',
+      });
+    }
+    return res.json({
+      ok: true,
+      active: true,
+      productId: sub.productId || null,
+      domainsUsed: Number(sub.domainsUsed) || 0,
+      domainsLimit: Number(sub.domainsLimit) || PREMIUM_DOMAINS_PER_KEY,
+      expiresAt: sub.expiresAt || null,
+    });
+  } catch (err: any) {
+    console.warn('[Premium] verify-key failed:', err?.message);
+    return res.status(500).json({ error: 'Could not check the license key, please try again.' });
+  }
+});
+
+// Create a dedicated Postmark server for one customer domain (one inbound
+// stream per server, one domain per stream). Returns the Postmark server id
+// on success; throws on API failure.
+async function createPostmarkServerForDomain(domain: string): Promise<number> {
+  const res = await fetch('https://api.postmarkapp.com/servers', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'X-Postmark-Account-Token': POSTMARK_API_TOKEN,
+    },
+    body: JSON.stringify({
+      Name: `TempMail Pro — ${domain}`,
+      DeliveryType: 'Live',
+      InboundDomain: domain,
+      InboundHookUrl: POSTMARK_WEBHOOK_URL,
+    }),
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Postmark create server failed (${res.status}): ${detail.slice(0, 200)}`);
+  }
+  const data: any = await res.json();
+  if (!data || typeof data.ID !== 'number') throw new Error('Postmark create server returned no server id.');
+  return data.ID;
+}
+
+// POST /api/premium/register-domain {key, domain} — claim a domain for a
+// license key, store it, and (when the Postmark account token is set)
+// create its dedicated Postmark server. Without the token the domain is
+// stored as pending and the response says so plainly instead of failing.
+app.post('/api/premium/register-domain', premiumLimiter, async (req: any, res: any) => {
+  const key = normalizeLicenseKey(req.body?.key);
+  const domain = String(req.body?.domain || '').trim().toLowerCase();
+  if (!key) return res.status(400).json({ error: 'Enter your license key first.' });
+  if (!domain) return res.status(400).json({ error: 'Enter your domain, for example londonstore.com.' });
+  if (!isValidDomainName(domain)) {
+    return res.status(400).json({ error: 'That does not look like a domain. Enter just the domain, for example londonstore.com — no https://, no @, no path.' });
+  }
+  if (domain === 'tempmailpk.com' || domain.endsWith('.tempmailpk.com') || domain === POSTMARK_INBOUND_DOMAIN) {
+    return res.status(400).json({ error: 'That domain belongs to TempMail Pro. Connect a domain you own instead.' });
+  }
+  try {
+    const sub = await getSubscription(key);
+    if (!sub || !subscriptionIsUsable(sub)) {
+      return res.status(403).json({ error: 'This license key is not active. Verify your key first, then register your domain.' });
+    }
+    const domainsUsed = Number(sub.domainsUsed) || 0;
+    const domainsLimit = Number(sub.domainsLimit) || PREMIUM_DOMAINS_PER_KEY;
+    const existing = await getCustomDomain(domain);
+    if (existing) {
+      if (existing.key === key) {
+        // Idempotent re-register: return the current state instead of
+        // erroring, so a retry after a network hiccup is harmless.
+        return res.json({
+          ok: true,
+          domain,
+          status: existing.status,
+          postmarkServerId: existing.postmarkServerId || null,
+          postmarkConfigured: Boolean(POSTMARK_API_TOKEN),
+          mxRecords: PREMIUM_MX_RECORDS,
+          mxNote: PREMIUM_MX_NOTE,
+        });
+      }
+      return res.status(409).json({ error: 'This domain is already registered to another license key.' });
+    }
+    if (domainsUsed >= domainsLimit) {
+      return res.status(403).json({ error: 'This license key already has its domain. One key covers one domain.' });
+    }
+
+    await upsertCustomDomain(domain, {
+      key,
+      status: 'pending',
+      postmarkServerId: null,
+      postmarkError: null,
+      mxVerifiedAt: null,
+      createdAt: new Date().toISOString(),
+    });
+    await upsertSubscription(key, { domainsUsed: domainsUsed + 1 });
+
+    let postmarkServerId: number | null = null;
+    let postmarkError: string | null = null;
+    let status = 'pending';
+    if (!POSTMARK_API_TOKEN) {
+      postmarkError = 'Postmark is not connected on the server yet. Your domain is saved — it will be connected once the Postmark account token is set.';
+    } else {
+      try {
+        postmarkServerId = await createPostmarkServerForDomain(domain);
+        status = 'pending_dns';
+        await upsertCustomDomain(domain, { status, postmarkServerId, postmarkError: null });
+      } catch (err: any) {
+        postmarkError = err?.message || 'Could not create the Postmark server.';
+        console.warn('[Premium] Postmark server create failed for', domain, ':', postmarkError);
+        await upsertCustomDomain(domain, { status: 'pending', postmarkError });
+      }
+    }
+
+    return res.json({
+      ok: true,
+      domain,
+      status,
+      postmarkServerId,
+      postmarkConfigured: Boolean(POSTMARK_API_TOKEN),
+      postmarkError,
+      mxRecords: PREMIUM_MX_RECORDS,
+      mxNote: PREMIUM_MX_NOTE,
+    });
+  } catch (err: any) {
+    console.warn('[Premium] register-domain failed:', err?.message);
+    return res.status(500).json({ error: 'Could not register the domain, please try again.' });
+  }
+});
+
+// GET /api/premium/verify-dns/:domain?key=XXX — check the domain's MX
+// records for one pointing at inbound.postmarkapp.com. When the owning
+// license key is supplied and matches, a passing check marks the domain
+// verified in Firestore; without a matching key it only reports the MX
+// status (so nobody can mark a domain they do not own as verified).
+app.get('/api/premium/verify-dns/:domain', premiumLimiter, async (req: any, res: any) => {
+  const domain = String(req.params.domain || '').trim().toLowerCase();
+  const key = normalizeLicenseKey(req.query?.key);
+  if (!domain || !isValidDomainName(domain)) {
+    return res.status(400).json({ error: 'Enter a valid domain to check.' });
+  }
+  let mx: Array<{ exchange: string; priority: number }> = [];
+  let lookupError: string | null = null;
+  try {
+    const records = await dns.resolveMx(domain);
+    mx = (records || []).map((r: any) => ({ exchange: String(r.exchange || '').toLowerCase().replace(/\.$/, ''), priority: Number(r.priority) || 0 }));
+  } catch (err: any) {
+    lookupError = err?.code === 'ENOTFOUND' ? 'No DNS records found for this domain yet.' : `DNS lookup failed (${err?.code || 'error'}).`;
+  }
+  const verified = mx.some((r) => r.exchange === POSTMARK_MX_HOST || r.exchange.endsWith('.' + POSTMARK_MX_HOST));
+  let stored: any = null;
+  try {
+    stored = await getCustomDomain(domain);
+    if (verified && stored && key && stored.key === key && stored.status !== 'verified') {
+      await upsertCustomDomain(domain, { status: 'verified', mxVerifiedAt: new Date().toISOString() });
+      stored = await getCustomDomain(domain);
+    }
+  } catch (err: any) {
+    console.warn('[Premium] verify-dns store read failed:', err?.message);
+  }
+  return res.json({
+    ok: true,
+    domain,
+    verified,
+    mx,
+    lookupError,
+    status: stored?.status || null,
+    hint: verified
+      ? 'MX is pointing at Postmark. Mail to this domain will now arrive in your custom-domain inbox.'
+      : 'Add the MX record shown in the app at your domain registrar, then check again. DNS changes can take a few minutes to appear.',
+    checkedAt: new Date().toISOString(),
+  });
+});
+
+// --- Creem webhook -------------------------------------------------------
+// POST /api/webhooks/creem — receives checkout.completed (which carries the
+// license_keys[] array) and subscription lifecycle events, and upserts the
+// premium_subscriptions records that verify-key reads. Signature: HMAC-
+// SHA256 of the raw request body, keyed with CREEM_WEBHOOK_SECRET, sent in
+// the `creem-signature` header. The raw body is read here (the global JSON
+// parser skips this path) because parsing it first would destroy the bytes
+// the signature covers. Events are deduplicated by event id — Creem
+// retries a non-200 delivery, so the same event can arrive twice.
+// Dashboard setup (user step): Creem dashboard > Developers > Webhooks,
+// add URL https://tempro.onrender.com/api/webhooks/creem, copy the secret
+// into Render as CREEM_WEBHOOK_SECRET.
+function creemSignatureIsValid(rawBody: Buffer, signatureHeader: any, secret: string): boolean {
+  if (!secret || typeof signatureHeader !== 'string' || !signatureHeader) return false;
+  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  const a = Buffer.from(expected, 'utf8');
+  const b = Buffer.from(signatureHeader, 'utf8');
+  if (a.length !== b.length) return false;
+  try {
+    return crypto.timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+}
+
+app.post(
+  '/api/webhooks/creem',
+  express.raw({ type: 'application/json', limit: '100kb' }),
+  async (req: any, res: any) => {
+    if (!CREEM_WEBHOOK_SECRET) {
+      console.warn('[Premium] Creem webhook called but CREEM_WEBHOOK_SECRET is not set.');
+      return res.status(500).json({ error: 'Creem webhook is not configured on this server.' });
+    }
+    const rawBody: Buffer = Buffer.isBuffer(req.body) ? req.body : Buffer.from(String(req.body || ''), 'utf8');
+    if (!creemSignatureIsValid(rawBody, req.headers['creem-signature'], CREEM_WEBHOOK_SECRET)) {
+      return res.status(401).json({ error: 'Invalid webhook signature.' });
+    }
+    let event: any;
+    try {
+      event = JSON.parse(rawBody.toString('utf8'));
+    } catch {
+      return res.status(400).json({ error: 'Invalid JSON payload.' });
+    }
+    const eventId = String(event?.id || '');
+    const eventType = String(event?.eventType || event?.type || '');
+    const obj = event?.object || {};
+    if (!eventId || !eventType) {
+      return res.status(400).json({ error: 'Webhook event is missing an id or type.' });
+    }
+    try {
+      if (await isCreemEventProcessed(eventId)) {
+        return res.json({ ok: true, duplicate: true });
+      }
+      await markCreemEventProcessed(eventId);
+    } catch (err: any) {
+      console.warn('[Premium] Creem event dedupe failed:', err?.message);
+    }
+
+    try {
+      if (eventType === 'checkout.completed') {
+        // The checkout object carries license_keys[] — one entry per
+        // license-key feature on the product. Each key becomes a
+        // subscription record the app verifies against.
+        const productId = String(obj?.product_id || obj?.productId || '');
+        if (PREMIUM_PRODUCT_IDS.has(productId)) {
+          const subId = String(obj?.subscription?.id || obj?.subscription_id || obj?.subscriptionId || '');
+          const customerEmail = String(obj?.customer?.email || obj?.customer_email || '');
+          const expiresAt = obj?.subscription?.current_period_end || obj?.current_period_end || null;
+          const keys: any[] = Array.isArray(obj?.license_keys) ? obj.license_keys : [];
+          for (const lic of keys) {
+            const key = normalizeLicenseKey(lic?.key);
+            if (!key) continue;
+            const prev = await getSubscription(key).catch(() => null);
+            await upsertSubscription(key, {
+              productId,
+              subscriptionId: subId || prev?.subscriptionId || null,
+              customerEmail: customerEmail || prev?.customerEmail || null,
+              status: 'active',
+              domainsUsed: Number(prev?.domainsUsed) || 0,
+              domainsLimit: PREMIUM_DOMAINS_PER_KEY,
+              expiresAt: expiresAt || prev?.expiresAt || null,
+              createdAt: prev?.createdAt || new Date().toISOString(),
+            });
+            console.log(`[Premium] License key recorded for ${productId} (subscription ${subId || 'n/a'}).`);
+          }
+          if (keys.length === 0) {
+            console.warn('[Premium] checkout.completed for a Premium product carried no license_keys — is the license-key feature enabled on the product in the Creem dashboard?');
+          }
+        }
+      } else if (eventType.startsWith('subscription.')) {
+        // Lifecycle events carry the subscription object; update every
+        // subscription record that belongs to it.
+        const subId = String(obj?.id || '');
+        const productId = String(obj?.product_id || obj?.productId || '');
+        const nextStatus =
+          eventType === 'subscription.active' || eventType === 'subscription.paid' ? 'active'
+          : eventType === 'subscription.canceled' ? 'cancelled'
+          : eventType === 'subscription.expired' ? 'expired'
+          : eventType === 'subscription.past_due' ? 'past_due'
+          : eventType === 'subscription.unpaid' ? 'unpaid'
+          : eventType === 'subscription.paused' ? 'paused'
+          : null; // subscription.scheduled_cancel and others: leave status alone
+        if (subId && nextStatus) {
+          // Find keys by subscription id: scan is bounded because the
+          // table only holds Premium keys. (Firestore has no query-by-
+          // field helper in the in-memory fallback, so scan both stores.)
+          const updateFor = async (rec: any) => {
+            if (rec && rec.subscriptionId === subId) {
+              await upsertSubscription(rec.key, {
+                status: nextStatus,
+                expiresAt: obj?.current_period_end || rec.expiresAt || null,
+              });
+            }
+          };
+          if (inboundDb) {
+            const snap = await inboundDb.collection('premium_subscriptions').where('subscriptionId', '==', subId).get();
+            for (const doc of snap.docs) await updateFor(doc.data());
+          } else {
+            for (const rec of premiumSubsMemory.values()) await updateFor(rec);
+          }
+          console.log(`[Premium] Subscription ${subId} (${productId || 'unknown product'}) -> ${nextStatus}.`);
+        }
+      } else {
+        console.log(`[Premium] Ignored Creem event ${eventType}.`);
+      }
+    } catch (err: any) {
+      console.warn('[Premium] Creem webhook handling failed:', err?.message);
+      return res.status(500).json({ error: 'Webhook handling failed.' });
+    }
+    return res.json({ ok: true });
+  }
+);
 
 // CORS rejections (and other errors) must be JSON, not Express HTML 500 pages.
 app.use((err: any, req: any, res: any, next: any) => {

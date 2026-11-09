@@ -1,0 +1,473 @@
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import getApiRoot from "../utils/apiRoot";
+import AppIcon from "./AppIcon";
+import Inbox from "./Inbox";
+
+// Custom-domain (Premium BYOD) section inside /app.
+// Paid access is a license key, not a login: the customer pays on Creem,
+// gets a key by email, and pastes it here. The key is verified SERVER-side
+// (POST /api/premium/verify-key) — a browser flag alone never unlocks it.
+// The key is stored in localStorage so the user does not re-enter it, and
+// the domain is stored the same way. One key = one domain.
+//
+// The section is fully self-serve:
+//   key -> domain -> MX records shown -> user adds MX at their registrar
+//   -> Verify (DNS MX check) -> verified -> read mail on that domain.
+// Free Mail.tm inboxes are untouched by this component.
+const PREMIUM_KEY_STORAGE = "tempmail_premium_key";
+const PREMIUM_DOMAIN_STORAGE = "tempmail_premium_domain";
+
+const POLL_MS = 15000;
+
+function stripHtml(html) {
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+const CustomDomainSection = () => {
+  const [keyInput, setKeyInput] = useState("");
+  const [keyState, setKeyState] = useState("unknown"); // unknown | checking | active | invalid | error
+  const [keyMessage, setKeyMessage] = useState("");
+  const [storedKey, setStoredKey] = useState(() => {
+    try { return localStorage.getItem(PREMIUM_KEY_STORAGE) || ""; } catch { return ""; }
+  });
+
+  const [domainInput, setDomainInput] = useState("");
+  const [domain, setDomain] = useState(() => {
+    try { return localStorage.getItem(PREMIUM_DOMAIN_STORAGE) || ""; } catch { return ""; }
+  });
+  const [domainStatus, setDomainStatus] = useState(null); // 'pending' | 'pending_dns' | 'verified' | 'failed'
+  const [mxRecords, setMxRecords] = useState([]);
+  const [postmarkConfigured, setPostmarkConfigured] = useState(true);
+  const [domainMessage, setDomainMessage] = useState("");
+  const [registering, setRegistering] = useState(false);
+
+  const [dnsResult, setDnsResult] = useState(null);
+  const [checkingDns, setCheckingDns] = useState(false);
+
+  const [addressInput, setAddressInput] = useState("");
+  const [customMessages, setCustomMessages] = useState([]);
+  const [customLoading, setCustomLoading] = useState(false);
+  const [customError, setCustomError] = useState("");
+
+  const [copiedField, setCopiedField] = useState("");
+  const pollTimer = useRef(null);
+
+  const apiRoot = getApiRoot();
+
+  const verifyKey = useCallback(async (keyToCheck) => {
+    const key = (keyToCheck || "").trim();
+    if (!key) {
+      setKeyState("invalid");
+      setKeyMessage("Enter your license key.");
+      return false;
+    }
+    setKeyState("checking");
+    setKeyMessage("");
+    try {
+      const res = await fetch(`${apiRoot}/premium/verify-key`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok && data.active) {
+        setStoredKey(key);
+        try { localStorage.setItem(PREMIUM_KEY_STORAGE, key); } catch { /* storage unavailable */ }
+        setKeyState("active");
+        setKeyMessage("");
+        return true;
+      }
+      setKeyState("invalid");
+      setKeyMessage(data.error || "That key is not active. Check it and try again, or buy Premium to get a key.");
+      return false;
+    } catch {
+      setKeyState("error");
+      setKeyMessage("Could not reach the server. Check your connection and try again.");
+      return false;
+    }
+  }, [apiRoot]);
+
+  // On mount, re-verify a stored key (server-side — a stored key is not
+  // trusted until the server says it is active).
+  useEffect(() => {
+    if (storedKey) verifyKey(storedKey);
+    // Only once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleUnlock = (e) => {
+    e.preventDefault();
+    verifyKey(keyInput);
+  };
+
+  const handleRemoveKey = () => {
+    setStoredKey("");
+    setKeyInput("");
+    setKeyState("unknown");
+    setKeyMessage("");
+    setDomain("");
+    setDomainStatus(null);
+    setMxRecords([]);
+    setDnsResult(null);
+    setCustomMessages([]);
+    try {
+      localStorage.removeItem(PREMIUM_KEY_STORAGE);
+      localStorage.removeItem(PREMIUM_DOMAIN_STORAGE);
+    } catch { /* storage unavailable */ }
+  };
+
+  const registerDomain = async (e) => {
+    e.preventDefault();
+    const d = domainInput.trim().toLowerCase();
+    if (!d) {
+      setDomainMessage("Enter your domain, for example londonstore.com.");
+      return;
+    }
+    setRegistering(true);
+    setDomainMessage("");
+    setDnsResult(null);
+    try {
+      const res = await fetch(`${apiRoot}/premium/register-domain`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: storedKey, domain: d }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        setDomain(data.domain);
+        setDomainStatus(data.status);
+        setMxRecords(Array.isArray(data.mxRecords) ? data.mxRecords : []);
+        setPostmarkConfigured(data.postmarkConfigured !== false);
+        try { localStorage.setItem(PREMIUM_DOMAIN_STORAGE, data.domain); } catch { /* storage unavailable */ }
+        if (data.status === "verified") {
+          setDomainMessage("This domain is already verified and live.");
+        } else if (data.postmarkConfigured === false) {
+          setDomainMessage("Domain saved. Our setup is still being completed — add the MX record now and verify it once the setup is ready.");
+        } else {
+          setDomainMessage("Domain registered. Add the MX record below at your registrar, then press Verify.");
+        }
+        if (!addressInput) setAddressInput(`hello@${data.domain}`);
+      } else {
+        setDomainMessage(data.error || "Could not register that domain. Check it and try again.");
+      }
+    } catch {
+      setDomainMessage("Could not reach the server. Check your connection and try again.");
+    } finally {
+      setRegistering(false);
+    }
+  };
+
+  const checkDns = async () => {
+    if (!domain) return;
+    setCheckingDns(true);
+    setDnsResult(null);
+    try {
+      const res = await fetch(
+        `${apiRoot}/premium/verify-dns/${encodeURIComponent(domain)}?key=${encodeURIComponent(storedKey)}`
+      );
+      const data = await res.json().catch(() => ({}));
+      setDnsResult(data);
+      if (data.verified) {
+        setDomainStatus("verified");
+        setDomainMessage("Verified — mail sent to addresses on this domain now arrives here.");
+        if (!addressInput) setAddressInput(`hello@${domain}`);
+      } else if (data.lookupError) {
+        setDomainMessage("The DNS check failed to run. Try again in a moment.");
+      } else {
+        setDomainMessage(data.hint || "The MX record was not found yet. Add it at your registrar, wait a few minutes, and verify again.");
+      }
+    } catch {
+      setDomainMessage("Could not reach the server. Check your connection and try again.");
+    } finally {
+      setCheckingDns(false);
+    }
+  };
+
+  const copyText = async (field, value) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(""), 2000);
+    } catch {
+      // Clipboard unavailable (non-secure context) — the value is shown
+      // in the read-only input so the user can copy it manually.
+      setCopiedField(`${field}-manual`);
+      setTimeout(() => setCopiedField(""), 3000);
+    }
+  };
+
+  // Map a Postmark inbound message to the shape Inbox expects.
+  const mapCustomMessage = useCallback((m) => {
+    const attachments = Array.isArray(m.attachments) ? m.attachments : [];
+    return {
+      id: m.id,
+      token: "custom",
+      from: { address: m.from || "", name: m.fromName || "" },
+      subject: m.subject || "(no subject)",
+      date: m.receivedAt,
+      intro: (m.text || "").slice(0, 140) || stripHtml(m.html || "").slice(0, 140),
+      text: m.text || "",
+      html: m.html || "",
+      hasAttachments: attachments.length > 0,
+      attachments,
+    };
+  }, []);
+
+  // Custom-domain messages already carry their full body (the webhook
+  // stored it). No Mail.tm fetch is needed — just hand the body back.
+  const fetchCustomContent = useCallback(async (msg) => ({
+    text: msg.text || "",
+    html: msg.html || "",
+    attachments: msg.attachments || [],
+  }), []);
+
+  const fetchCustomMessages = useCallback(async (address) => {
+    const addr = (address || "").trim().toLowerCase();
+    if (!addr) return;
+    setCustomLoading(true);
+    setCustomError("");
+    try {
+      const res = await fetch(`${apiRoot}/inbound/messages/${encodeURIComponent(addr)}`);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        setCustomMessages((data.messages || []).map(mapCustomMessage));
+      } else {
+        setCustomError(data.error || "Could not load messages for that address.");
+      }
+    } catch {
+      setCustomError("Could not reach the server. Check your connection and try again.");
+    } finally {
+      setCustomLoading(false);
+    }
+  }, [apiRoot, mapCustomMessage]);
+
+  // Poll the active custom address while the domain is verified.
+  useEffect(() => {
+    if (domainStatus !== "verified" || !addressInput.trim()) {
+      if (pollTimer.current) { clearInterval(pollTimer.current); pollTimer.current = null; }
+      return;
+    }
+    fetchCustomMessages(addressInput);
+    pollTimer.current = setInterval(() => fetchCustomMessages(addressInput), POLL_MS);
+    return () => {
+      if (pollTimer.current) { clearInterval(pollTimer.current); pollTimer.current = null; }
+    };
+  }, [domainStatus, addressInput, fetchCustomMessages]);
+
+  const isLocked = keyState !== "active";
+
+  return (
+    <div className="card border-0 shadow-sm mb-4">
+      <div className="card-header bg-light d-flex align-items-center justify-content-between">
+        <h5 className="mb-0">
+          <AppIcon iconClass="bi bi-globe" size={18} /> Custom domain{" "}
+          <span className="badge bg-warning text-dark ms-1">Premium</span>
+        </h5>
+        {!isLocked && (
+          <button type="button" className="btn btn-sm btn-outline-secondary" onClick={handleRemoveKey}>
+            Remove key
+          </button>
+        )}
+      </div>
+      <div className="card-body">
+        {isLocked ? (
+          <>
+            <p className="text-muted mb-3">
+              Connect a domain you own and receive mail at addresses on it — for example{" "}
+              <code>wiki@londonstore.com</code>. This is a Premium feature: paste your license key to unlock it.
+            </p>
+            <form onSubmit={handleUnlock} className="mb-3">
+              <label htmlFor="premium-key" className="form-label small fw-bold">License key</label>
+              <div className="input-group">
+                <input
+                  id="premium-key"
+                  type="text"
+                  className="form-control"
+                  placeholder="ABCDE-FGHIJ-KLMNO-PQRST-UVWXY"
+                  value={keyInput}
+                  onChange={(e) => setKeyInput(e.target.value)}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                <button type="submit" className="btn btn-primary" disabled={keyState === "checking"}>
+                  {keyState === "checking" ? "Checking…" : "Unlock"}
+                </button>
+              </div>
+              <div className="form-text">Your key is in the Creem receipt email and your Creem customer portal.</div>
+            </form>
+            {keyMessage && (
+              <div className={`alert ${keyState === "invalid" || keyState === "error" ? "alert-warning" : "alert-info"} py-2 mb-3`} role="alert">
+                {keyMessage}
+              </div>
+            )}
+            <p className="mb-0">
+              Don&apos;t have a key?{" "}
+              <Link to="/premium">Get TempMail Pro Premium — $5/month</Link>
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="alert alert-success py-2 mb-3" role="alert">
+              <AppIcon iconClass="bi bi-patch-check" size={16} /> Premium unlocked. One key covers one domain.
+            </div>
+
+            {/* Domain registration */}
+            {!domain ? (
+              <form onSubmit={registerDomain} className="mb-3">
+                <label htmlFor="custom-domain" className="form-label small fw-bold">Your domain</label>
+                <div className="input-group">
+                  <input
+                    id="custom-domain"
+                    type="text"
+                    className="form-control"
+                    placeholder="londonstore.com"
+                    value={domainInput}
+                    onChange={(e) => setDomainInput(e.target.value)}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  <button type="submit" className="btn btn-primary" disabled={registering}>
+                    {registering ? "Registering…" : "Register domain"}
+                  </button>
+                </div>
+                <div className="form-text">The domain you own — no www, just the domain itself.</div>
+              </form>
+            ) : (
+              <div className="mb-3">
+                <div className="d-flex align-items-center gap-2 flex-wrap">
+                  <strong>{domain}</strong>
+                  {domainStatus === "verified" ? (
+                    <span className="badge bg-success">Verified — live</span>
+                  ) : domainStatus === "failed" ? (
+                    <span className="badge bg-danger">Failed</span>
+                  ) : (
+                    <span className="badge bg-warning text-dark">Pending DNS</span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-link p-0 mt-1"
+                  onClick={() => {
+                    setDomain("");
+                    setDomainStatus(null);
+                    setMxRecords([]);
+                    setDnsResult(null);
+                    setCustomMessages([]);
+                    try { localStorage.removeItem(PREMIUM_DOMAIN_STORAGE); } catch { /* storage unavailable */ }
+                  }}
+                >
+                  Use a different domain
+                </button>
+              </div>
+            )}
+
+            {domainMessage && (
+              <div className={`alert ${domainStatus === "verified" ? "alert-success" : "alert-info"} py-2 mb-3`} role="alert">
+                {domainMessage}
+              </div>
+            )}
+
+            {/* MX records */}
+            {domain && mxRecords.length > 0 && domainStatus !== "verified" && (
+              <div className="mb-3">
+                <p className="small fw-bold mb-2">Add this MX record at your registrar (DNS):</p>
+                <div className="table-responsive">
+                  <table className="table table-sm table-bordered mb-2">
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th>Host</th>
+                        <th>Value</th>
+                        <th>Priority</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {mxRecords.map((rec, i) => (
+                        <tr key={`${rec.type}-${i}`}>
+                          <td>{rec.type}</td>
+                          <td><code>{rec.host}</code></td>
+                          <td><code>{rec.value}</code></td>
+                          <td>{rec.priority}</td>
+                          <td>
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-secondary"
+                              onClick={() => copyText(`mx-${i}`, rec.value)}
+                            >
+                              {copiedField === `mx-${i}` ? "Copied" : "Copy"}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" className="btn btn-primary" onClick={checkDns} disabled={checkingDns}>
+                  {checkingDns ? "Checking DNS…" : "Verify DNS"}
+                </button>
+                {dnsResult && !dnsResult.verified && (
+                  <div className="alert alert-warning py-2 mt-3 mb-0" role="alert">
+                    MX not found yet{dnsResult.lookupError ? ` (${dnsResult.lookupError})` : ""}.{" "}
+                    {dnsResult.hint || "DNS changes can take a few minutes — wait, then press Verify again."}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {domain && !postmarkConfigured && domainStatus !== "verified" && (
+              <div className="alert alert-warning py-2 mb-3" role="alert">
+                Our mail setup for new domains is still being completed. You can add the MX record now — once the setup is ready, press Verify and your domain will go live.
+              </div>
+            )}
+
+            {/* Verified: read mail on the domain */}
+            {domainStatus === "verified" && (
+              <div className="mt-3">
+                <p className="small fw-bold mb-2">Read mail on this domain</p>
+                <form
+                  className="input-group mb-3"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    fetchCustomMessages(addressInput);
+                  }}
+                >
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder={`hello@${domain}`}
+                    value={addressInput}
+                    onChange={(e) => setAddressInput(e.target.value)}
+                    autoComplete="off"
+                    spellCheck={false}
+                    aria-label="Address on your domain"
+                  />
+                  <button type="submit" className="btn btn-primary" disabled={customLoading}>
+                    {customLoading ? "Checking…" : "Check mail"}
+                  </button>
+                </form>
+                <p className="text-muted small mb-3">
+                  Any address on {domain} works — mail sent to it arrives here. Messages are checked every 15 seconds while this section is open.
+                </p>
+                {customError && (
+                  <div className="alert alert-warning py-2 mb-3" role="alert">{customError}</div>
+                )}
+                <Inbox
+                  messages={customMessages}
+                  isLoading={customLoading}
+                  onRetry={() => fetchCustomMessages(addressInput)}
+                  onFetchContent={fetchCustomContent}
+                  hideActions
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CustomDomainSection;

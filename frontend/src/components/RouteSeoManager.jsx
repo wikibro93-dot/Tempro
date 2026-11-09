@@ -87,6 +87,24 @@ const ROUTE_SEO_REGISTRY = {
     canonical: `${SITE_URL}/dmca`,
     ogType: 'website',
   },
+  '/premium': {
+    title: 'TempMail Pro Premium – Custom Domain, $5/Month',
+    description: 'TempMail Pro Premium costs $5 a month: connect your own custom domain, get more inboxes, longer expiry, and no ads. No sign-in — pay, paste your key, and go.',
+    canonical: `${SITE_URL}/premium`,
+    ogType: 'website',
+    schema: {
+      '@type': 'Product',
+      name: 'TempMail Pro Premium',
+      description: 'Connect your own custom domain to TempMail Pro, with more inboxes, longer expiry, and no ads.',
+      url: `${SITE_URL}/premium`,
+      offers: {
+        '@type': 'Offer',
+        price: '5',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+      },
+    },
+  },
 };
 
 /**

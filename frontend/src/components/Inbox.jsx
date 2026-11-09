@@ -113,7 +113,7 @@ const EmailRowItem = memo(({ index, style, messages, selectedId, copiedOtp, onSe
 });
 EmailRowItem.displayName = 'EmailRowItem';
 
-const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) => {
+const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired, onFetchContent, hideActions = false }) => {
   const [selectedMsg, setSelectedMsg] = useState(null);
   const [messageContent, setMessageContent] = useState(null);
   const [loadingContent, setLoadingContent] = useState(false);
@@ -165,6 +165,27 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
     setLoadingContent(true);
     setContentError(null);
     setIsOfflineContent(false);
+
+    // Custom-domain messages already carry their full body (the Postmark
+    // webhook stored it in our backend). When the caller supplies
+    // onFetchContent, use it instead of the Mail.tm content endpoint —
+    // a custom-domain message has no Mail.tm token to fetch with.
+    if (typeof onFetchContent === 'function') {
+      try {
+        const content = await onFetchContent(msg);
+        setMessageContent(content || {
+          text: msg.text || msg.intro || '',
+          html: msg.html || '',
+          attachments: msg.attachments || [],
+        });
+        setIsOfflineContent(false);
+      } catch (err) {
+        setContentError('Message could not be loaded. Please try again.');
+      } finally {
+        setLoadingContent(false);
+      }
+      return;
+    }
 
     // If device is offline, check offline cache immediately
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
@@ -497,17 +518,19 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                     >
                       Plain Text
                     </button>
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${deleteArmedId === selectedMsg?.id ? 'btn-danger' : 'btn-outline-danger'} py-1 px-2 d-inline-flex align-items-center gap-1`}
-                      onClick={() => handleDeleteMessage(selectedMsg)}
-                      disabled={isDeleting}
-                      title={deleteArmedId === selectedMsg?.id ? 'Click again to confirm delete' : 'Delete this email'}
-                      style={{ minHeight: '44px' }}
-                    >
-                      <AppIcon iconClass={`bi bi-trash ${isDeleting ? 'spin' : ''}`} size={14} />
-                      <span className={deleteArmedId === selectedMsg?.id ? '' : 'd-none d-sm-inline'}>{isDeleting ? 'Deleting…' : deleteArmedId === selectedMsg?.id ? 'Click again to confirm' : 'Delete'}</span>
-                    </button>
+                    {!hideActions && (
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${deleteArmedId === selectedMsg?.id ? 'btn-danger' : 'btn-outline-danger'} py-1 px-2 d-inline-flex align-items-center gap-1`}
+                        onClick={() => handleDeleteMessage(selectedMsg)}
+                        disabled={isDeleting}
+                        title={deleteArmedId === selectedMsg?.id ? 'Click again to confirm delete' : 'Delete this email'}
+                        style={{ minHeight: '44px' }}
+                      >
+                        <AppIcon iconClass={`bi bi-trash ${isDeleting ? 'spin' : ''}`} size={14} />
+                        <span className={deleteArmedId === selectedMsg?.id ? '' : 'd-none d-sm-inline'}>{isDeleting ? 'Deleting…' : deleteArmedId === selectedMsg?.id ? 'Click again to confirm' : 'Delete'}</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -589,16 +612,18 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                             : 'Attached Files'}
                         </span>
                       </h6>
-                      <a
-                        href={`${API_ROOT}/inbox/download/${selectedMsg?.token || messageContent?.token || ''}/${selectedMsg.id}`}
-                        download={`email-${selectedMsg.id}.eml`}
-                        className="btn btn-sm btn-outline-secondary py-1 px-2 small d-inline-flex align-items-center gap-1"
-                        style={{ fontSize: '0.78rem' }}
-                        title="Download raw email with all attachments (.eml)"
-                      >
-                        <AppIcon iconClass="bi bi-download" size={13} />
-                        <span>Download Full .eml</span>
-                      </a>
+                      {!hideActions && (
+                        <a
+                          href={`${API_ROOT}/inbox/download/${selectedMsg?.token || messageContent?.token || ''}/${selectedMsg.id}`}
+                          download={`email-${selectedMsg.id}.eml`}
+                          className="btn btn-sm btn-outline-secondary py-1 px-2 small d-inline-flex align-items-center gap-1"
+                          style={{ fontSize: '0.78rem' }}
+                          title="Download raw email with all attachments (.eml)"
+                        >
+                          <AppIcon iconClass="bi bi-download" size={13} />
+                          <span>Download Full .eml</span>
+                        </a>
+                      )}
                     </div>
 
                     {messageContent?.attachments && messageContent.attachments.length > 0 ? (
@@ -613,7 +638,10 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                           // a proper Content-Disposition name+extension.
                           // Browsers ignore the cross-origin `download`
                           // attribute, so without this the file saved as .bin.
-                          const downloadUrl = `${API_ROOT}/inbox/attachment/${tokenForDownload}/${selectedMsg.id}/${att.id}?filename=${encodeURIComponent(att.filename || 'attachment')}`;
+                          // A custom-domain attachment may already carry its
+                          // own download URL (a data: URI built from the
+                          // stored base64 content) — use it when present.
+                          const downloadUrl = att.downloadUrl || `${API_ROOT}/inbox/attachment/${tokenForDownload}/${selectedMsg.id}/${att.id}?filename=${encodeURIComponent(att.filename || 'attachment')}`;
 
                           return (
                             <div key={att.id} className="col-sm-6">
@@ -646,14 +674,16 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired }) =>
                       </div>
                     ) : (
                       <div className="alert alert-info py-2 px-3 small d-flex align-items-center justify-content-between mt-2">
-                        <span>This message contains attached files. Click below to download the complete email package:</span>
-                        <a
-                          href={`${API_ROOT}/inbox/download/${selectedMsg.token}/${selectedMsg.id}`}
-                          download={`email-${selectedMsg.id}.eml`}
-                          className="btn btn-sm btn-primary ms-2"
-                        >
-                          Download .eml
-                        </a>
+                        <span>This message contains attached files.{!hideActions && ' Click below to download the complete email package:'}</span>
+                        {!hideActions && (
+                          <a
+                            href={`${API_ROOT}/inbox/download/${selectedMsg.token}/${selectedMsg.id}`}
+                            download={`email-${selectedMsg.id}.eml`}
+                            className="btn btn-sm btn-primary ms-2"
+                          >
+                            Download .eml
+                          </a>
+                        )}
                       </div>
                     )}
                   </div>

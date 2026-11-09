@@ -59,6 +59,7 @@ const Footer = () => {
             <ul className="site-footer__links">
               <li><Link to="/"><AppIcon iconClass="fas fa-home me-2" />Home</Link></li>
               <li><Link to="/app"><AppIcon iconClass="fas fa-envelope me-2" />Use App</Link></li>
+              <li><Link to="/premium"><AppIcon iconClass="fas fa-crown me-2" />Premium — Custom Domain</Link></li>
               <li><Link to="/privacy-stack"><AppIcon iconClass="fas fa-layer-group me-2" />Privacy Stack</Link></li>
               <li><Link to="/blog"><AppIcon iconClass="fas fa-newspaper me-2" />Blog</Link></li>
               <li><Link to="/about"><AppIcon iconClass="fas fa-info-circle me-2" />About</Link></li>

@@ -10,6 +10,7 @@ const PageNavbar = () => {
   const links = [
     { to: "/", label: "Home", icon: "fas fa-home" },
     { to: "/app", label: "Use App", icon: "fas fa-bolt" },
+    { to: "/premium", label: "Premium", icon: "fas fa-crown" },
     { to: "/privacy-stack", label: "Privacy Stack", icon: "fas fa-layer-group" },
     { to: "/blog", label: "Blog", icon: "fas fa-newspaper" },
     { to: "/about", label: "About", icon: "fas fa-info-circle" },

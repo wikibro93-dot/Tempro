@@ -11,6 +11,7 @@ import Footer from "./Footer";
 import ErrorAlert from "./ErrorAlert";
 import YesimRecommendation from "./YesimRecommendation.jsx";
 import PageNavbar from "./PageNavbar";
+import CustomDomainSection from "./CustomDomainSection.jsx";
 import AppIcon from "./AppIcon";
 import batchInboxManager from "../utils/batchInboxManager";
 import offlineMailbox from "../utils/offlineMailbox";
@@ -96,6 +97,27 @@ function TempMailApp({ onEmailCopied }) {
   const [deleteArmedAddress, setDeleteArmedAddress] = useState(null);
   const [showExpiredCard, setShowExpiredCard] = useState(false);
   const [showAddPanel, setShowAddPanel] = useState(false);
+
+  // Creem returns here after a successful Premium checkout
+  // (?subscribed=1). The subscription is NOT granted from this flag —
+  // the license key is verified server-side in CustomDomainSection.
+  // The banner just tells the buyer where their key is.
+  const [showSubscribedBanner, setShowSubscribedBanner] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).get('subscribed') === '1';
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    if (!showSubscribedBanner) return;
+    // Strip the param so a refresh does not re-show the banner.
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('subscribed');
+      window.history.replaceState({}, '', url.toString());
+    } catch { /* URL API unavailable */ }
+  }, [showSubscribedBanner]);
   const [inboxCounts, setInboxCounts] = useState(() => {
     // Seed counts safely from localStorage cached messages
     try {
@@ -700,6 +722,16 @@ function TempMailApp({ onEmailCopied }) {
       <div className="container-fluid py-3 px-3 px-md-4">
         <PageNavbar />
 
+        {showSubscribedBanner && (
+          <div className="alert alert-success d-flex align-items-center gap-2 mb-2 py-2 px-3 small" role="alert">
+            <AppIcon iconClass="bi bi-patch-check-fill text-success" />
+            <span>
+              <strong>Subscription active.</strong> Your license key is in the Creem receipt email and your Creem customer portal — paste it into the Custom domain section below to unlock your domain.
+            </span>
+            <button type="button" className="btn-close ms-auto" aria-label="Dismiss" onClick={() => setShowSubscribedBanner(false)} />
+          </div>
+        )}
+
         {error && (
           <ErrorAlert
             error={error}
@@ -797,6 +829,12 @@ function TempMailApp({ onEmailCopied }) {
                 )}
               </>
             )}
+
+            {/* Custom domain (Premium BYOD) — independent of the free
+                Mail.tm inboxes, so it sits outside the active-inbox block. */}
+            <div className="mt-4">
+              <CustomDomainSection />
+            </div>
           </div>
         </div>
       </div>

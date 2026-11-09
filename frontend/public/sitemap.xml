@@ -74,6 +74,14 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/dmca" />
   </url>
   <url>
+    <loc>https://tempmailpk.com/premium</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tempmailpk.com/premium" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tempmailpk.com/premium" />
+  </url>
+  <url>
     <loc>https://tempmailpk.com/blog/temp-email-for-ai-tool-signups</loc>
     <lastmod>2026-10-29</lastmod>
     <changefreq>weekly</changefreq>

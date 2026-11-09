@@ -91,6 +91,13 @@ export function generateDynamicSitemap(siteUrl = SITE_URL) {
       changefreq: 'monthly',
       priority: '0.60',
       description: 'TempMail Pro DMCA Policy'
+    },
+    {
+      url: `${siteUrl}/premium`,
+      lastmod: '2026-11-09',
+      changefreq: 'monthly',
+      priority: '0.80',
+      description: 'TempMail Pro Premium — connect your own custom domain, $5/month'
     }
   ];
 
