@@ -12,6 +12,18 @@ import AppIcon from "./AppIcon";
 // product checkout URLs. After paying, Creem emails the customer a
 // license key, which they paste into /app to unlock the custom-domain
 // section. No login, no account — the key is the credential.
+//
+// COMING-SOON GATE (9 Nov 2026): purchases are DISABLED until the
+// Postmark account is fully approved AND a real test purchase has proven
+// the checkout -> webhook -> license-key flow end to end. While the gate
+// is off, the page still shows pricing and features, but every Subscribe
+// button is a disabled "Coming soon" button, so nobody can pay for a
+// product that is not ready yet — and we never have to refund a premature
+// purchase. Flip PREMIUM_AVAILABLE to true only after Postmark approval
+// + the real purchase test passes. (The /app custom-domain section is
+// already key-gated, so no change is needed there.)
+const PREMIUM_AVAILABLE = false;
+
 const CREEM_MONTHLY_URL = "https://www.creem.io/payment/prod_5rlysHo03p4e5czTOZFe02";
 const CREEM_YEARLY_URL = "https://www.creem.io/payment/prod_7LDR5lYmCrzoHqjIDtO2K";
 
@@ -94,6 +106,16 @@ const Premium = () => {
               lead="Premium connects a domain you already own to TempMail Pro, so mail sent to addresses on your domain lands in your inbox here. The free app stays exactly as it is: no sign-in, no account, no change."
             />
 
+            {/* Coming-soon notice while purchases are gated */}
+            {!PREMIUM_AVAILABLE && (
+              <div className="alert alert-info text-center mb-4" role="alert">
+                <strong>Premium is coming soon.</strong> We are finishing the
+                custom-domain setup and will open subscriptions once it is fully
+                tested. <Link to="/contact">Contact us</Link> if you would like
+                to be notified when it launches.
+              </div>
+            )}
+
             {/* Pricing */}
             <div className="row g-4 mb-4">
               <div className="col-md-6">
@@ -102,9 +124,15 @@ const Premium = () => {
                     <h5 className="fw-bold">Monthly</h5>
                     <p className="display-6 fw-bold mb-1">$5<span className="fs-6 text-muted fw-normal"> / month</span></p>
                     <p className="text-muted small mb-4">Billed monthly. Cancel anytime.</p>
-                    <a href={CREEM_MONTHLY_URL} className="btn btn-primary btn-lg w-100">
-                      Subscribe — $5/month
-                    </a>
+                    {PREMIUM_AVAILABLE ? (
+                      <a href={CREEM_MONTHLY_URL} className="btn btn-primary btn-lg w-100">
+                        Subscribe — $5/month
+                      </a>
+                    ) : (
+                      <button type="button" className="btn btn-secondary btn-lg w-100" disabled aria-disabled="true">
+                        Coming soon
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -115,9 +143,15 @@ const Premium = () => {
                     <h5 className="fw-bold">Yearly</h5>
                     <p className="display-6 fw-bold mb-1">$48<span className="fs-6 text-muted fw-normal"> / year</span></p>
                     <p className="text-muted small mb-4">$4 a month when billed yearly. Cancel anytime.</p>
-                    <a href={CREEM_YEARLY_URL} className="btn btn-primary btn-lg w-100">
-                      Subscribe — $48/year
-                    </a>
+                    {PREMIUM_AVAILABLE ? (
+                      <a href={CREEM_YEARLY_URL} className="btn btn-primary btn-lg w-100">
+                        Subscribe — $48/year
+                      </a>
+                    ) : (
+                      <button type="button" className="btn btn-secondary btn-lg w-100" disabled aria-disabled="true">
+                        Coming soon
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -152,11 +186,17 @@ const Premium = () => {
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-body text-center py-5">
                 <AppIcon iconClass="bi bi-envelope text-primary mb-3" size={40} />
-                <h4 className="mb-3">Ready to use your own domain?</h4>
-                <p className="text-muted mb-4">Subscribe, get your license key, and connect your domain in the app.</p>
-                <a href={CREEM_MONTHLY_URL} className="btn btn-primary btn-lg me-3">
-                  Subscribe — $5/month
-                </a>
+                <h4 className="mb-3">{PREMIUM_AVAILABLE ? "Ready to use your own domain?" : "Premium is coming soon"}</h4>
+                <p className="text-muted mb-4">{PREMIUM_AVAILABLE ? "Subscribe, get your license key, and connect your domain in the app." : "We are finishing the custom-domain setup. Subscriptions open once it is fully tested — contact us to be notified."}</p>
+                {PREMIUM_AVAILABLE ? (
+                  <a href={CREEM_MONTHLY_URL} className="btn btn-primary btn-lg me-3">
+                    Subscribe — $5/month
+                  </a>
+                ) : (
+                  <button type="button" className="btn btn-secondary btn-lg me-3" disabled aria-disabled="true">
+                    Coming soon
+                  </button>
+                )}
                 <Link to="/app" className="btn btn-outline-secondary btn-lg">
                   Back to the free app
                 </Link>
