@@ -1489,37 +1489,52 @@ app.post(
         // The checkout object carries license_keys[] — one entry per
         // license-key feature on the product. Each key becomes a
         // subscription record the app verifies against.
-        const productId = String(obj?.product_id || obj?.productId || '');
-        if (PREMIUM_PRODUCT_IDS.has(productId)) {
-          const subId = String(obj?.subscription?.id || obj?.subscription_id || obj?.subscriptionId || '');
-          const customerEmail = String(obj?.customer?.email || obj?.customer_email || '');
-          const expiresAt = obj?.subscription?.current_period_end || obj?.current_period_end || null;
-          const keys: any[] = Array.isArray(obj?.license_keys) ? obj.license_keys : [];
-          for (const lic of keys) {
-            const key = normalizeLicenseKey(lic?.key);
-            if (!key) continue;
-            const prev = await getSubscription(key).catch(() => null);
-            await upsertSubscription(key, {
-              productId,
-              subscriptionId: subId || prev?.subscriptionId || null,
-              customerEmail: customerEmail || prev?.customerEmail || null,
-              status: 'active',
-              domainsUsed: Number(prev?.domainsUsed) || 0,
-              domainsLimit: PREMIUM_DOMAINS_PER_KEY,
-              expiresAt: expiresAt || prev?.expiresAt || null,
-              createdAt: prev?.createdAt || new Date().toISOString(),
-            });
-            console.log(`[Premium] License key recorded for ${productId} (subscription ${subId || 'n/a'}).`);
-          }
-          if (keys.length === 0) {
-            console.warn('[Premium] checkout.completed for a Premium product carried no license_keys — is the license-key feature enabled on the product in the Creem dashboard?');
-          }
+        // PAYLOAD STRUCTURE (Creem docs, verified 10 Nov 2026): the
+        // checkout object does NOT carry a top-level product_id. The
+        // product is nested at obj.product.id, and each license entry
+        // carries its own product_id (the product the key was issued
+        // for). The first real purchase (10 Nov 2026, $5) proved the
+        // old obj.product_id read returned '' and the handler silently
+        // skipped the whole event — returning 200 while recording
+        // nothing. So: read the product per license entry, and never
+        // skip silently again.
+        const keys: any[] = Array.isArray(obj?.license_keys) ? obj.license_keys : [];
+        const topProductId = String(obj?.product?.id || obj?.product_id || obj?.productId || obj?.order?.product_id || '');
+        const subId = String(obj?.subscription?.id || obj?.subscription_id || obj?.subscriptionId || '');
+        const customerEmail = String(obj?.customer?.email || obj?.customer_email || '');
+        const expiresAt = obj?.subscription?.current_period_end || obj?.current_period_end || null;
+        let recorded = 0;
+        for (const lic of keys) {
+          const key = normalizeLicenseKey(lic?.key);
+          if (!key) continue;
+          // Prefer the license entry's own product_id (the product the
+          // key was issued for); fall back to the checkout's product.
+          const productId = String(lic?.product_id || lic?.productId || topProductId || '');
+          if (!PREMIUM_PRODUCT_IDS.has(productId)) continue;
+          const prev = await getSubscription(key).catch(() => null);
+          await upsertSubscription(key, {
+            productId,
+            subscriptionId: subId || prev?.subscriptionId || null,
+            customerEmail: customerEmail || prev?.customerEmail || null,
+            status: 'active',
+            domainsUsed: Number(prev?.domainsUsed) || 0,
+            domainsLimit: PREMIUM_DOMAINS_PER_KEY,
+            expiresAt: expiresAt || prev?.expiresAt || null,
+            createdAt: prev?.createdAt || new Date().toISOString(),
+          });
+          recorded++;
+          console.log(`[Premium] License key recorded for ${productId} (subscription ${subId || 'n/a'}).`);
+        }
+        if (keys.length === 0) {
+          console.warn('[Premium] checkout.completed carried no license_keys — is the license-key feature enabled on the product in the Creem dashboard?');
+        } else if (recorded === 0) {
+          console.warn(`[Premium] checkout.completed carried ${keys.length} license key(s) but none matched a Premium product (top product: ${topProductId || 'none'}). Keys were NOT recorded.`);
         }
       } else if (eventType.startsWith('subscription.')) {
         // Lifecycle events carry the subscription object; update every
         // subscription record that belongs to it.
         const subId = String(obj?.id || '');
-        const productId = String(obj?.product_id || obj?.productId || '');
+        const productId = String(obj?.product?.id || obj?.product_id || obj?.productId || '');
         const nextStatus =
           eventType === 'subscription.active' || eventType === 'subscription.paid' ? 'active'
           : eventType === 'subscription.canceled' ? 'cancelled'
