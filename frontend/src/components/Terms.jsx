@@ -156,9 +156,9 @@ const Terms = () => {
 
             <h2 className="mt-5">9. Governing Law</h2>
             <p>
-              These terms are governed by the laws of Pakistan. Any dispute
-              arising from the use of the service shall be handled under the
-              jurisdiction of the local courts.
+              These terms are governed by the applicable laws. Any dispute
+              arising from the use of the service shall be handled by the
+              courts with jurisdiction.
             </p>
 
             <h2 className="mt-5">10. Contact</h2>

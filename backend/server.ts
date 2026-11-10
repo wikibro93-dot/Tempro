@@ -930,6 +930,13 @@ app.post(
     if (!to || !(await isAcceptedInboundDomain(to))) {
       return res.status(400).json({ error: 'Recipient is not on a registered inbound domain' });
     }
+    // Usage limits (customer domains only; the plumbing domain is exempt).
+    // A 400 here is a permanent failure for Postmark — it will not retry,
+    // so over-limit mail is dropped, not queued.
+    const usage = await checkPremiumUsageLimits(to);
+    if (!usage.ok) {
+      return res.status(400).json({ error: usage.error });
+    }
     const attachments: InboundAttachment[] = Array.isArray(body.Attachments)
       ? body.Attachments.map((a: any) => {
           const content = typeof a?.Content === 'string' ? a.Content : '';
@@ -958,6 +965,13 @@ app.post(
     try {
       const result = await saveInboundMessage(msg);
       if (result === 'duplicate') return res.json({ ok: true, duplicate: true });
+      // Record the usage only after a successful save, so a failed or
+      // duplicate save does not consume quota. Best-effort: a usage-record
+      // failure must not fail the webhook (the message is already stored).
+      if (usage.domain) {
+        try { await recordPremiumUsage(usage.domain, to, Boolean(usage.isNewAddress)); }
+        catch (e: any) { console.warn('[Premium] usage record failed:', e?.message); }
+      }
     } catch (err: any) {
       console.warn('[Postmark inbound] Save failed:', err?.message);
       return res.status(500).json({ error: 'Could not store message' });
@@ -1025,6 +1039,16 @@ const PREMIUM_PRODUCT_IDS = new Set([
   'prod_7LDR5lYmCrzoHqjIDtO2K', // TempMail Pro Premium — Yearly ($48)
 ]);
 const PREMIUM_DOMAINS_PER_KEY = 1;
+// Usage limits — the industry answer to quota-drain abuse. A refund kills
+// the key at once, but the Postmark quota already consumed is gone, so the
+// service itself is capped: at most 10 distinct inboxes may receive mail on
+// one custom domain, and at most 50 inbound emails per license key per
+// calendar month (the Postmark free tier is 100/month shared across all
+// customers; the paid tier is 10,000/month). Enforced in the inbound
+// webhook, so it cannot be bypassed from the browser. The plumbing domain
+// (inbound.tempmailpk.com) is our own test address and is never capped.
+const PREMIUM_INBOXES_PER_DOMAIN = 10;
+const PREMIUM_EMAILS_PER_KEY_PER_MONTH = 50;
 const POSTMARK_MX_HOST = 'inbound.postmarkapp.com';
 const POSTMARK_API_TOKEN = process.env.POSTMARK_API_TOKEN || '';
 const CREEM_WEBHOOK_SECRET = process.env.CREEM_WEBHOOK_SECRET || '';
@@ -1101,8 +1125,9 @@ async function markCreemEventProcessed(eventId: string): Promise<void> {
 
 // Is this recipient address on a domain we accept inbound mail for? The
 // plumbing domain always counts; a customer domain counts only once it is
-// registered AND DNS-verified. (Function declaration so it is hoisted and
-// usable by the inbound webhook defined above this section.)
+// registered AND DNS-verified AND its subscription is still usable.
+// (Function declaration so it is hoisted and usable by the inbound webhook
+// defined above this section.)
 async function isAcceptedInboundDomain(address: string): Promise<boolean> {
   const at = address.lastIndexOf('@');
   if (at < 0) return false;
@@ -1110,10 +1135,69 @@ async function isAcceptedInboundDomain(address: string): Promise<boolean> {
   if (domain === POSTMARK_INBOUND_DOMAIN) return true;
   try {
     const rec = await getCustomDomain(domain);
-    return Boolean(rec && rec.status === 'verified');
+    if (!rec || rec.status !== 'verified') return false;
+    // A refunded, disputed, or expired subscription must stop receiving
+    // mail at once — otherwise a refunded domain would keep consuming the
+    // shared Postmark quota even though the key is dead. A cancelled
+    // subscription still counts as usable until its period ends (see
+    // subscriptionIsUsable), so a cancelling customer keeps mail until then.
+    if (!rec.key) return false;
+    const sub = await getSubscription(rec.key);
+    return subscriptionIsUsable(sub);
   } catch {
     return false;
   }
+}
+
+// Premium usage limits — checked in the inbound webhook before a message is
+// stored, so a single key cannot drain the shared Postmark quota. Two caps,
+// both per custom domain (= per license key, since one key covers one
+// domain): at most PREMIUM_INBOXES_PER_DOMAIN distinct recipient addresses
+// may receive mail on the domain, and at most
+// PREMIUM_EMAILS_PER_KEY_PER_MONTH inbound emails per calendar month (UTC).
+// An "inbox" only counts once mail arrives for it — typing an address in
+// the app without receiving mail costs nothing. The counter resets on the
+// 1st of each month. Returns { ok, error?, domain?, isNewAddress? }; the
+// caller records the usage only after the message is stored, so a failed or
+// duplicate save does not consume quota. (Known limit: two messages
+// arriving at the same instant can both pass at count 49 and both record,
+// so the cap can be exceeded by 1 email. Negligible at this scale.)
+async function checkPremiumUsageLimits(address: string): Promise<{ ok: boolean; error?: string; domain?: string; isNewAddress?: boolean }> {
+  const at = address.lastIndexOf('@');
+  if (at < 0) return { ok: true };
+  const domain = address.slice(at + 1).toLowerCase();
+  if (domain === POSTMARK_INBOUND_DOMAIN) return { ok: true };
+  const rec = await getCustomDomain(domain);
+  if (!rec || rec.status !== 'verified') return { ok: true }; // isAcceptedInboundDomain already rejected these; not this function's decision
+  const addresses: string[] = Array.isArray(rec.addresses) ? rec.addresses : [];
+  const addr = address.toLowerCase();
+  const isNewAddress = !addresses.includes(addr);
+  if (isNewAddress && addresses.length >= PREMIUM_INBOXES_PER_DOMAIN) {
+    return { ok: false, error: `This domain already has the maximum of ${PREMIUM_INBOXES_PER_DOMAIN} inboxes. Mail to a new address on this domain is not accepted.` };
+  }
+  const month = new Date().toISOString().slice(0, 7); // YYYY-MM (UTC)
+  const usageMonth = rec.usageMonth || '';
+  const usageCount = usageMonth === month ? (Number(rec.usageCount) || 0) : 0;
+  if (usageCount >= PREMIUM_EMAILS_PER_KEY_PER_MONTH) {
+    return { ok: false, error: `This domain has reached its limit of ${PREMIUM_EMAILS_PER_KEY_PER_MONTH} received emails this month. Mail will be accepted again on the 1st of next month.` };
+  }
+  return { ok: true, domain, isNewAddress };
+}
+
+async function recordPremiumUsage(domain: string, address: string, isNewAddress: boolean): Promise<void> {
+  const rec = await getCustomDomain(domain);
+  if (!rec) return;
+  const month = new Date().toISOString().slice(0, 7);
+  const usageMonth = rec.usageMonth || '';
+  const usageCount = usageMonth === month ? (Number(rec.usageCount) || 0) : 0;
+  const addresses: string[] = Array.isArray(rec.addresses) ? rec.addresses : [];
+  const addr = address.toLowerCase();
+  const nextAddresses = isNewAddress && !addresses.includes(addr) ? [...addresses, addr] : addresses;
+  await upsertCustomDomain(domain, {
+    addresses: nextAddresses,
+    usageMonth: month,
+    usageCount: usageCount + 1,
+  });
 }
 
 function normalizeLicenseKey(raw: any): string {
@@ -1540,3 +1624,19 @@ function shutdown(signal: string) {
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
+
+// Exported for local testing only (usage-limit + refund verification). This
+// does not change runtime behaviour — the server still starts via app.listen
+// above. A test imports this module (which starts the server on PORT) and
+// uses these helpers to set up a verified domain directly, since verify-dns
+// needs real DNS. Never import this from another production module.
+export const __test__ = {
+  getCustomDomain,
+  upsertCustomDomain,
+  getSubscription,
+  upsertSubscription,
+  checkPremiumUsageLimits,
+  recordPremiumUsage,
+  isAcceptedInboundDomain,
+  subscriptionIsUsable,
+};
