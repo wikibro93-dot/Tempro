@@ -209,15 +209,25 @@ const CustomDomainSection = () => {
   // Map a Postmark inbound message to the shape Inbox expects.
   const mapCustomMessage = useCallback((m) => {
     const attachments = Array.isArray(m.attachments) ? m.attachments : [];
+    // The backend stores the body as textBody/htmlBody (Postmark's field
+    // names) and the arrival time as receivedAt (ms since epoch) plus date
+    // (the sender's RFC 2822 Date header). The Inbox reads text/html and
+    // createdAt, so map them here — reading m.text/m.html directly left
+    // every custom-domain message body blank ("No text content available")
+    // and createdAt undefined rendered as "Invalid Date".
+    const text = m.textBody || m.text || "";
+    const html = m.htmlBody || m.html || "";
+    const at = m.receivedAt ? new Date(m.receivedAt).toISOString() : (m.date || "");
     return {
       id: m.id,
       token: "custom",
       from: { address: m.from || "", name: m.fromName || "" },
       subject: m.subject || "(no subject)",
-      date: m.receivedAt,
-      intro: (m.text || "").slice(0, 140) || stripHtml(m.html || "").slice(0, 140),
-      text: m.text || "",
-      html: m.html || "",
+      date: at,
+      createdAt: at,
+      intro: text.slice(0, 140) || stripHtml(html).slice(0, 140),
+      text,
+      html,
       hasAttachments: attachments.length > 0,
       attachments,
     };
