@@ -57,7 +57,14 @@ export default defineConfig({
         clientsClaim: true,
         skipWaiting: true,
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api\/.*/],
+        // Without these, the service worker serves index.html for /sitemap.xml,
+        // /robots.txt, /rss.xml and /llms.txt, so a real browser shows the app's
+        // 404 page ("Oops! The page you're looking for doesn't exist.") instead
+        // of the static file — even though Vercel serves it fine (curl: 200).
+        navigateFallbackDenylist: [
+          /^\/api\/.*/,
+          /^\/(sitemap\.xml|robots\.txt|rss\.xml|llms\.txt|manifest\.webmanifest|sw\.js|registerSW\.js|cache-worker\.js)$/,
+        ],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/.*/i,
