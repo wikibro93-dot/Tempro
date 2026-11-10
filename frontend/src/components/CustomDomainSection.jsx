@@ -126,6 +126,10 @@ const CustomDomainSection = () => {
         setDomainStatus(data.status);
         setMxRecords(Array.isArray(data.mxRecords) ? data.mxRecords : []);
         setPostmarkConfigured(data.postmarkConfigured !== false);
+        // Persist the domain locally too, so a plain reload keeps it even
+        // if the server lookup is ever unavailable. (registerDomain does
+        // the same; restoreDomain previously forgot to.)
+        try { localStorage.setItem(PREMIUM_DOMAIN_STORAGE, data.domain); } catch { /* storage unavailable */ }
         // No banner here: the "Verified — live" badge already says it,
         // and a banner restating it on every fresh load is noise.
         if (!addressInput) setAddressInput(`hello@${data.domain}`);
