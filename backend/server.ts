@@ -8,8 +8,16 @@ import { Readable } from 'node:stream';
 
 const PORT = Number(process.env.PORT) || 10000;
 const MAIL_TM_API_BASE = (process.env.MAIL_TM_API_BASE || 'https://api.mail.tm').replace(/\/+$/, '');
-const CORS_ORIGINS = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:3000,https://tempmailpk.com,https://www.tempmailpk.com')
-  .split(',').map((o) => o.trim()).filter(Boolean);
+const CORS_ORIGINS = Array.from(new Set([
+  ...(process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:3000,https://tempmailpk.com,https://www.tempmailpk.com')
+    .split(',').map((o) => o.trim()).filter(Boolean),
+  // Universal Slide Engine (doc2slides.online) calls this backend for its
+  // license-key verification (POST /api/use/verify-key). The Render env var
+  // CORS_ORIGIN overrides the default above, so the USE origins are merged
+  // in here rather than relying on the default list.
+  'https://doc2slides.online',
+  'https://www.doc2slides.online',
+]));
 
 const app = express();
 // Trust Render's first proxy so req.ip is the real client IP (from
@@ -1174,6 +1182,20 @@ const PREMIUM_PRODUCT_IDS = new Set([
   'prod_5rlysHo03p4e5czTOZFe02', // TempMail Pro Premium — Monthly ($5)
   'prod_7LDR5lYmCrzoHqjIDtO2K', // TempMail Pro Premium — Yearly ($48)
 ]);
+// Universal Slide Engine subscriptions (doc2slides.online). Same license-key
+// pattern as TempMail Premium, but no custom domain — the key alone unlocks
+// exports. One key = one subscription. The customer pastes the key the Creem
+// checkout gives them into the app; POST /api/use/verify-key checks it.
+// The Creem webhook below records these in Firestore collection
+// "use_subscriptions" (doc id = normalized license key).
+const USE_PRODUCT_IDS = new Set([
+  'prod_6KByXDeCv8ij38XgLMFa2e', // Universal Slide Engine — Monthly ($2)
+  'prod_4xtPnNyXEdvIioIvpgDiIm', // Universal Slide Engine — Yearly ($12)
+]);
+const USE_PRODUCT_PLAN: Record<string, string> = {
+  prod_6KByXDeCv8ij38XgLMFa2e: 'monthly',
+  prod_4xtPnNyXEdvIioIvpgDiIm: 'yearly',
+};
 const PREMIUM_DOMAINS_PER_KEY = 1;
 // Usage limits — the industry answer to quota-drain abuse. A refund kills
 // the key at once, but the Postmark quota already consumed is gone, so the
@@ -1221,6 +1243,26 @@ async function upsertSubscription(key: string, data: any): Promise<void> {
     return;
   }
   premiumSubsMemory.set(key, { ...(premiumSubsMemory.get(key) || {}), ...record });
+}
+
+// --- Universal Slide Engine subscriptions (same pattern, separate collection) ---
+const useSubsMemory = new Map<string, any>();
+
+async function getUseSubscription(key: string): Promise<any | null> {
+  if (inboundDb) {
+    const snap = await inboundDb.collection('use_subscriptions').doc(key).get();
+    return snap.exists ? snap.data() : null;
+  }
+  return useSubsMemory.get(key) || null;
+}
+
+async function upsertUseSubscription(key: string, data: any): Promise<void> {
+  const record = { ...data, key, updatedAt: new Date().toISOString() };
+  if (inboundDb) {
+    await inboundDb.collection('use_subscriptions').doc(key).set(record, { merge: true });
+    return;
+  }
+  useSubsMemory.set(key, { ...(useSubsMemory.get(key) || {}), ...record });
 }
 
 async function getCustomDomain(domain: string): Promise<any | null> {
@@ -1439,6 +1481,47 @@ app.post('/api/premium/verify-key', premiumLimiter, async (req: any, res: any) =
     });
   } catch (err: any) {
     console.warn('[Premium] verify-key failed:', err?.message);
+    return res.status(500).json({ error: 'Could not check the license key, please try again.' });
+  }
+});
+
+// POST /api/use/verify-key {key} — server-side license check for Universal
+// Slide Engine (doc2slides.online). Same pattern as /api/premium/verify-key,
+// but the key alone unlocks exports (no domain). The browser never decides
+// on its own; only a record written by the verified Creem webhook counts.
+// This is what kills the ?subscribed=1 spoof: a URL alone can no longer
+// unlock exports — only a real paid key, verified here, can.
+app.post('/api/use/verify-key', premiumLimiter, async (req: any, res: any) => {
+  const key = normalizeLicenseKey(req.body?.key);
+  if (!key) return res.status(400).json({ error: 'Enter your license key.' });
+  try {
+    const sub = await getUseSubscription(key);
+    if (!sub) {
+      return res.status(404).json({
+        ok: false,
+        error: 'This license key was not found. Check the key from your Creem receipt email — it is five groups of five characters.',
+      });
+    }
+    if (!subscriptionIsUsable(sub)) {
+      return res.status(403).json({
+        ok: false,
+        error:
+          sub.status === 'cancelled'
+            ? 'This subscription has ended. Renew it in Creem to export again.'
+            : sub.status === 'refunded' || sub.status === 'disputed'
+            ? 'This subscription was refunded, so the license key is no longer active. To export again, subscribe again.'
+            : 'This license key is not active right now. If you just paid, give the payment a minute to register, then try again.',
+      });
+    }
+    return res.json({
+      ok: true,
+      active: true,
+      productId: sub.productId || null,
+      plan: USE_PRODUCT_PLAN[sub.productId] || null,
+      expiresAt: sub.expiresAt || null,
+    });
+  } catch (err: any) {
+    console.warn('[USE] verify-key failed:', err?.message);
     return res.status(500).json({ error: 'Could not check the license key, please try again.' });
   }
 });
@@ -1825,25 +1908,43 @@ app.post(
           // Prefer the license entry's own product_id (the product the
           // key was issued for); fall back to the checkout's product.
           const productId = String(lic?.product_id || lic?.productId || topProductId || '');
-          if (!PREMIUM_PRODUCT_IDS.has(productId)) continue;
-          const prev = await getSubscription(key).catch(() => null);
-          await upsertSubscription(key, {
-            productId,
-            subscriptionId: subId || prev?.subscriptionId || null,
-            customerEmail: customerEmail || prev?.customerEmail || null,
-            status: 'active',
-            domainsUsed: Number(prev?.domainsUsed) || 0,
-            domainsLimit: PREMIUM_DOMAINS_PER_KEY,
-            expiresAt: expiresAt || prev?.expiresAt || null,
-            createdAt: prev?.createdAt || new Date().toISOString(),
-          });
-          recorded++;
-          console.log(`[Premium] License key recorded for ${productId} (subscription ${subId || 'n/a'}).`);
+          if (PREMIUM_PRODUCT_IDS.has(productId)) {
+            const prev = await getSubscription(key).catch(() => null);
+            await upsertSubscription(key, {
+              productId,
+              subscriptionId: subId || prev?.subscriptionId || null,
+              customerEmail: customerEmail || prev?.customerEmail || null,
+              status: 'active',
+              domainsUsed: Number(prev?.domainsUsed) || 0,
+              domainsLimit: PREMIUM_DOMAINS_PER_KEY,
+              expiresAt: expiresAt || prev?.expiresAt || null,
+              createdAt: prev?.createdAt || new Date().toISOString(),
+            });
+            recorded++;
+            console.log(`[Premium] License key recorded for ${productId} (subscription ${subId || 'n/a'}).`);
+          } else if (USE_PRODUCT_IDS.has(productId)) {
+            // Universal Slide Engine: same key flow, no domain. The key
+            // alone unlocks exports; POST /api/use/verify-key checks it.
+            const prev = await getUseSubscription(key).catch(() => null);
+            await upsertUseSubscription(key, {
+              productId,
+              plan: USE_PRODUCT_PLAN[productId] || null,
+              subscriptionId: subId || prev?.subscriptionId || null,
+              customerEmail: customerEmail || prev?.customerEmail || null,
+              status: 'active',
+              expiresAt: expiresAt || prev?.expiresAt || null,
+              createdAt: prev?.createdAt || new Date().toISOString(),
+            });
+            recorded++;
+            console.log(`[USE] License key recorded for ${productId} (subscription ${subId || 'n/a'}).`);
+          }
+          // Any other product: not ours — skip silently (another product
+          // on the same Creem store, e.g. a future product).
         }
         if (keys.length === 0) {
           console.warn('[Premium] checkout.completed carried no license_keys — is the license-key feature enabled on the product in the Creem dashboard?');
         } else if (recorded === 0) {
-          console.warn(`[Premium] checkout.completed carried ${keys.length} license key(s) but none matched a Premium product (top product: ${topProductId || 'none'}). Keys were NOT recorded.`);
+          console.warn(`[Premium] checkout.completed carried ${keys.length} license key(s) but none matched a Premium or USE product (top product: ${topProductId || 'none'}). Keys were NOT recorded.`);
         }
       } else if (eventType.startsWith('subscription.')) {
         // Lifecycle events carry the subscription object; update every
@@ -1875,6 +1976,23 @@ app.post(
             for (const doc of snap.docs) await updateFor(doc.data());
           } else {
             for (const rec of premiumSubsMemory.values()) await updateFor(rec);
+          }
+          // Universal Slide Engine keys live in their own collection —
+          // same lifecycle (renewal extends expiresAt, cancellation keeps
+          // access until period end).
+          const updateUseFor = async (rec: any) => {
+            if (rec && rec.subscriptionId === subId) {
+              await upsertUseSubscription(rec.key, {
+                status: nextStatus,
+                expiresAt: obj?.current_period_end || rec.expiresAt || null,
+              });
+            }
+          };
+          if (inboundDb) {
+            const snap = await inboundDb.collection('use_subscriptions').where('subscriptionId', '==', subId).get();
+            for (const doc of snap.docs) await updateUseFor(doc.data());
+          } else {
+            for (const rec of useSubsMemory.values()) await updateUseFor(rec);
           }
           console.log(`[Premium] Subscription ${subId} (${productId || 'unknown product'}) -> ${nextStatus}.`);
         }
@@ -1915,6 +2033,22 @@ app.post(
             for (const doc of snap.docs) await revokeFor(doc.data());
           } else {
             for (const rec of premiumSubsMemory.values()) await revokeFor(rec);
+          }
+          // Universal Slide Engine keys are revoked the same way — a
+          // refunded USE subscription loses export access at once.
+          const revokeUseFor = async (rec: any) => {
+            if (rec && rec.subscriptionId === subId) {
+              await upsertUseSubscription(rec.key, {
+                status: nextStatus,
+                expiresAt: new Date().toISOString(),
+              });
+            }
+          };
+          if (inboundDb) {
+            const snap = await inboundDb.collection('use_subscriptions').where('subscriptionId', '==', subId).get();
+            for (const doc of snap.docs) await revokeUseFor(doc.data());
+          } else {
+            for (const rec of useSubsMemory.values()) await revokeUseFor(rec);
           }
           console.log(`[Premium] ${eventType} for subscription ${subId} -> ${nextStatus} (key revoked immediately).`);
         } else {
@@ -1967,6 +2101,8 @@ export const __test__ = {
   getDomainByKey,
   getSubscription,
   upsertSubscription,
+  getUseSubscription,
+  upsertUseSubscription,
   checkPremiumUsageLimits,
   recordPremiumUsage,
   isAcceptedInboundDomain,
