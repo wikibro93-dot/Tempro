@@ -97,7 +97,10 @@ const SafeEmailViewer = ({
         </div>
       </div>
 
-      <pre className="p-3 p-md-4 rounded-3 border bg-body-tertiary font-monospace small text-dark mb-0 whitespace-pre-wrap">
+      <pre
+        className="p-3 p-md-4 rounded-3 border bg-body-tertiary font-monospace small text-dark mb-0 whitespace-pre-wrap"
+        style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
+      >
         {displayText}
       </pre>
     </div>

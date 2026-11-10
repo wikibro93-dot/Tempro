@@ -144,10 +144,18 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired, onFe
     prevCountRef.current = currentCount;
   }, [messages]);
 
-  // Auto-select first message on desktop if none selected
+  // Auto-select first message on desktop if none selected. Also reset
+  // the selection when the selected message is no longer in the list —
+  // that happens when the user switches to a different inbox (e.g. from
+  // hello@ to test@ on a custom domain): without the reset, the detail
+  // pane keeps showing a message from the previous inbox while the list
+  // shows the new one. A poll refresh keeps the selection because the
+  // message ids are unchanged.
   useEffect(() => {
-    if (messages && messages.length > 0 && !selectedMsg) {
-      setSelectedMsg(messages[0]);
+    if (messages && messages.length > 0) {
+      if (!selectedMsg || !messages.some((m) => m.id === selectedMsg.id)) {
+        setSelectedMsg(messages[0]);
+      }
     } else if (messages && messages.length === 0) {
       setSelectedMsg(null);
       setMessageContent(null);
