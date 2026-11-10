@@ -7,8 +7,10 @@ import { IntroCard, FeatureGrid, SectionCard, StepsGrid, UpdatedAt } from "./Inf
 import AppIcon from "./AppIcon";
 
 // TempMail Pro Premium — sales page.
-// Two plans, both the same product (custom domain + more inboxes + longer
-// expiry + no ads). Checkout is Creem; the links below are the real
+// Two plans, both the same product (custom domain + 10 addresses on it +
+// addresses that stay live + no ads). The copy states the real limits:
+// 10 addresses, 50 emails a month, messages kept 7 days — the free
+// presets run to 365 days, so "longer expiry" would be false here. Checkout is Creem; the links below are the real
 // product checkout URLs. After paying, Creem emails the customer a
 // license key, which they paste into /app to unlock the custom-domain
 // section. No login, no account — the key is the credential.
@@ -39,16 +41,16 @@ const Premium = () => {
     {
       iconClass: "bi bi-inboxes",
       iconColor: "text-success",
-      title: "More inboxes",
+      title: "10 addresses on your domain",
       description:
-        "Run more temporary inboxes at once, so each signup, trial, or test case keeps its own inbox instead of sharing one.",
+        "Use up to 10 addresses on your own domain at once — for example sales@, support@, and trials@ — each with its own inbox. Up to 50 emails a month across them.",
     },
     {
       iconClass: "bi bi-clock",
       iconColor: "text-info",
-      title: "Longer expiry",
+      title: "Addresses that stay live",
       description:
-        "Keep an inbox for longer than the free presets allow, so a trial or signup that runs for weeks is not cut short.",
+        "Your custom-domain addresses stay live as long as your subscription is active — no 10-minute or 1-hour countdown. Messages are kept for 7 days.",
     },
     {
       iconClass: "bi bi-badge-ad",
@@ -85,7 +87,7 @@ const Premium = () => {
         <title>TempMail Pro Premium – Custom Domain, $5/Month</title>
         <meta
           name="description"
-          content="TempMail Pro Premium costs $5 a month: connect your own custom domain, get more inboxes, longer expiry, and no ads. No sign-in — pay, paste your key, and go."
+          content="TempMail Pro Premium costs $5 a month: connect your own custom domain, use up to 10 addresses on it, and browse with no ads. No sign-in — pay, paste your key, and go."
         />
         <link rel="canonical" href="https://tempmailpk.com/premium" />
         <meta property="og:title" content="TempMail Pro Premium – Custom Domain, $5/Month" />

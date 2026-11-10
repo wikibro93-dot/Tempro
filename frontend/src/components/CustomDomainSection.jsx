@@ -79,6 +79,9 @@ const CustomDomainSection = () => {
       if (res.ok && data.ok && data.active) {
         setStoredKey(key);
         try { localStorage.setItem(PREMIUM_KEY_STORAGE, key); } catch { /* storage unavailable */ }
+        // Tell the App shell a Premium key is now present, so it hides
+        // the sponsored PromoCard ("No ads" is a paid promise).
+        try { window.dispatchEvent(new Event("tempmail-premium-changed")); } catch { /* non-browser */ }
         setKeyState("active");
         setKeyMessage("");
         setKeyExpiresAt(data.expiresAt || null);
@@ -164,6 +167,9 @@ const CustomDomainSection = () => {
       localStorage.removeItem(PREMIUM_KEY_STORAGE);
       localStorage.removeItem(PREMIUM_DOMAIN_STORAGE);
     } catch { /* storage unavailable */ }
+    // Tell the App shell the Premium key is gone, so the sponsored
+    // PromoCard may show again.
+    try { window.dispatchEvent(new Event("tempmail-premium-changed")); } catch { /* non-browser */ }
   };
 
   const registerDomain = async (e) => {
@@ -492,6 +498,12 @@ const CustomDomainSection = () => {
                   {new Date(keyExpiresAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}.
                 </div>
               )}
+              <div className="small mt-1">
+                <a href="https://www.creem.io/my-orders/login" target="_blank" rel="noreferrer">
+                  Manage subscription in Creem
+                </a>{" "}
+                — cancel or update payment (log in with the email you paid with).
+              </div>
             </div>
 
             {/* Domain registration */}
@@ -538,6 +550,22 @@ const CustomDomainSection = () => {
                 {usage && (
                   <div className="text-muted small mt-2">
                     Usage this month: {usage.inboxesUsed} of {usage.inboxesLimit} inboxes · {usage.emailsUsed} of {usage.emailsLimit} emails
+                  </div>
+                )}
+                {usage && (usage.emailsUsed / Math.max(usage.emailsLimit, 1) >= 0.8 || usage.inboxesUsed / Math.max(usage.inboxesLimit, 1) >= 0.8) && (
+                  <div className="alert alert-warning py-2 mt-2 mb-0" role="alert">
+                    <div className="small">
+                      {usage.emailsUsed / Math.max(usage.emailsLimit, 1) >= 1
+                        ? `You've used all ${usage.emailsLimit} emails for this month — new mail will resume on the 1st of next month.`
+                        : usage.emailsUsed / Math.max(usage.emailsLimit, 1) >= 0.8
+                          ? `You're at ${usage.emailsUsed} of ${usage.emailsLimit} emails this month — new mail stops arriving at ${usage.emailsLimit} and resumes on the 1st of next month.`
+                          : null}
+                      {usage.inboxesUsed / Math.max(usage.inboxesLimit, 1) >= 0.8 && (
+                        <div className="mt-1">
+                          You're using {usage.inboxesUsed} of {usage.inboxesLimit} addresses on this domain.
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
                 {confirmingRemove && (
