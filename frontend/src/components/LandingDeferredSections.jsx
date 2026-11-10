@@ -2,12 +2,15 @@ import React, { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import AppIcon from "./AppIcon";
 import WorkspaceCarousel from "./WorkspaceCarousel";
+import useIsPremium from "../hooks/useIsPremium";
 
 const FAQSection = lazy(() => import("./FAQSection"));
 const BlogList = lazy(() => import("./BlogList"));
 const YesimRecommendation = lazy(() => import("./YesimRecommendation"));
 
 const LandingDeferredSections = () => {
+  // Premium subscribers paid for "No ads" — hide the Yesim card.
+  const isPremium = useIsPremium();
   return (
     <>
       {/* Interactive App Preview Carousel Showcase */}
@@ -89,10 +92,12 @@ const LandingDeferredSections = () => {
         </div>
       </section>
 
-      {/* Yesim Recommendation Section */}
-      <Suspense fallback={<div className="landing-lazy-placeholder landing-lazy-placeholder--yesim" aria-hidden="true" />}>
-        <YesimRecommendation />
-      </Suspense>
+      {/* Yesim Recommendation Section — hidden for Premium ("No ads"). */}
+      {!isPremium && (
+        <Suspense fallback={<div className="landing-lazy-placeholder landing-lazy-placeholder--yesim" aria-hidden="true" />}>
+          <YesimRecommendation />
+        </Suspense>
+      )}
 
       {/* How It Works with Modern Step Cards */}
       <section id="how-it-works" className="py-5 defer-render-section">

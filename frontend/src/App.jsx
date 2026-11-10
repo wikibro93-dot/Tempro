@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import { HelmetProvider } from "react-helmet-async";
 
 import ScrollToTop from "./components/ScrollToTop";
+import useIsPremium from "./hooks/useIsPremium";
 import Landing from "./components/Landing.jsx";
 import OfflineIndicator from "./components/OfflineIndicator";
 import RouteSeoManager from "./components/RouteSeoManager";
@@ -50,20 +51,9 @@ function AppContent() {
   const [showPromoCard, setShowPromoCard] = useState(false);
   const [promoSuppressed, setPromoSuppressed] = useState(() => isPromoSuppressed());
   // Premium subscribers paid for "No ads" — the sponsored PromoCard must
-  // not show for them. The key lives in localStorage; re-read it whenever
-  // the Premium section reports a change (key set or removed) and on every
-  // route change, so a key pasted in /app also hides the card on / and /blog.
-  const [isPremium, setIsPremium] = useState(() => {
-    try { return !!localStorage.getItem("tempmail_premium_key"); } catch { return false; }
-  });
-  useEffect(() => {
-    const syncPremium = () => {
-      try { setIsPremium(!!localStorage.getItem("tempmail_premium_key")); } catch { setIsPremium(false); }
-    };
-    syncPremium();
-    window.addEventListener("tempmail-premium-changed", syncPremium);
-    return () => window.removeEventListener("tempmail-premium-changed", syncPremium);
-  }, [location.pathname]);
+  // not show for them. Shared hook (also used by the Monetag slots and
+  // the Yesim card); re-reads localStorage on the premium-changed event.
+  const isPremium = useIsPremium();
   // The promo is a fixed card at the bottom-right; it must not cover the
   // hero console / address card while the reader is still at the top of
   // the page. So it only becomes eligible once the reader has scrolled

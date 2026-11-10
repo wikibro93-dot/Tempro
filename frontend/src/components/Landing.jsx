@@ -6,6 +6,7 @@ import AppIcon from "./AppIcon";
 import HomepageHeroConsole from "./HomepageHeroConsole";
 import CompetitorComparison from "./CompetitorComparison";
 import PWAInstallButton from "./PWAInstallButton";
+import useIsPremium from "../hooks/useIsPremium";
 
 const LandingDeferredSections = lazy(() => import("./LandingDeferredSections.jsx"));
 
@@ -14,6 +15,8 @@ const deferredSectionIds = new Set(["comparison", "features", "how-it-works", "s
 const Landing = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Premium subscribers paid for "No ads" — hide the sponsored slot.
+  const isPremium = useIsPremium();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -228,15 +231,17 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Sponsor / Monetag Ad Strip */}
-        <section className="monetag-ad-section" aria-label="Sponsored content">
-          <div className="container">
-            <div className="monetag-ad-slot">
-              <div className="monetag-ad-slot__label">Sponsored</div>
-              <div className="monetag-ads" data-zone="11505330" data-ad-format="auto" aria-live="polite"></div>
+        {/* Sponsor / Monetag Ad Strip — hidden for Premium ("No ads"). */}
+        {!isPremium && (
+          <section className="monetag-ad-section" aria-label="Sponsored content">
+            <div className="container">
+              <div className="monetag-ad-slot">
+                <div className="monetag-ad-slot__label">Sponsored</div>
+                <div className="monetag-ads" data-zone="11505330" data-ad-format="auto" aria-live="polite"></div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Competitor Comparison Section */}
         <CompetitorComparison />

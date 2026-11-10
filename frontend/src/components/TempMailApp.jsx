@@ -17,6 +17,7 @@ import batchInboxManager from "../utils/batchInboxManager";
 import offlineMailbox from "../utils/offlineMailbox";
 
 import { getApiRoot } from '../utils/apiRoot.js';
+import useIsPremium from "../hooks/useIsPremium";
 
 const API_ROOT = getApiRoot();
 
@@ -47,6 +48,9 @@ const isPersistentError = (message = "") => {
 };
 
 function TempMailApp({ onEmailCopied }) {
+  // Premium subscribers paid for "No ads" — hide the sponsored slot and
+  // the Yesim recommendation card below the inbox.
+  const isPremium = useIsPremium();
   const [account, setAccount] = useState(() => {
     const saved = localStorage.getItem("tempMailAccount");
     if (!saved) return null;
@@ -814,15 +818,17 @@ function TempMailApp({ onEmailCopied }) {
                   onTokenExpired={handleTokenExpired}
                 />
 
-                {/* Sponsored Ad Section (Placed below active inbox so it doesn't push mail offscreen) */}
-                <section className="monetag-app-ad-section mt-3" aria-label="Sponsored content">
-                  <div className="monetag-app-ad-slot">
-                    <div className="monetag-ad-slot__label">Sponsored</div>
-                    <div className="monetag-ads monetag-ads--compact" data-zone="11505330" data-ad-format="auto" aria-live="polite"></div>
-                  </div>
-                </section>
+                {/* Sponsored Ad Section (Placed below active inbox so it doesn't push mail offscreen) — hidden for Premium ("No ads"). */}
+                {!isPremium && (
+                  <section className="monetag-app-ad-section mt-3" aria-label="Sponsored content">
+                    <div className="monetag-app-ad-slot">
+                      <div className="monetag-ad-slot__label">Sponsored</div>
+                      <div className="monetag-ads monetag-ads--compact" data-zone="11505330" data-ad-format="auto" aria-live="polite"></div>
+                    </div>
+                  </section>
+                )}
 
-                {!showExpiredCard && tokenValid && (
+                {!isPremium && !showExpiredCard && tokenValid && (
                   <div className="mt-3">
                     <YesimRecommendation />
                   </div>
