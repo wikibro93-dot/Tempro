@@ -1462,6 +1462,43 @@ app.post('/api/premium/remove-domain', premiumLimiter, async (req: any, res: any
   }
 });
 
+// GET /api/premium/usage/:domain?key=XXX — usage + inbox addresses for
+// one customer domain, for the usage display in the app ("X of 10 inboxes,
+// Y of 50 emails this month") and the clickable address list. Only the
+// owning key may read it. The email count is for the current calendar
+// month (UTC); an inbox only counts once mail has arrived for it.
+app.get('/api/premium/usage/:domain', premiumLimiter, async (req: any, res: any) => {
+  const domain = String(req.params.domain || '').trim().toLowerCase();
+  const key = normalizeLicenseKey(req.query?.key);
+  if (!domain || !isValidDomainName(domain)) {
+    return res.status(400).json({ error: 'Enter a valid domain.' });
+  }
+  if (!key) return res.status(400).json({ error: 'Enter your license key first.' });
+  try {
+    const rec = await getCustomDomain(domain);
+    if (!rec) return res.status(404).json({ error: 'That domain is not registered.' });
+    if (rec.key !== key) {
+      return res.status(403).json({ error: 'That domain belongs to a different license key.' });
+    }
+    const month = new Date().toISOString().slice(0, 7); // YYYY-MM (UTC)
+    const addresses: string[] = Array.isArray(rec.addresses) ? rec.addresses : [];
+    const emailsUsed = rec.usageMonth === month ? (Number(rec.usageCount) || 0) : 0;
+    return res.json({
+      ok: true,
+      domain,
+      inboxesUsed: addresses.length,
+      inboxesLimit: PREMIUM_INBOXES_PER_DOMAIN,
+      emailsUsed,
+      emailsLimit: PREMIUM_EMAILS_PER_KEY_PER_MONTH,
+      usageMonth: month,
+      addresses,
+    });
+  } catch (err: any) {
+    console.warn('[Premium] usage failed:', err?.message);
+    return res.status(500).json({ error: 'Could not load usage, please try again.' });
+  }
+});
+
 // GET /api/premium/verify-dns/:domain?key=XXX — check the domain's MX
 // records for one pointing at inbound.postmarkapp.com. When the owning
 // license key is supplied and matches, a passing check marks the domain

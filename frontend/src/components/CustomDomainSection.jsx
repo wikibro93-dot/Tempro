@@ -43,6 +43,9 @@ const CustomDomainSection = () => {
   const [domainMessage, setDomainMessage] = useState("");
   const [registering, setRegistering] = useState(false);
   const [removing, setRemoving] = useState(false);
+  const [confirmingRemove, setConfirmingRemove] = useState(false);
+  const [keyExpiresAt, setKeyExpiresAt] = useState(null);
+  const [usage, setUsage] = useState(null); // {inboxesUsed, inboxesLimit, emailsUsed, emailsLimit, usageMonth, addresses}
 
   const [dnsResult, setDnsResult] = useState(null);
   const [checkingDns, setCheckingDns] = useState(false);
@@ -78,10 +81,12 @@ const CustomDomainSection = () => {
         try { localStorage.setItem(PREMIUM_KEY_STORAGE, key); } catch { /* storage unavailable */ }
         setKeyState("active");
         setKeyMessage("");
+        setKeyExpiresAt(data.expiresAt || null);
         return true;
       }
       setKeyState("invalid");
       setKeyMessage(data.error || "That key is not active. Check it and try again, or buy Premium to get a key.");
+      setKeyExpiresAt(null);
       return false;
     } catch {
       setKeyState("error");
@@ -148,6 +153,9 @@ const CustomDomainSection = () => {
     setKeyInput("");
     setKeyState("unknown");
     setKeyMessage("");
+    setKeyExpiresAt(null);
+    setUsage(null);
+    setConfirmingRemove(false);
     setDomain("");
     setDomainStatus(null);
     setMxRecords([]);
@@ -226,6 +234,8 @@ const CustomDomainSection = () => {
         setMxRecords([]);
         setDnsResult(null);
         setCustomMessages([]);
+        setUsage(null);
+        setConfirmingRemove(false);
         try { localStorage.removeItem(PREMIUM_DOMAIN_STORAGE); } catch { /* storage unavailable */ }
         setDomainMessage(`Removed ${d}. Your key is free to connect a different domain.`);
       } else {
@@ -237,6 +247,44 @@ const CustomDomainSection = () => {
       setRemoving(false);
     }
   }, [apiRoot, domain, storedKey]);
+
+  // Usage + inbox addresses for the registered domain, for the usage
+  // display ("X of 10 inboxes, Y of 50 emails this month") and the
+  // clickable address list. Failures stay silent — the usage line simply
+  // does not render, and the address input still works.
+  const fetchUsage = useCallback(async () => {
+    const d = (domain || "").trim().toLowerCase();
+    const k = (storedKey || "").trim();
+    if (!d || !k) { setUsage(null); return; }
+    try {
+      const res = await fetch(`${apiRoot}/premium/usage/${encodeURIComponent(d)}?key=${encodeURIComponent(k)}`);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        setUsage({
+          inboxesUsed: Number(data.inboxesUsed) || 0,
+          inboxesLimit: Number(data.inboxesLimit) || 10,
+          emailsUsed: Number(data.emailsUsed) || 0,
+          emailsLimit: Number(data.emailsLimit) || 50,
+          usageMonth: data.usageMonth || "",
+          addresses: Array.isArray(data.addresses) ? data.addresses : [],
+        });
+      } else {
+        setUsage(null);
+      }
+    } catch {
+      setUsage(null);
+    }
+  }, [apiRoot, domain, storedKey]);
+
+  // Load usage whenever a domain is registered and the key is active, and
+  // refresh it as mail arrives (fetchCustomMessages calls fetchUsage).
+  useEffect(() => {
+    if (domain && storedKey && keyState === "active") {
+      fetchUsage();
+    } else {
+      setUsage(null);
+    }
+  }, [domain, storedKey, keyState, fetchUsage]);
 
   const checkDns = async () => {
     if (!domain) return;
@@ -337,8 +385,11 @@ const CustomDomainSection = () => {
       setCustomError("Could not reach the server. Check your connection and try again.");
     } finally {
       setCustomLoading(false);
+      // Refresh the usage counts + address list so a newly arrived
+      // message updates the display without a page reload.
+      fetchUsage();
     }
-  }, [apiRoot, mapCustomMessage]);
+  }, [apiRoot, mapCustomMessage, fetchUsage]);
 
   // Poll the active custom address while the domain is verified.
   useEffect(() => {
@@ -408,6 +459,12 @@ const CustomDomainSection = () => {
           <>
             <div className="alert alert-success py-2 mb-3" role="alert">
               <AppIcon iconClass="bi bi-patch-check" size={16} /> Premium unlocked. One key covers one domain.
+              {keyExpiresAt && !Number.isNaN(new Date(keyExpiresAt).getTime()) && (
+                <div className="small mt-1">
+                  Subscription active until{" "}
+                  {new Date(keyExpiresAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}.
+                </div>
+              )}
             </div>
 
             {/* Domain registration */}
@@ -446,11 +503,42 @@ const CustomDomainSection = () => {
                 <button
                   type="button"
                   className="btn btn-sm btn-link p-0 mt-1"
-                  onClick={removeDomain}
+                  onClick={() => setConfirmingRemove(true)}
                   disabled={removing}
                 >
-                  {removing ? "Removing…" : "Use a different domain"}
+                  Use a different domain
                 </button>
+                {usage && (
+                  <div className="text-muted small mt-2">
+                    Usage this month: {usage.inboxesUsed} of {usage.inboxesLimit} inboxes · {usage.emailsUsed} of {usage.emailsLimit} emails
+                  </div>
+                )}
+                {confirmingRemove && (
+                  <div className="alert alert-warning py-2 mt-2 mb-0" role="alert">
+                    <div className="small">
+                      Remove <strong>{domain}</strong>? Mail to addresses on this domain will stop arriving.
+                      You can add this domain (or a different one) again anytime.
+                    </div>
+                    <div className="d-flex gap-2 mt-2">
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-danger"
+                        onClick={removeDomain}
+                        disabled={removing}
+                      >
+                        {removing ? "Removing…" : "Remove domain"}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-secondary"
+                        onClick={() => setConfirmingRemove(false)}
+                        disabled={removing}
+                      >
+                        Keep domain
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -518,6 +606,20 @@ const CustomDomainSection = () => {
             {domainStatus === "verified" && (
               <div className="mt-3">
                 <p className="small fw-bold mb-2">Read mail on this domain</p>
+                {usage && usage.addresses.length > 0 && (
+                  <div className="d-flex flex-wrap gap-2 mb-3">
+                    {usage.addresses.map((addr) => (
+                      <button
+                        key={addr}
+                        type="button"
+                        className={`btn btn-sm ${addressInput.trim().toLowerCase() === addr ? "btn-primary" : "btn-outline-secondary"}`}
+                        onClick={() => setAddressInput(addr)}
+                      >
+                        {addr}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <form
                   className="input-group mb-3"
                   onSubmit={(e) => {
