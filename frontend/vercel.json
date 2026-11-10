@@ -28,7 +28,16 @@
       ]
     },
     {
-      "source": "/(.*\\.html|robots.txt|sitemap.xml|sw.js)",
+      "source": "/(sw.js|registerSW.js)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.html|robots.txt|sitemap.xml)",
       "headers": [
         {
           "key": "Cache-Control",
