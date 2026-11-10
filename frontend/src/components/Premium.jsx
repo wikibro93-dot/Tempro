@@ -22,7 +22,7 @@ import AppIcon from "./AppIcon";
 // purchase. Flip PREMIUM_AVAILABLE to true only after Postmark approval
 // + the real purchase test passes. (The /app custom-domain section is
 // already key-gated, so no change is needed there.)
-const PREMIUM_AVAILABLE = false;
+const PREMIUM_AVAILABLE = true;
 
 const CREEM_MONTHLY_URL = "https://www.creem.io/payment/prod_5rlysHo03p4e5czTOZFe02";
 const CREEM_YEARLY_URL = "https://www.creem.io/payment/prod_7LDR5lYmCrzoHqjIDtO2K";
