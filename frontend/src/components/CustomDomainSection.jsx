@@ -169,10 +169,18 @@ const CustomDomainSection = () => {
       );
       const data = await res.json().catch(() => ({}));
       setDnsResult(data);
-      if (data.verified) {
+      if (data.verified && data.status === "verified") {
         setDomainStatus("verified");
         setDomainMessage("Verified — mail sent to addresses on this domain now arrives here.");
         if (!addressInput) setAddressInput(`hello@${domain}`);
+      } else if (data.verified && data.postmarkError) {
+        // MX is right but Postmark has no server for the domain yet, so
+        // mail would not arrive. Do not claim verified — keep the domain
+        // pending and let the user retry; the next Verify click retries
+        // the Postmark server setup.
+        setDomainMessage(`Your MX record is correct, but connecting the mail server failed: ${data.postmarkError} Press Verify again to retry.`);
+      } else if (data.verified) {
+        setDomainMessage(data.hint || "The MX record is correct. Press Verify again to finish connecting.");
       } else if (data.lookupError) {
         setDomainMessage("The DNS check failed to run. Try again in a moment.");
       } else {

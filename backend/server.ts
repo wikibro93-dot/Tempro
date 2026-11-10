@@ -991,7 +991,10 @@ app.get('/api/inbound/messages/:address', inboxLimiter, async (req: any, res: an
   }
   try {
     const messages = await getInboundMessages(address);
-    return res.json({ address, messages, count: messages.length });
+    // `ok: true` is required: the frontend's fetch checks `data.ok` before
+    // rendering messages, and without it every poll showed "Could not load
+    // messages" and mail never displayed even after it arrived.
+    return res.json({ ok: true, address, messages, count: messages.length });
   } catch (err: any) {
     console.warn('[Postmark inbound] Fetch failed:', err?.message);
     return res.status(500).json({ error: 'Could not fetch messages' });
@@ -1403,10 +1406,40 @@ app.get('/api/premium/verify-dns/:domain', premiumLimiter, async (req: any, res:
   }
   const verified = mx.some((r) => r.exchange === POSTMARK_MX_HOST || r.exchange.endsWith('.' + POSTMARK_MX_HOST));
   let stored: any = null;
+  let postmarkError: string | null = null;
   try {
     stored = await getCustomDomain(domain);
-    if (verified && stored && key && stored.key === key && stored.status !== 'verified') {
-      await upsertCustomDomain(domain, { status: 'verified', mxVerifiedAt: new Date().toISOString() });
+    if (verified && stored && key && stored.key === key) {
+      // A domain is only truly live once Postmark has a server for it —
+      // that server is what routes incoming mail to our webhook. The
+      // server is created at register time, but Postmark rejects it
+      // (ErrorCode 610) while the MX record does not exist yet, and the
+      // MX can only be added after registration shows it. So a domain
+      // registered before its MX existed has no Postmark server, and mail
+      // to it has nowhere to go. Retry the creation here, now that the
+      // MX is confirmed live, and only mark the domain verified once
+      // Postmark is connected — otherwise the app would promise "mail
+      // now arrives here" while Postmark drops it.
+      let postmarkServerId: number | null = stored.postmarkServerId || null;
+      if (!postmarkServerId) {
+        if (!POSTMARK_API_TOKEN) {
+          postmarkError = 'Postmark is not connected on the server yet. Your domain is saved — it will be connected once the Postmark account token is set.';
+        } else {
+          try {
+            postmarkServerId = await createPostmarkServerForDomain(domain);
+          } catch (err: any) {
+            postmarkError = err?.message || 'Could not create the Postmark server.';
+            console.warn('[Premium] Postmark server create failed on verify for', domain, ':', postmarkError);
+          }
+        }
+      }
+      if (postmarkServerId) {
+        await upsertCustomDomain(domain, { status: 'verified', postmarkServerId, postmarkError: null, mxVerifiedAt: new Date().toISOString() });
+      } else {
+        // MX is right but Postmark is not connected — do not claim
+        // verified. The next Verify click retries the server creation.
+        await upsertCustomDomain(domain, { postmarkError });
+      }
       stored = await getCustomDomain(domain);
     }
   } catch (err: any) {
@@ -1419,8 +1452,12 @@ app.get('/api/premium/verify-dns/:domain', premiumLimiter, async (req: any, res:
     mx,
     lookupError,
     status: stored?.status || null,
+    postmarkServerId: stored?.postmarkServerId || null,
+    postmarkError: postmarkError || stored?.postmarkError || null,
     hint: verified
-      ? 'MX is pointing at Postmark. Mail to this domain will now arrive in your custom-domain inbox.'
+      ? (postmarkError
+        ? 'Your MX record is correct, but connecting the mail server failed. Press Verify again to retry.'
+        : 'MX is pointing at Postmark. Mail to this domain will now arrive in your custom-domain inbox.')
       : 'Add the MX record shown in the app at your domain registrar, then check again. DNS changes can take a few minutes to appear.',
     checkedAt: new Date().toISOString(),
   });
