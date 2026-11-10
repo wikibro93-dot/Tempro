@@ -89,10 +89,50 @@ const CustomDomainSection = () => {
     }
   }, [apiRoot]);
 
+  // Restore a previously registered domain's status + MX records.
+  // register-domain is idempotent for a domain owned by this key, so this
+  // is a safe read of the stored state, not a new registration. Without
+  // it, a fresh page load showed the domain as "Pending DNS" with no MX
+  // table and no Verify button (mxRecords is only set by register), and
+  // the user had to re-register to get them back. Failures stay silent —
+  // the register form still works.
+  const restoreDomain = useCallback(async (domainToRestore, keyToUse) => {
+    const d = (domainToRestore || "").trim().toLowerCase();
+    const k = (keyToUse || "").trim();
+    if (!d || !k) return;
+    try {
+      const res = await fetch(`${apiRoot}/premium/register-domain`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: k, domain: d }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        setDomain(data.domain);
+        setDomainStatus(data.status);
+        setMxRecords(Array.isArray(data.mxRecords) ? data.mxRecords : []);
+        setPostmarkConfigured(data.postmarkConfigured !== false);
+        if (data.status === "verified") {
+          setDomainMessage("This domain is already verified and live.");
+        }
+        if (!addressInput) setAddressInput(`hello@${data.domain}`);
+      }
+    } catch {
+      // Network failure on mount — stay silent; the form still works.
+    }
+  }, [apiRoot, addressInput]);
+
   // On mount, re-verify a stored key (server-side — a stored key is not
-  // trusted until the server says it is active).
+  // trusted until the server says it is active), then restore the stored
+  // domain's status + MX records so the Verify button is there.
   useEffect(() => {
-    if (storedKey) verifyKey(storedKey);
+    (async () => {
+      if (!storedKey) return;
+      const ok = await verifyKey(storedKey);
+      if (ok && domain) {
+        await restoreDomain(domain, storedKey);
+      }
+    })();
     // Only once on mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
