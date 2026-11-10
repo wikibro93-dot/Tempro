@@ -679,7 +679,6 @@ const CustomDomainSection = () => {
                   isLoading={customLoading}
                   onRetry={() => fetchCustomMessages(addressInput)}
                   onFetchContent={fetchCustomContent}
-                  hideActions
                 />
               </div>
             )}
