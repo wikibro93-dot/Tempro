@@ -462,7 +462,7 @@ const CustomDomainSection = () => {
               {keyExpiresAt && !Number.isNaN(new Date(keyExpiresAt).getTime()) && (
                 <div className="small mt-1">
                   Subscription active until{" "}
-                  {new Date(keyExpiresAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}.
+                  {new Date(keyExpiresAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}.
                 </div>
               )}
             </div>
