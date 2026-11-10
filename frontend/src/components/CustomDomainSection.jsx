@@ -60,6 +60,11 @@ const CustomDomainSection = () => {
 
   const apiRoot = getApiRoot();
 
+  // Returns the domain owned by the key on success (a string), or false
+  // when the key is not usable. The server returns the domain so the app
+  // can restore it after a cache clear or device swap, when localStorage
+  // no longer knows it — the caller then restores the domain, which in
+  // turn pulls the inboxes and emails back (they live in Firestore).
   const verifyKey = useCallback(async (keyToCheck) => {
     const key = (keyToCheck || "").trim();
     if (!key) {
@@ -85,7 +90,7 @@ const CustomDomainSection = () => {
         setKeyState("active");
         setKeyMessage("");
         setKeyExpiresAt(data.expiresAt || null);
-        return true;
+        return (typeof data.domain === "string" && data.domain) || null;
       }
       setKeyState("invalid");
       setKeyMessage(data.error || "That key is not active. Check it and try again, or buy Premium to get a key.");
@@ -131,23 +136,31 @@ const CustomDomainSection = () => {
   }, [apiRoot, addressInput]);
 
   // On mount, re-verify a stored key (server-side — a stored key is not
-  // trusted until the server says it is active), then restore the stored
-  // domain's status + MX records so the Verify button is there.
+  // trusted until the server says it is active), then restore the domain.
+  // Prefer the server-known domain (it survives a cache clear or device
+  // swap); fall back to the locally stored domain. Restoring the domain
+  // pulls the inboxes and emails back too — the usage effect loads the
+  // clickable address list, and the polling effect loads the messages for
+  // the active address (both read from Firestore).
   useEffect(() => {
     (async () => {
       if (!storedKey) return;
-      const ok = await verifyKey(storedKey);
-      if (ok && domain) {
-        await restoreDomain(domain, storedKey);
+      const serverDomain = await verifyKey(storedKey);
+      const d = (typeof serverDomain === "string" && serverDomain) || domain;
+      if (d) {
+        await restoreDomain(d, storedKey);
       }
     })();
     // Only once on mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleUnlock = (e) => {
+  const handleUnlock = async (e) => {
     e.preventDefault();
-    verifyKey(keyInput);
+    const serverDomain = await verifyKey(keyInput);
+    if (typeof serverDomain === "string" && serverDomain) {
+      await restoreDomain(serverDomain, keyInput.trim());
+    }
   };
 
   const handleRemoveKey = () => {

@@ -1231,6 +1231,32 @@ async function getCustomDomain(domain: string): Promise<any | null> {
   return customDomainsMemory.get(domain) || null;
 }
 
+// Find the domain owned by a license key (one key = one domain). Used by
+// verify-key so the frontend can restore the domain after a cache clear
+// or device swap, when localStorage no longer knows it. Returns null when
+// the key owns no domain yet, or when the lookup fails (the key check
+// itself must not break because of this).
+async function getDomainByKey(key: string): Promise<string | null> {
+  try {
+    if (inboundDb) {
+      const snap = await inboundDb
+        .collection('custom_domains')
+        .where('key', '==', key)
+        .limit(1)
+        .get();
+      if (snap.empty) return null;
+      return snap.docs[0].id; // the doc id IS the domain
+    }
+    for (const [domain, rec] of customDomainsMemory) {
+      if (rec && rec.key === key) return domain;
+    }
+    return null;
+  } catch (err: any) {
+    console.warn('[Premium] getDomainByKey failed:', err?.message);
+    return null;
+  }
+}
+
 async function upsertCustomDomain(domain: string, data: any): Promise<void> {
   const record = { ...data, domain, updatedAt: new Date().toISOString() };
   if (inboundDb) {
@@ -1398,6 +1424,10 @@ app.post('/api/premium/verify-key', premiumLimiter, async (req: any, res: any) =
             : 'This license key is not active right now. If you just paid, give the payment a minute to register, then try again.',
       });
     }
+    // The domain owned by this key, so the frontend can restore it after
+    // a cache clear or device swap (when localStorage no longer knows it).
+    // Null when the key owns no domain yet.
+    const domain = await getDomainByKey(key);
     return res.json({
       ok: true,
       active: true,
@@ -1405,6 +1435,7 @@ app.post('/api/premium/verify-key', premiumLimiter, async (req: any, res: any) =
       domainsUsed: Number(sub.domainsUsed) || 0,
       domainsLimit: Number(sub.domainsLimit) || PREMIUM_DOMAINS_PER_KEY,
       expiresAt: sub.expiresAt || null,
+      domain,
     });
   } catch (err: any) {
     console.warn('[Premium] verify-key failed:', err?.message);
@@ -1933,6 +1964,7 @@ export const __test__ = {
   getCustomDomain,
   upsertCustomDomain,
   deleteCustomDomain,
+  getDomainByKey,
   getSubscription,
   upsertSubscription,
   checkPremiumUsageLimits,
