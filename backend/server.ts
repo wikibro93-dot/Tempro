@@ -1107,6 +1107,14 @@ async function upsertCustomDomain(domain: string, data: any): Promise<void> {
   customDomainsMemory.set(domain, { ...(customDomainsMemory.get(domain) || {}), ...record });
 }
 
+async function deleteCustomDomain(domain: string): Promise<void> {
+  if (inboundDb) {
+    await inboundDb.collection('custom_domains').doc(domain).delete();
+    return;
+  }
+  customDomainsMemory.delete(domain);
+}
+
 async function isCreemEventProcessed(eventId: string): Promise<boolean> {
   if (inboundDb) {
     const snap = await inboundDb.collection('creem_webhook_events').doc(eventId).get();
@@ -1299,6 +1307,24 @@ async function createPostmarkServerForDomain(domain: string): Promise<number> {
   return data.ID;
 }
 
+// Delete a dedicated Postmark server (best-effort cleanup when a customer
+// removes a domain). A failure must never block the removal itself — the
+// server is harmless if it lingers (no mail routes to it once the domain
+// record is gone, because isAcceptedInboundDomain requires the record),
+// so callers log the failure and carry on.
+async function deletePostmarkServerForDomain(serverId: number): Promise<void> {
+  if (!POSTMARK_API_TOKEN || !serverId) return;
+  const res = await fetch(`https://api.postmarkapp.com/servers/${serverId}`, {
+    method: 'DELETE',
+    headers: { Accept: 'application/json', 'X-Postmark-Account-Token': POSTMARK_API_TOKEN },
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Postmark delete server failed (${res.status}): ${detail.slice(0, 200)}`);
+  }
+}
+
 // POST /api/premium/register-domain {key, domain} — claim a domain for a
 // license key, store it, and (when the Postmark account token is set)
 // create its dedicated Postmark server. Without the token the domain is
@@ -1382,6 +1408,57 @@ app.post('/api/premium/register-domain', premiumLimiter, async (req: any, res: a
   } catch (err: any) {
     console.warn('[Premium] register-domain failed:', err?.message);
     return res.status(500).json({ error: 'Could not register the domain, please try again.' });
+  }
+});
+
+// POST /api/premium/remove-domain {key, domain} — free a license key's
+// domain slot so the customer can connect a different domain. This is the
+// self-serve counterpart to register-domain. Before it existed, "Use a
+// different domain" in the app only cleared the browser's local copy,
+// while the server still counted the old domain — so a customer could
+// never actually switch domains (registering a new one was rejected with
+// "already has its domain") and there was no way to remove one at all.
+// Removing a domain:
+//   * deletes the custom_domains record (mail to it stops being accepted),
+//   * decrements the subscription's domainsUsed (frees the slot),
+//   * best-effort deletes the dedicated Postmark server for the domain
+//     (a failure there never blocks the removal).
+// Stored inbound messages for the domain are NOT deleted — they expire
+// after 7 days on read, and the domain can be re-registered later.
+// Only the owning key may remove a domain; a refunded or expired key may
+// still remove one (cleanup), since the domain is already dead for
+// receiving in that case.
+app.post('/api/premium/remove-domain', premiumLimiter, async (req: any, res: any) => {
+  const key = normalizeLicenseKey(req.body?.key);
+  const domain = String(req.body?.domain || '').trim().toLowerCase();
+  if (!key) return res.status(400).json({ error: 'Enter your license key first.' });
+  if (!domain) return res.status(400).json({ error: 'Enter the domain to remove.' });
+  try {
+    const sub = await getSubscription(key);
+    if (!sub) return res.status(404).json({ error: 'This license key was not found.' });
+    const existing = await getCustomDomain(domain);
+    if (!existing) {
+      // Nothing registered under this domain — the slot is already free.
+      return res.json({ ok: true, domain, removed: false, domainsUsed: Number(sub.domainsUsed) || 0 });
+    }
+    if (existing.key !== key) {
+      return res.status(403).json({ error: 'That domain belongs to a different license key.' });
+    }
+    const postmarkServerId = existing.postmarkServerId || null;
+    await deleteCustomDomain(domain);
+    const domainsUsed = Math.max(0, (Number(sub.domainsUsed) || 0) - 1);
+    await upsertSubscription(key, { domainsUsed });
+    if (postmarkServerId) {
+      try {
+        await deletePostmarkServerForDomain(postmarkServerId);
+      } catch (err: any) {
+        console.warn('[Premium] Postmark server delete failed for', domain, ':', err?.message);
+      }
+    }
+    return res.json({ ok: true, domain, removed: true, domainsUsed });
+  } catch (err: any) {
+    console.warn('[Premium] remove-domain failed:', err?.message);
+    return res.status(500).json({ error: 'Could not remove the domain, please try again.' });
   }
 });
 
@@ -1685,6 +1762,7 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 export const __test__ = {
   getCustomDomain,
   upsertCustomDomain,
+  deleteCustomDomain,
   getSubscription,
   upsertSubscription,
   checkPremiumUsageLimits,

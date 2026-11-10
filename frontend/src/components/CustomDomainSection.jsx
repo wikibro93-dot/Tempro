@@ -42,6 +42,7 @@ const CustomDomainSection = () => {
   const [postmarkConfigured, setPostmarkConfigured] = useState(true);
   const [domainMessage, setDomainMessage] = useState("");
   const [registering, setRegistering] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   const [dnsResult, setDnsResult] = useState(null);
   const [checkingDns, setCheckingDns] = useState(false);
@@ -198,6 +199,44 @@ const CustomDomainSection = () => {
       setRegistering(false);
     }
   };
+
+  // Remove the registered domain and free the key's slot on the server,
+  // so the customer can connect a different domain. Before this existed,
+  // "Use a different domain" only cleared the browser's local copy while
+  // the server still counted the old domain — so switching was impossible
+  // (the next register was rejected with "already has its domain") and
+  // there was no way to remove a domain at all. The local state is only
+  // cleared after the server confirms the removal, so a failed call
+  // leaves the domain on screen for a retry.
+  const removeDomain = useCallback(async () => {
+    const d = (domain || "").trim().toLowerCase();
+    if (!d || !storedKey) return;
+    setRemoving(true);
+    setDomainMessage("");
+    try {
+      const res = await fetch(`${apiRoot}/premium/remove-domain`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: storedKey, domain: d }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        setDomain("");
+        setDomainStatus(null);
+        setMxRecords([]);
+        setDnsResult(null);
+        setCustomMessages([]);
+        try { localStorage.removeItem(PREMIUM_DOMAIN_STORAGE); } catch { /* storage unavailable */ }
+        setDomainMessage(`Removed ${d}. Your key is free to connect a different domain.`);
+      } else {
+        setDomainMessage(data.error || "Could not remove that domain. Try again.");
+      }
+    } catch {
+      setDomainMessage("Could not reach the server. Check your connection and try again.");
+    } finally {
+      setRemoving(false);
+    }
+  }, [apiRoot, domain, storedKey]);
 
   const checkDns = async () => {
     if (!domain) return;
@@ -407,16 +446,10 @@ const CustomDomainSection = () => {
                 <button
                   type="button"
                   className="btn btn-sm btn-link p-0 mt-1"
-                  onClick={() => {
-                    setDomain("");
-                    setDomainStatus(null);
-                    setMxRecords([]);
-                    setDnsResult(null);
-                    setCustomMessages([]);
-                    try { localStorage.removeItem(PREMIUM_DOMAIN_STORAGE); } catch { /* storage unavailable */ }
-                  }}
+                  onClick={removeDomain}
+                  disabled={removing}
                 >
-                  Use a different domain
+                  {removing ? "Removing…" : "Use a different domain"}
                 </button>
               </div>
             )}
