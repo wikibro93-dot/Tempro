@@ -665,16 +665,27 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired, onFe
                                     </div>
                                   </div>
                                 </div>
-                                <a
-                                  href={downloadUrl}
-                                  download={att.filename || 'attachment'}
-                                  className="btn btn-sm btn-primary py-2 px-3 d-inline-flex align-items-center gap-1"
-                                  style={{ minHeight: '44px' }}
-                                  title={`Download ${att.filename || 'file'}`}
-                                >
-                                  <AppIcon iconClass="bi bi-download" size={14} />
-                                  <span className="d-none d-sm-inline small">Download</span>
-                                </a>
+                                {att.tooLarge && !downloadUrl ? (
+                                  <span
+                                    className="btn btn-sm btn-outline-secondary py-2 px-3 d-inline-flex align-items-center gap-1 disabled"
+                                    style={{ minHeight: '44px' }}
+                                    title="This attachment was too large to store, so it cannot be downloaded."
+                                  >
+                                    <AppIcon iconClass="bi bi-exclamation-triangle" size={14} />
+                                    <span className="d-none d-sm-inline small">Too large</span>
+                                  </span>
+                                ) : (
+                                  <a
+                                    href={downloadUrl}
+                                    download={att.filename || 'attachment'}
+                                    className="btn btn-sm btn-primary py-2 px-3 d-inline-flex align-items-center gap-1"
+                                    style={{ minHeight: '44px' }}
+                                    title={`Download ${att.filename || 'file'}`}
+                                  >
+                                    <AppIcon iconClass="bi bi-download" size={14} />
+                                    <span className="d-none d-sm-inline small">Download</span>
+                                  </a>
+                                )}
                               </div>
                             </div>
                           );

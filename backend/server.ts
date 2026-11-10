@@ -714,6 +714,26 @@ app.get('/api/inbox/download/:token/:messageId', fileLimiter, async (req, res) =
     return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
   }
 
+  // Custom-domain messages are stored in Firestore/in-memory, not in
+  // Mail.tm, so the Mail.tm download below cannot serve them. Build the
+  // .eml from the stored message instead.
+  if (token === 'custom') {
+    try {
+      const msg = await getInboundMessageById(messageId);
+      if (!msg) return res.status(404).json({ error: 'Could not download email' });
+      const eml = buildInboundEml(msg);
+      if (Buffer.byteLength(eml, 'utf8') > MAX_PROXIED_BYTES) {
+        return res.status(413).json({ error: 'Email too large to download.', code: 'FILE_TOO_LARGE' });
+      }
+      res.setHeader('Content-Type', 'message/rfc822');
+      res.setHeader('Content-Disposition', `attachment; filename="email-${messageId}.eml"`);
+      return res.send(eml);
+    } catch (err: any) {
+      console.warn('[Backend] Custom .eml download error:', err?.message);
+      return res.status(404).json({ error: 'Could not download email' });
+    }
+  }
+
   try {
     const emlRes = await fetch(`${MAIL_TM_API_BASE}/messages/${messageId}/download`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -743,6 +763,22 @@ app.delete('/api/inbox/:token/:messageId', deleteLimiter, messageDeleteTokenLimi
 
   if (token.startsWith('mock_')) {
     return res.status(401).json({ error: 'Session expired. Please create a new email address.' });
+  }
+
+  // Custom-domain messages live in the inbound store (Firestore /
+  // in-memory), not in Mail.tm, so the Mail.tm delete below cannot remove
+  // them. Delete the stored message instead. The id is an unguessable
+  // UUID and the fetch endpoint for these messages is likewise open by
+  // address, so this matches the existing temp-mail threat model.
+  if (token === 'custom') {
+    try {
+      const removed = await deleteInboundMessage(messageId);
+      if (!removed) return res.status(404).json({ success: false, error: 'Message not found.', messageId });
+      return res.json({ success: true, messageId });
+    } catch (err: any) {
+      console.warn('[Backend] Custom delete error:', err?.message);
+      return res.status(502).json({ success: false, error: 'Could not delete message, please try again.', code: 'UPSTREAM_ERROR', messageId });
+    }
   }
 
   try {
@@ -896,6 +932,103 @@ async function getInboundMessages(address: string): Promise<InboundMessage[]> {
   }
   memoryPrune();
   return (inboundMemory.get(address) || []).slice(0, INBOUND_MAX_PER_ADDRESS);
+}
+
+// Fetch one inbound message by its id (the Firestore doc id). Used by
+// the custom-domain .eml download and delete endpoints.
+async function getInboundMessageById(id: string): Promise<InboundMessage | null> {
+  if (inboundDb) {
+    const doc = await inboundDb.collection('inbound_messages').doc(id).get();
+    if (!doc.exists) return null;
+    return doc.data() as InboundMessage;
+  }
+  for (const list of inboundMemory.values()) {
+    const found = list.find((m) => m.id === id);
+    if (found) return found;
+  }
+  return null;
+}
+
+// Delete one inbound message by its id. Returns true when a message was
+// removed. Used by the custom-domain delete endpoint (token "custom").
+async function deleteInboundMessage(id: string): Promise<boolean> {
+  if (inboundDb) {
+    const docRef = inboundDb.collection('inbound_messages').doc(id);
+    const existing = await docRef.get();
+    if (!existing.exists) return false;
+    await docRef.delete();
+    return true;
+  }
+  for (const [addr, list] of inboundMemory) {
+    const idx = list.findIndex((m) => m.id === id);
+    if (idx >= 0) {
+      list.splice(idx, 1);
+      if (list.length === 0) inboundMemory.delete(addr);
+      return true;
+    }
+  }
+  return false;
+}
+
+// Build a minimal RFC 822 (.eml) file for a stored inbound message, so a
+// custom-domain message can be downloaded like a Mail.tm one. The text
+// body is the canonical content (HTML is not included — the text body is
+// what the inbox shows in Plain Text view). Attachments that were stored
+// are included as base64 MIME parts; ones flagged tooLarge were never
+// stored, so they are noted in the body instead of silently dropped.
+// Header values are stripped of CR/LF so a crafted subject cannot inject
+// headers.
+function buildInboundEml(msg: InboundMessage): string {
+  const safeHeader = (s: string) => String(s || '').replace(/[\r\n]+/g, ' ').trim();
+  const from = safeHeader(msg.fromName ? `${msg.fromName} <${msg.from}>` : msg.from);
+  const to = safeHeader(msg.to);
+  const subject = safeHeader(msg.subject);
+  const date = msg.date ? safeHeader(msg.date) : new Date(msg.receivedAt).toUTCString();
+  const text = msg.textBody || (msg.htmlBody ? msg.htmlBody.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '');
+  const usable = (msg.attachments || []).filter((a) => a.content && !a.tooLarge);
+  const skipped = (msg.attachments || []).length - usable.length;
+  const notice = skipped > 0 ? `\n\n[${skipped} attachment(s) were too large to include in this download.]` : '';
+  if (usable.length === 0) {
+    return [
+      `From: ${from}`,
+      `To: ${to}`,
+      `Subject: ${subject}`,
+      `Date: ${date}`,
+      'MIME-Version: 1.0',
+      'Content-Type: text/plain; charset=utf-8',
+      'Content-Transfer-Encoding: 8bit',
+      '',
+      text + notice,
+    ].join('\r\n');
+  }
+  const boundary = `tempmail-${String(msg.id).replace(/[^A-Za-z0-9]/g, '').slice(0, 8)}-${Date.now().toString(36)}`;
+  const parts: string[] = [
+    `From: ${from}`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    `Date: ${date}`,
+    'MIME-Version: 1.0',
+    `Content-Type: multipart/mixed; boundary="${boundary}"`,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/plain; charset=utf-8',
+    'Content-Transfer-Encoding: 8bit',
+    '',
+    text + notice,
+  ];
+  for (const a of usable) {
+    const filename = String(a.name || 'attachment').replace(/["\r\n]/g, '');
+    parts.push(
+      `--${boundary}`,
+      `Content-Type: ${a.contentType || 'application/octet-stream'}; name="${filename}"`,
+      'Content-Transfer-Encoding: base64',
+      `Content-Disposition: attachment; filename="${filename}"`,
+      '',
+      String(a.content || '').replace(/(.{76})/g, '$1\r\n'),
+    );
+  }
+  parts.push(`--${boundary}--`, '');
+  return parts.join('\r\n');
 }
 
 // Extract the recipient address from a Postmark inbound payload.
@@ -1806,4 +1939,8 @@ export const __test__ = {
   recordPremiumUsage,
   isAcceptedInboundDomain,
   subscriptionIsUsable,
+  saveInboundMessage,
+  getInboundMessageById,
+  deleteInboundMessage,
+  buildInboundEml,
 };

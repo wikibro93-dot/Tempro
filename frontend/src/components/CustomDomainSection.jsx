@@ -336,7 +336,33 @@ const CustomDomainSection = () => {
 
   // Map a Postmark inbound message to the shape Inbox expects.
   const mapCustomMessage = useCallback((m) => {
-    const attachments = Array.isArray(m.attachments) ? m.attachments : [];
+    // The backend stores attachments in Postmark's field names
+    // (name/contentLength/contentId/base64 content), but the Inbox reads
+    // id/filename/size/downloadUrl. Passing them through unmapped left
+    // every custom-domain attachment showing as "attachment" with no size
+    // and a Download button that fell back to the Mail.tm proxy — which
+    // cannot serve a Postmark-stored file. Map them here, building a
+    // data: URI from the stored base64 content so the Download button
+    // works without a server round-trip (the content already arrives with
+    // the message fetch). Attachments flagged tooLarge were never stored,
+    // so they carry no download URL and the Inbox shows them as too large.
+    const attachments = (Array.isArray(m.attachments) ? m.attachments : []).map((a, i) => {
+      const filename = a?.name || a?.filename || "attachment";
+      const size = Number(a?.contentLength ?? a?.size) || 0;
+      const contentType = a?.contentType || "application/octet-stream";
+      const id = a?.contentId || a?.id || `att-${i}`;
+      const downloadUrl = a?.content && !a?.tooLarge
+        ? `data:${contentType};base64,${a.content}`
+        : (a?.downloadUrl || undefined);
+      return {
+        id,
+        filename,
+        size,
+        contentType,
+        downloadUrl,
+        tooLarge: Boolean(a?.tooLarge),
+      };
+    });
     // The backend stores the body as textBody/htmlBody (Postmark's field
     // names) and the arrival time as receivedAt (ms since epoch) plus date
     // (the sender's RFC 2822 Date header). The Inbox reads text/html and
