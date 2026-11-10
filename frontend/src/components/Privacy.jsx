@@ -1,5 +1,6 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 import PageNavbar from "./PageNavbar";
 import Footer from "./Footer";
 import { IntroCard, FeatureGrid, SectionCard, StepsGrid, FinalCtaCard, UpdatedAt } from "./InfoPageBlocks";
@@ -19,7 +20,7 @@ const Privacy = () => {
       iconColor: "text-danger",
       title: "No Server Database",
       description:
-        "TempMail Pro keeps no database of inboxes. Messages live on Mail.tm under Mail.tm's retention; an expired inbox leaves your view, and deleting an inbox requests deletion of its Mail.tm account.",
+        "The free service keeps no database of inboxes. Messages live on Mail.tm under Mail.tm's retention; an expired inbox leaves your view, and deleting an inbox requests deletion of its Mail.tm account. Premium custom-domain mail is the one exception — it is stored for delivery, see below.",
     },
     {
       iconClass: "bi bi-eye-slash",
@@ -134,6 +135,21 @@ const Privacy = () => {
             <p className="text-muted small mb-4">
               Note: this list is about TempMail Pro itself. Messages live on Mail.tm under Mail.tm&apos;s retention and deletion policies, and Mail.tm may see connection metadata. Partner referral clicks are counted as described below.
             </p>
+
+            <SectionCard title="Premium (Custom Domains) — What Changes">
+              <p>
+                Premium is the paid option that connects a domain you own. It is the only part of TempMail Pro that stores data on our servers. Everything else in this policy applies to Premium in the same way — no profiling, no sale of data, no advertising use.
+              </p>
+              <p>
+                <strong>What we store for Premium:</strong> your license key (to verify your subscription), your domain (to route mail to it), and the messages received on that domain. Messages are stored so you can read them and are shown for 7 days. We also keep a count of how many inboxes and emails you have used this month, to enforce the fair-use limits (10 inboxes and 50 emails per month per key).
+              </p>
+              <p>
+                <strong>Payments:</strong> Premium is billed through Creem, our merchant of record. Creem takes the payment, issues the receipt, and handles tax. We never see or store your card details. Creem holds your email address for the receipt and the customer portal, under its own privacy policy.
+              </p>
+              <p>
+                <strong>Mail delivery:</strong> custom-domain mail is received through Postmark, which processes the messages and delivers them to our backend. Postmark sees the message content in order to deliver it, under its own privacy policy.
+              </p>
+            </SectionCard>
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-header bg-light">
                 <h4 className="mb-0">Your Rights</h4>
@@ -157,6 +173,31 @@ const Privacy = () => {
                 </p>
               </div>
             </div>
+
+            <SectionCard title="Your Data Protection Rights (GDPR)">
+              <p>
+                We process personal data lawfully in accordance with the General Data Protection Regulation (GDPR) (Regulation (EU) 2016/679). TempMail Pro is the data controller for the data described in this policy. If you are in the European Economic Area (EEA), you have the following rights:
+              </p>
+              <ul>
+                <li><strong>Right to access</strong> — request a copy of the personal data we hold about you.</li>
+                <li><strong>Right to rectification</strong> — ask us to correct data you believe is inaccurate or incomplete.</li>
+                <li><strong>Right to erasure</strong> — ask us to delete your personal data, under certain conditions.</li>
+                <li><strong>Right to restrict processing</strong> — ask us to limit how we use your data, under certain conditions.</li>
+                <li><strong>Right to object</strong> — object to our processing of your data, under certain conditions.</li>
+                <li><strong>Right to data portability</strong> — ask us to transfer the data you provided to you or another organisation, under certain conditions.</li>
+                <li><strong>Right to lodge a complaint</strong> — with your local data protection authority, if you believe your rights have been violated.</li>
+              </ul>
+              <p>
+                <strong>How these rights apply here:</strong> the free service holds almost no data about you — temporary addresses and messages expire and disappear, and deleting an inbox requests deletion of its Mail.tm account. Because there is no account and no database for the free service, access and deletion requests are generally not applicable after expiry, since there is nothing left to access or delete. For Premium, you can ask us to access, correct, or delete your Premium data (license key, domain, messages, usage counts).
+              </p>
+              <p>
+                <strong>Legal basis:</strong> we process data to perform the contract (a Premium subscription) and on legitimate interest (keeping the free service running, preventing abuse, and rate-limiting). <strong>Transfers:</strong> your data may be processed outside the EEA by our providers (Mail.tm, Postmark, Creem, Render, Vercel) in order to deliver the service.
+              </p>
+              <p>
+                To exercise any of these rights, contact us through the{" "}
+                <Link to="/contact">Contact Us</Link> form. We will respond within one month.
+              </p>
+            </SectionCard>
 
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-body">
