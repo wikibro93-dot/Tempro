@@ -263,6 +263,40 @@ function TempMailApp({ onEmailCopied }) {
     if (hasAutoInitRef.current) return;
     hasAutoInitRef.current = true;
 
+    // QR deep link (?inbox=<address>&token=<token>[&exp=<ISO>]): opening the
+    // QR on another device restores THAT inbox instead of just /app. The
+    // token is the Mail.tm credential, so the phone can read the messages.
+    // The token is stripped from the address bar right after restoring, so
+    // it does not linger in history.
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const deepInbox = (params.get('inbox') || '').toLowerCase();
+      const deepToken = params.get('token') || '';
+      if (deepInbox && deepToken) {
+        const deepExp = params.get('exp') || '';
+        const expDate = deepExp ? new Date(deepExp) : null;
+        const restored = {
+          address: deepInbox,
+          email: deepInbox,
+          token: deepToken,
+          expiration: (expDate && !isNaN(expDate)) ? expDate.toISOString() : new Date(Date.now() + 3600000).toISOString(),
+          createdAt: new Date().toISOString(),
+        };
+        setAccount(restored);
+        setTokenValid(true);
+        setGeneratedEmails(prev => {
+          const filtered = (prev || []).filter(e => (e.address || e.email) !== deepInbox);
+          return [{ address: deepInbox, expiration: restored.expiration, createdAt: restored.createdAt, token: deepToken }, ...filtered].slice(0, 10);
+        });
+        const url = new URL(window.location.href);
+        url.searchParams.delete('inbox');
+        url.searchParams.delete('token');
+        url.searchParams.delete('exp');
+        window.history.replaceState(null, '', url.toString());
+        return;
+      }
+    } catch { /* malformed deep link: fall through to normal init */ }
+
     const savedAccRaw = localStorage.getItem("tempMailAccount");
     let currentAcc = null;
     try {

@@ -189,6 +189,8 @@ const AccountManager = ({
       {showQrModal && (
         <QRCodeModal
           email={email}
+          token={account?.token}
+          expiration={account?.expiration}
           onClose={() => setShowQrModal(false)}
         />
       )}

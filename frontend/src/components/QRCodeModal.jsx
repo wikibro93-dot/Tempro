@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
+import QRCode from 'react-qr-code';
 import AppIcon from './AppIcon';
 
-const QRCodeModal = ({ email, onClose }) => {
+const QRCodeModal = ({ email, token, expiration, onClose }) => {
   const [copiedLink, setCopiedLink] = useState(false);
-  // Local QR for https://tempmailpk.com/app — same asset as the homepage
-  // carousel. Previously this depended on an external QR service, which
-  // could be slow or blocked and break the /app mobile handover.
-  const qrImageUrl = '/qr-app.svg';
+  // Deep link to THIS inbox, so scanning the QR on a phone opens the same
+  // email and its messages — not just the generic /app page. The phone
+  // needs the Mail.tm token to read the inbox, so the link carries it;
+  // anyone who scans this QR can open this (temporary, disposable) inbox,
+  // which is the nature of a QR handover — show it only to yourself.
+  // Falls back to the plain /app link when no token is available.
+  const shareUrl = token
+    ? `${window.location.origin}/app?inbox=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}${expiration ? `&exp=${encodeURIComponent(expiration)}` : ''}`
+    : `${window.location.origin}/app`;
 
   const copyShareLink = () => {
     navigator.clipboard.writeText(email).then(() => {
@@ -43,18 +49,11 @@ const QRCodeModal = ({ email, onClose }) => {
 
           <div className="modal-body text-center p-4">
             <p className="small text-muted mb-3">
-              Scan this QR code with your smartphone camera to open TempMail Pro directly on your phone.
+              Scan this QR code with your smartphone camera to open this exact inbox on your phone.
             </p>
 
             <div className="d-inline-block p-3 rounded-3 border bg-white shadow-xs mb-3">
-              <img
-                src={qrImageUrl}
-                alt="QR code — scan to open tempmailpk.com/app on your phone"
-                width={200}
-                height={200}
-                className="img-fluid rounded"
-                loading="lazy"
-              />
+              <QRCode value={shareUrl} size={200} bgColor="#ffffff" fgColor="#0f172a" />
             </div>
 
             <div className="p-2 rounded-2 bg-light-subtle border small font-monospace text-truncate text-dark fw-semibold mb-3">
