@@ -118,9 +118,8 @@ const CustomDomainSection = () => {
         setDomainStatus(data.status);
         setMxRecords(Array.isArray(data.mxRecords) ? data.mxRecords : []);
         setPostmarkConfigured(data.postmarkConfigured !== false);
-        if (data.status === "verified") {
-          setDomainMessage("This domain is already verified and live.");
-        }
+        // No banner here: the "Verified — live" badge already says it,
+        // and a banner restating it on every fresh load is noise.
         if (!addressInput) setAddressInput(`hello@${data.domain}`);
       }
     } catch {
@@ -190,12 +189,14 @@ const CustomDomainSection = () => {
         setMxRecords(Array.isArray(data.mxRecords) ? data.mxRecords : []);
         setPostmarkConfigured(data.postmarkConfigured !== false);
         try { localStorage.setItem(PREMIUM_DOMAIN_STORAGE, data.domain); } catch { /* storage unavailable */ }
-        if (data.status === "verified") {
-          setDomainMessage("This domain is already verified and live.");
-        } else if (data.postmarkConfigured === false) {
-          setDomainMessage("Domain saved. Our setup is still being completed — add the MX record now and verify it once the setup is ready.");
-        } else {
-          setDomainMessage("Domain registered. Add the MX record below at your registrar, then press Verify.");
+        // No message when already verified — the "Verified — live" badge
+        // and the read-mail section already say it.
+        if (data.status !== "verified") {
+          if (data.postmarkConfigured === false) {
+            setDomainMessage("Domain saved. Our setup is still being completed — add the MX record now and verify it once the setup is ready.");
+          } else {
+            setDomainMessage("Domain registered. Add the MX record below at your registrar, then press Verify.");
+          }
         }
         if (!addressInput) setAddressInput(`hello@${data.domain}`);
       } else {
@@ -414,7 +415,7 @@ const CustomDomainSection = () => {
           <span className="badge bg-warning text-dark ms-1">Premium</span>
         </h5>
         {!isLocked && (
-          <button type="button" className="btn btn-sm btn-outline-secondary" onClick={handleRemoveKey}>
+          <button type="button" className="btn btn-sm btn-outline-light" onClick={handleRemoveKey}>
             Remove key
           </button>
         )}

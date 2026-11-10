@@ -550,7 +550,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired, onFe
 
                 <div className="inbox-detail-meta small text-secondary">
                   <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
-                    <div className="d-flex flex-wrap gap-x-4 gap-y-1">
+                    <div className="d-flex flex-wrap gap-3">
                       <div>
                         <strong>From:</strong> {selectedMsg.from?.name ? `${selectedMsg.from.name} <${selectedMsg.from.address}>` : (selectedMsg.from?.address || 'Unknown')}
                       </div>
