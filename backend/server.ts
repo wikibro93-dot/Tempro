@@ -1121,7 +1121,9 @@ function normalizeLicenseKey(raw: any): string {
 }
 
 // A key is usable while its subscription is active, or while a cancelled
-// subscription is still inside the period the customer paid for.
+// subscription is still inside the period the customer paid for. A
+// refunded or disputed (chargeback) subscription is NEVER usable — the
+// key dies the moment the refund is issued, not at the period end.
 function subscriptionIsUsable(sub: any): boolean {
   if (!sub) return false;
   if (sub.status === 'active') return true;
@@ -1163,6 +1165,8 @@ app.post('/api/premium/verify-key', premiumLimiter, async (req: any, res: any) =
         error:
           sub.status === 'cancelled'
             ? 'This subscription has ended. Renew it in Creem to use your custom domain again.'
+            : sub.status === 'refunded' || sub.status === 'disputed'
+            ? 'This subscription was refunded, so the license key is no longer active. To use your custom domain again, subscribe again on our Premium page.'
             : 'This license key is not active right now. If you just paid, give the payment a minute to register, then try again.',
       });
     }
@@ -1459,6 +1463,48 @@ app.post(
             for (const rec of premiumSubsMemory.values()) await updateFor(rec);
           }
           console.log(`[Premium] Subscription ${subId} (${productId || 'unknown product'}) -> ${nextStatus}.`);
+        }
+      } else if (eventType === 'refund.created' || eventType === 'dispute.created') {
+        // A refund (or a chargeback) means the customer got their money
+        // back, so the license key stops working the MOMENT the refund
+        // is issued — it must NOT stay usable until the end of the paid
+        // period. Otherwise a customer could buy, refund the next day,
+        // and keep using the custom domain for the whole month for free
+        // (burning our Postmark quota). This is the Temp-Mail.io rule:
+        // "Once the refund is issued to you, you will lose access."
+        // Our refund policy is full refunds only, so ANY refund on a
+        // Premium subscription revokes its keys. A plain cancellation is
+        // different: that keeps access until the period ends (handled
+        // by the subscription.canceled branch above).
+        const subId = String(
+          obj?.subscription?.id ||
+          obj?.subscriptions?.id ||
+          obj?.subscription_id ||
+          obj?.subscriptionId ||
+          obj?.order?.subscription_id ||
+          obj?.order?.subscription?.id ||
+          obj?.transaction?.subscription_id ||
+          ''
+        );
+        const nextStatus = eventType === 'refund.created' ? 'refunded' : 'disputed';
+        if (subId) {
+          const revokeFor = async (rec: any) => {
+            if (rec && rec.subscriptionId === subId) {
+              await upsertSubscription(rec.key, {
+                status: nextStatus,
+                expiresAt: new Date().toISOString(),
+              });
+            }
+          };
+          if (inboundDb) {
+            const snap = await inboundDb.collection('premium_subscriptions').where('subscriptionId', '==', subId).get();
+            for (const doc of snap.docs) await revokeFor(doc.data());
+          } else {
+            for (const rec of premiumSubsMemory.values()) await revokeFor(rec);
+          }
+          console.log(`[Premium] ${eventType} for subscription ${subId} -> ${nextStatus} (key revoked immediately).`);
+        } else {
+          console.warn(`[Premium] ${eventType} carried no subscription id — could not revoke a key.`);
         }
       } else {
         console.log(`[Premium] Ignored Creem event ${eventType}.`);

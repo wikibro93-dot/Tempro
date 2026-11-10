@@ -156,8 +156,12 @@ const Premium = () => {
                 </div>
               </div>
             </div>
-            <p className="text-center text-muted small mb-4">
+            <p className="text-center text-muted small mb-2">
               Payments are processed by Creem (our merchant of record). Prices include tax where Creem applies it.
+            </p>
+            <p className="text-center text-muted small mb-4">
+              14-day money-back guarantee on your first payment. Cancel anytime from your Creem customer portal — see our{" "}
+              <Link to="/terms">Terms</Link> for the full cancellation and refund policy.
             </p>
 
             <FeatureGrid items={featureItems} />
