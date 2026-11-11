@@ -590,7 +590,10 @@ app.get('/api/inbox/content/:token/:messageId', inboxLimiter, async (req, res) =
         Authorization: `Bearer ${token}`,
         Accept: 'application/json'
       },
-      signal: AbortSignal.timeout(8000)
+      // 15s (was 8s): Mail.tm can be slow on a fresh message, and the
+      // frontend now auto-retries a failure — a longer upstream window
+      // means fewer retries are needed to show the full body with links.
+      signal: AbortSignal.timeout(15000)
     });
 
     if (tmRes.ok) {

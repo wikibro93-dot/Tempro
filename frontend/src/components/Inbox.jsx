@@ -129,6 +129,16 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired, onFe
   const [deleteArmedId, setDeleteArmedId] = useState(null);
   const [isOfflineContent, setIsOfflineContent] = useState(false);
   const prevCountRef = useRef(messages?.length || 0);
+  // Auto-retry for a content fetch that fails (cold backend / slow
+  // Mail.tm): the first attempt can time out while the free-tier backend
+  // is still waking up, and a retry a few seconds later succeeds — so
+  // the user gets the full body with its links instead of having to
+  // reload the whole app. The timer is cleared when the selection
+  // changes or the component unmounts.
+  const contentRetryRef = useRef(null);
+  const selectedMsgIdRef = useRef(null);
+  const CONTENT_MAX_ATTEMPTS = 3; // initial try + 2 retries
+  const CONTENT_RETRY_DELAY_MS = 3000;
 
   const API_ROOT = getApiRoot();
 
@@ -164,15 +174,51 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired, onFe
   }, [messages]);
 
   useEffect(() => {
+    selectedMsgIdRef.current = selectedMsg?.id ?? null;
+    if (contentRetryRef.current) {
+      clearTimeout(contentRetryRef.current);
+      contentRetryRef.current = null;
+    }
     if (selectedMsg) {
       fetchMessageContent(selectedMsg);
     }
   }, [selectedMsg?.id]);
 
-  const fetchMessageContent = async (msg) => {
+  // Clear any pending content retry when the inbox unmounts so a late
+  // retry never writes into an unmounted component.
+  useEffect(() => {
+    return () => {
+      if (contentRetryRef.current) clearTimeout(contentRetryRef.current);
+    };
+  }, []);
+
+  const fetchMessageContent = async (msg, attempt = 0) => {
+    if (contentRetryRef.current) {
+      clearTimeout(contentRetryRef.current);
+      contentRetryRef.current = null;
+    }
     setLoadingContent(true);
     setContentError(null);
     setIsOfflineContent(false);
+
+    // Schedule one more attempt after a short delay. Used when the
+    // backend or Mail.tm is slow (cold free-tier backend, slow upstream)
+    // — the retry lands after the backend has woken up, so the full
+    // body loads without the user reloading the app. Returns false when
+    // no retries remain. Never retries an auth failure (401/403).
+    const scheduleRetry = () => {
+      if (attempt + 1 >= CONTENT_MAX_ATTEMPTS) return false;
+      contentRetryRef.current = setTimeout(() => {
+        contentRetryRef.current = null;
+        // Only retry if this message is still the selected one — a
+        // retry for a deselected message must never overwrite the new
+        // message's content.
+        if (msg.id === selectedMsgIdRef.current) {
+          fetchMessageContent(msg, attempt + 1);
+        }
+      }, CONTENT_RETRY_DELAY_MS);
+      return true;
+    };
 
     // Custom-domain messages already carry their full body (the Postmark
     // webhook stored it in our backend). When the caller supplies
@@ -209,7 +255,7 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired, onFe
     try {
       const res = await axios.get(`${API_ROOT}/inbox/content/${msg.token}/${msg.id}`, {
         validateStatus: (status) => status < 500,
-        timeout: 6000,
+        timeout: 15000,
       });
 
       if (res.status === 401 || res.status === 403) {
@@ -220,6 +266,8 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired, onFe
       }
 
       if (res.status >= 400) {
+        // A 4xx that is not auth is a client error — retrying will not
+        // fix it, so show the error with its Retry button instead.
         setContentError(res.data?.error || 'Message could not be loaded. Please try again.');
         return;
       }
@@ -228,28 +276,43 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired, onFe
       setIsOfflineContent(false);
       offlineMailbox.saveMessageContent(msg.token, msg.id, res.data);
     } catch (err) {
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        const errorMsg = err.response?.data?.error || 'Token expired. Please create a new email address.';
+        setContentError(errorMsg);
+        if (onTokenExpired) onTokenExpired();
+        return;
+      }
+      // A 5xx / timeout / network failure is transient — retry it
+      // automatically (cold backend, slow Mail.tm) instead of making
+      // the user reload the whole app.
+      if (scheduleRetry()) {
+        return;
+      }
       // Offline fallback: try reading cached message body
       const cached = offlineMailbox.getMessageContent(msg.id);
       if (cached) {
         setMessageContent(cached);
         setIsOfflineContent(true);
-      } else if (msg.html || msg.text || msg.intro) {
+      } else if (msg.html || msg.text) {
+        // Only a real full body may stand in for the fetched content.
+        // The list preview (intro) is NOT the body — showing it here
+        // used to hide the failure and the message's links, leaving the
+        // user with a truncated paragraph and no way to retry except
+        // reloading the app.
         setMessageContent({
-          text: msg.text || msg.intro || '',
-          html: msg.html || `<p>${msg.text || msg.intro || ''}</p>`,
+          text: msg.text || '',
+          html: msg.html || '',
         });
         setIsOfflineContent(true);
       } else {
-        if (err.response?.status === 401 || err.response?.status === 403) {
-          const errorMsg = err.response?.data?.error || 'Token expired. Please create a new email address.';
-          setContentError(errorMsg);
-          if (onTokenExpired) onTokenExpired();
-        } else {
-          setContentError('Offline: message body not yet cached.');
-        }
+        setContentError('Message body could not be loaded. Please try again.');
       }
     } finally {
-      setLoadingContent(false);
+      // While a retry is pending the spinner stays up; only clear the
+      // loading state when no retry is queued.
+      if (!contentRetryRef.current) {
+        setLoadingContent(false);
+      }
     }
   };
 
