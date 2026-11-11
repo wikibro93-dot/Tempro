@@ -265,9 +265,23 @@ const Inbox = ({ messages = [], isLoading = false, onRetry, onTokenExpired, onFe
         return;
       }
 
+      if (res.status === 404) {
+        // A message that exists in the list but returns 404 on the
+        // content endpoint is a transient race — Mail.tm has not made
+        // the just-arrived message available yet, and it appears a
+        // moment later. Retry it like any other transient failure
+        // instead of showing an error the user has to clear by hand.
+        if (scheduleRetry()) {
+          return;
+        }
+        setContentError(res.data?.error || 'Message could not be loaded. Please try again.');
+        return;
+      }
+
       if (res.status >= 400) {
-        // A 4xx that is not auth is a client error — retrying will not
-        // fix it, so show the error with its Retry button instead.
+        // A 4xx that is not auth and not a 404 race is a client error
+        // — retrying will not fix it, so show the error with its
+        // Retry button instead.
         setContentError(res.data?.error || 'Message could not be loaded. Please try again.');
         return;
       }
