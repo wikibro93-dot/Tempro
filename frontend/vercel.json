@@ -91,6 +91,46 @@
       "permanent": true
     },
     {
+      "source": "/blog/temp-email-for-online-shopping",
+      "destination": "https://tempmailpk.com/blog/temp-email-for-online-shopping-without-spam-2026",
+      "permanent": true
+    },
+    {
+      "source": "/blog/burner-email-for-social-media",
+      "destination": "https://tempmailpk.com/blog/burner-email-social-media-signups-guide",
+      "permanent": true
+    },
+    {
+      "source": "/blog/temp-email-for-job-applications",
+      "destination": "https://tempmailpk.com/blog/free-temp-email-for-job-boards-guide",
+      "permanent": true
+    },
+    {
+      "source": "/blog/how-to-manage-multiple-temp-emails",
+      "destination": "https://tempmailpk.com/blog/free-temp-mail-multiple-inboxes-guide",
+      "permanent": true
+    },
+    {
+      "source": "/blog/temp-mail-for-qa-and-account-testing-teams",
+      "destination": "https://tempmailpk.com/blog/temp-email-for-account-testing",
+      "permanent": true
+    },
+    {
+      "source": "/blog/temp-email-for-streaming-and-entertainment-trials",
+      "destination": "https://tempmailpk.com/blog/how-to-use-temp-email-for-free-trials",
+      "permanent": true
+    },
+    {
+      "source": "/blog/temp-email-for-online-course-signups",
+      "destination": "https://tempmailpk.com/blog/free-temp-mail-for-students-and-developers",
+      "permanent": true
+    },
+    {
+      "source": "/blog/best-temp-email-for-free-trials-no-spam-2026",
+      "destination": "https://tempmailpk.com/blog/how-to-use-temp-email-for-free-trials",
+      "permanent": true
+    },
+    {
       "source": "/(.*)",
       "has": [
         {

@@ -40,7 +40,7 @@ The rule behind the table is simple: the inbox must outlive the last message the
 
 ## The hidden cost of choosing short out of habit
 
-Many people default to the shortest expiry because it feels safest. That instinct misfires in two ways. First, it creates rework: a lost delayed message means redoing the signup, sometimes with a different address, which fragments the account trail. Second, it creates false conclusions: a trial judged "broken" because its day-six reminder never arrived was not broken at all — its inbox had simply expired. For trials specifically, the selection logic is covered in [Best Temp Email for Free Trials Without Spam in 2026](/blog/best-temp-email-for-free-trials-no-spam-2026).
+Many people default to the shortest expiry because it feels safest. That instinct misfires in two ways. First, it creates rework: a lost delayed message means redoing the signup, sometimes with a different address, which fragments the account trail. Second, it creates false conclusions: a trial judged "broken" because its day-six reminder never arrived was not broken at all — its inbox had simply expired. For trials specifically, the selection logic is covered in [How to Use Temporary Email for Free Trials Without Spam](/blog/how-to-use-temp-email-for-free-trials).
 
 ## When neither is the right answer
 

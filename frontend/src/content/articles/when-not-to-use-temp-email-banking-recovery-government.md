@@ -27,7 +27,7 @@ A single "yes" is enough. You do not need three reasons to choose a permanent ad
 
 Bank accounts, payment apps, card accounts, and any service that moves or stores money should always use a permanent address. Transaction alerts, fraud warnings, statements, and dispute messages all travel by email, and a missed fraud alert because an inbox expired is a risk no convenience is worth. Payment services also use email to verify identity, confirm a new device, and recover an account. A temporary address breaks every one of those steps.
 
-The same applies to [online shopping accounts](/blog/temp-email-for-online-shopping) where you have a saved payment method or an order you may need to return, refund, or claim on later. A one-off coupon signup is a different matter from a store account holding your card and your order history, and the line between them is whether money or a future claim is involved.
+The same applies to [online shopping accounts](/blog/temp-email-for-online-shopping-without-spam-2026) where you have a saved payment method or an order you may need to return, refund, or claim on later. A one-off coupon signup is a different matter from a store account holding your card and your order history, and the line between them is whether money or a future claim is involved.
 
 ## Password recovery: the hidden dependency
 

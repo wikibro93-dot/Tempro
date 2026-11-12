@@ -37,7 +37,7 @@ None of those risks matters much for a coupon code or a trial you will abandon. 
 
 ## A no-login routine that stays safe
 
-Use a fresh inbox per signup, give it a custom name tied to the task, and save anything important — codes, links, order numbers — to your notes immediately, not "later." Decide before the inbox expires whether the account behind it is a keeper: if it is, migrate it to a permanent address or an alias while you still can. If it is not, let the inbox expire and enjoy the fact that its marketing mail expires with it. The organizing habit behind that routine is described in [How to Manage Multiple Temporary Emails for Different Websites](/blog/how-to-manage-multiple-temp-emails).
+Use a fresh inbox per signup, give it a custom name tied to the task, and save anything important — codes, links, order numbers — to your notes immediately, not "later." Decide before the inbox expires whether the account behind it is a keeper: if it is, migrate it to a permanent address or an alias while you still can. If it is not, let the inbox expire and enjoy the fact that its marketing mail expires with it. The organizing habit behind that routine is described in [Temp Mail With Multiple Inboxes Free: Complete Guide](/blog/free-temp-mail-multiple-inboxes-guide).
 
 ## Bottom Line
 

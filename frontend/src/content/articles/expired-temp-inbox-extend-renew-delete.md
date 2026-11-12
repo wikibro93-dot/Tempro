@@ -14,6 +14,17 @@ There is also no working extend or renew option for an expired inbox in the app.
 
 That is the privacy property of temporary mail: short-lived mail does not linger. You must save anything worth keeping before expiry.
 
+## The recovery truth, stated plainly
+
+There is no recovery path, and it is worth saying exactly why, because the misunderstanding is what costs people accounts.
+
+- **Expired means gone, in the app.** TempMail Pro assumes expired inboxes and their messages are unrecoverable. There is no support ticket, no restore button, and no grace period you can rely on.
+- **A new address with the same name is not the old inbox.** Custom names get a random 4-character suffix appended, and even if you recreate the same name, the underlying inbox is different. Mail sent to the expired address will not reach the new one.
+- **Expiry and deletion are different things.** In-app expiry stops the inbox receiving mail, but it does not delete the underlying Mail.tm account that powers the free service — only explicitly deleting the inbox does that. So if you want an address fully gone rather than merely expired, delete it instead of waiting for the clock to run out.
+- **The service on the other end does not know your inbox expired.** If a trial, store, or platform later sends a password reset to that address, the message goes nowhere useful. That is why accounts you may need to recover should never have been on a temporary address in the first place.
+
+If an inbox has expired and the account tied to it matters, your only options are the service's own support channel (with whatever details you still have) or accepting that the account cannot be recovered through email. Neither option is good, which is why the planning section below exists.
+
 ## What to do when you realise an inbox has expired
 
 First, check the facts. Confirm whether the inbox is truly expired, or whether you are looking at the wrong inbox among several open ones.
@@ -22,22 +33,39 @@ If the inbox is genuinely expired, ask what you actually lost. A verification li
 
 ## Deleting an inbox you no longer need
 
-Expiry is automatic, but deletion is a choice you can make earlier. When a signup, trial, or test is finished, delete its inbox rather than leaving it open until expiry. Deletion closes it immediately and clears it from your workspace.
+Expiry is automatic, but deletion is a choice you can make earlier. When a signup, trial, or test is finished, delete its inbox rather than leaving it open until expiry. Deletion closes it immediately and clears it from your workspace — and, as noted above, it is also the only action that removes the underlying Mail.tm account.
 
 In TempMail Pro, deletion is the action the app supports for an inbox you no longer need. Open the inbox, choose delete, and confirm. There is no need to keep an empty inbox "just in case": generating a fresh address later takes seconds.
 
 Delete inboxes at the end of each task, while you still remember what each one was for.
 
+## Plan before it expires: a practical workflow
+
+Most expiry pain is preventable, because the failure is almost always the same: something important was left inside an inbox whose end date nobody noted. Run this workflow for any inbox that will live longer than a day.
+
+**1. Before you create the inbox, write down what it is for.** One line in your own notes: the task, the service, and the date the inbox expires. That line is the only record that survives expiry, so it needs to exist outside the inbox.
+
+**2. Choose the expiry from the task's real end date.** TempMail Pro offers 10 minutes, 1 hour, 24 hours, 7 days, or a custom duration — with a hard maximum of **365 days**. No inbox lasts longer than a year. If the task runs longer than that, it is not a temporary task. Pick the duration that covers the whole job, plus a small margin: a trial ending on day 7 gets a 7-day inbox at minimum, and a custom duration running a day or two past the end date is safer still.
+
+**3. Export or forward what matters the moment it arrives.** Do not wait until the day before expiry. When a confirmation, code, receipt, or link arrives that you will need later, copy it into your own notes immediately. The rule is simple: if losing it would cost you time or money, it does not live only in the inbox.
+
+**4. Set a reminder one day before expiry.** For any inbox living longer than 24 hours, set a reminder a day before it ends. That reminder is your last chance to save anything you missed, and to move an account you decided to keep to a permanent address while the inbox is still live.
+
+**5. Decide, before expiry, whether the account is a keeper.** If the trial became a subscription, or the signup became an account you return to, move it to a permanent address or an alias now — not after expiry, when the confirmation for that change has nowhere to go.
+
+**6. Delete the inbox when the task ends.** Do not leave finished inboxes open until expiry. Deleting closes the loop, clears the workspace, and — unlike expiry — removes the underlying Mail.tm account.
+
 ## Choosing the right expiry next time
 
-Because expiry is set at creation time, and an expired inbox cannot be renewed, the most important decision happens before you generate the address. TempMail Pro offers 10 minutes, 1 hour, 24 hours, 7 days, or a custom duration:
+Because expiry is set at creation time, and an expired inbox cannot be renewed, the most important decision happens before you generate the address. TempMail Pro offers 10 minutes, 1 hour, 24 hours, 7 days, or a custom duration up to 365 days:
 
 | Task | A sensible expiry to choose at creation |
 |---|---|
 | A single verification code | 10 minutes, or 1 hour if the service is slow |
 | A short signup with a follow-up email | 1 hour, or 24 hours to be safe |
 | A trial or discussion lasting several days | 24 hours, or 7 days for a full week |
-| A project spanning more than a week | A custom duration covering the whole project |
+| A project spanning more than a week | A custom duration covering the whole project, up to 365 days |
+| Anything lasting longer than a year | A permanent address — no temporary inbox covers this |
 
 Two mistakes recur: picking 10 minutes for a task that will take longer, and picking 7 days by default for a ten-minute job. A thirty-second pause before creation prevents both. If torn between two durations, pick the longer one, provided the task genuinely spans that period.
 
@@ -54,9 +82,10 @@ Temporary inboxes are for accounts you can afford to lose. Do not use one for ba
 ## A short expiry routine
 
 - [ ] Name the task and estimate how long it will really take.
-- [ ] Choose an expiry at creation that covers that whole period.
+- [ ] Choose an expiry at creation that covers that whole period — custom durations go up to 365 days, and nothing lasts longer.
 - [ ] Give the inbox a custom name tied to the task.
 - [ ] Save anything important outside the inbox as soon as it arrives.
+- [ ] Set a reminder one day before expiry for any inbox living longer than a day.
 - [ ] Delete the inbox when the task ends, rather than waiting for expiry.
 - [ ] If the task grows into something permanent, move the account to a permanent address before expiry.
 

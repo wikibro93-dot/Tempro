@@ -43,7 +43,7 @@ Temporary email is a poor choice for an AI account that holds paid credits, a su
 
 It is also not a way to get around a tool's rules. If a service blocks disposable domains, use a permanent address for that service instead. A temporary address does not change a per-person trial limit, and it must not be used to impersonate someone else or to abuse a promotion.
 
-For a broader view of trial signups beyond AI tools, [How to Use Temporary Email for Free Trials Without Spam](/blog/how-to-use-temp-email-for-free-trials) covers the same workflow for trials in general. If you test AI tools as part of a larger testing job, [Temp Mail for Account Testing and QA Teams](/blog/temp-mail-for-qa-and-account-testing-teams) explains how to keep one inbox per test case so results stay separate.
+For a broader view of trial signups beyond AI tools, [How to Use Temporary Email for Free Trials Without Spam](/blog/how-to-use-temp-email-for-free-trials) covers the same workflow for trials in general. If you test AI tools as part of a larger testing job, [Temporary Email for QA Testing and Account Testing](/blog/temp-email-for-account-testing) explains how to keep one inbox per test case so results stay separate.
 
 ## A Sensible Way to Test Without the Clutter
 

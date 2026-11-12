@@ -14,31 +14,57 @@ Before you generate anything, decide what this account is for. A throwaway accou
 
 Ask three questions. Will I need to recover this account later? If yes, do not use a temporary inbox. How long will I realistically use it? Match the expiry to that answer, not to the longest option. What will arrive in this inbox? Usually a verification link and community notifications you can ignore.
 
-If the account is for a single discussion, 10 minutes or 1 hour may be enough. If you plan to return over several days to follow replies, 24 hours or 7 days makes more sense. TempMail Pro offers 10 minutes, 1 hour, 24 hours, 7 days, or a custom duration, and the expiry is set when the inbox is created.
+If the account is for a single discussion, 10 minutes or 1 hour may be enough. If you plan to return over several days to follow replies, 24 hours or 7 days makes more sense. TempMail Pro offers 10 minutes, 1 hour, 24 hours, 7 days, or a custom duration up to 365 days, and the expiry is set when the inbox is created.
+
+## Per-community verification rules: what each platform actually asks for
+
+Communities do not all verify the same way, and the differences decide whether a temporary inbox fits. Here is what the major ones actually require at signup.
+
+**Reddit.** Reddit asks for an email address at signup and sends a verification message; you can browse without verifying, but an unverified account is limited — you cannot create a community, and some subreddits restrict posting from unverified accounts. Reddit also enforces **karma and account-age gates**: many subreddits require a minimum account age (often days or weeks) and a minimum karma score before you can post or comment, and new accounts are rate-limited. A temporary inbox works for the email step, but it does not help with the karma and age gates — those are earned by participating over time, and an account you abandon after one question will never clear them. If you plan to participate in a gated subreddit, the account needs to survive long enough to age and earn karma, so pick a 7-day or custom expiry, and accept that a serious Reddit identity belongs on a permanent address.
+
+**Stack Overflow and Stack Exchange.** These require email verification at signup, and they enforce reputation gates: new users cannot comment, vote, or post freely until they have earned reputation by asking and answering. A temporary inbox covers the verification email, but a throwaway account will stay at the bottom of the reputation ladder. Use temp mail for a single question you will never revisit; use a permanent address for an account you intend to build reputation on.
+
+**Quora.** Quora requires an email address and verification, and it ties your identity to your profile — your name, credentials, and answer history are the point of the account. A temporary inbox can complete the signup, but a Quora account you care about needs a permanent address, because the profile is the reputation.
+
+**Discourse forums.** Many independent communities run on Discourse, and Discourse requires email verification at signup. It also enforces **trust levels**: new users start at trust level 0 with limits on links, images, and posting frequency, and rise through participation. A temp inbox fits a first visit to a Discourse forum; a community you join for the long term needs an address that survives, because trust levels are earned over weeks and a lost account resets them to zero.
+
+**Hacker News.** Hacker News asks for an email address at signup and sends a verification message. It also enforces karma thresholds: you need a minimum karma to downvote, to submit certain links, and to avoid rate limits. A throwaway account works for reading and an occasional comment, but anything beyond that needs an account you keep — and therefore an address you keep.
+
+The pattern is the same on all five: **email verification is the easy part, and a temporary inbox handles it. The hard part is the reputation, karma, and age gates that only time and participation clear.** A temporary inbox fits the exploratory account. A community identity you intend to build belongs on a permanent address.
+
+## How temp mail fits each one
+
+| Community | Email verification | Extra gates | Temp mail fits |
+| --- | --- | --- | --- |
+| Reddit | Yes, by email | Karma and account-age minimums in many subreddits | One question or a short exploration; not a serious identity |
+| Stack Overflow / Stack Exchange | Yes, by email | Reputation thresholds for commenting and voting | A single question; not a reputation-building account |
+| Quora | Yes, by email | Profile-based identity | Signup only; a real profile needs a permanent address |
+| Discourse forums | Yes, by email | Trust levels earned over weeks | A first visit; not a long-term membership |
+| Hacker News | Yes, by email | Karma thresholds for downvoting and submitting | Reading and occasional comments; not a regular account |
 
 ## Create the account in the right order
 
 The order of steps prevents the most common frustration: a verification link arriving in an inbox that has already expired, or in the wrong inbox among several open ones.
 
 1. Open TempMail Pro at tempmailpk.com and generate a new address. No sign-in is required.
-2. Give the inbox a custom name that reminds you of its purpose, for example reddit-hobby or forum-local-group.
-3. Choose an expiry that covers the whole signup, including time to re-request a code.
+2. Give the inbox a custom name that reminds you of its purpose, for example reddit-hobby or forum-local-group. In TempMail Pro a custom name gets a random 4-character suffix appended, so the address is close to your chosen name rather than exactly it.
+3. Choose an expiry that covers the whole signup, including time to re-request a code — and, for a community with age gates, long enough to cover the period you actually intend to participate.
 4. Use that address only for this community signup, not for shopping, trials, or another forum.
 5. Complete verification right away, while the inbox is open, and save anything you still need outside the temporary inbox.
 
-Keeping one inbox per community is the simplest version of a wider habit. If you want a fuller system for juggling several signups, the guide on [how to manage multiple temporary emails for different websites](/blog/how-to-manage-multiple-temp-emails) walks through naming, switching, and cleaning up inboxes without mixing messages.
+Keeping one inbox per community is the simplest version of a wider habit. If you want a fuller system for juggling several signups, the guide on [how to manage multiple temporary emails for different websites](/blog/free-temp-mail-multiple-inboxes-guide) walks through naming, switching, and cleaning up inboxes without mixing messages.
 
 ## Keep identities separate without confusion
 
 A separate inbox works only if you can still tell your accounts apart. Keep a small private note, outside the temporary inbox, recording which address was used for which community and when it expires. It does not need passwords or message contents. It only needs to answer, a week later, which inbox was that.
 
-The same separation idea applies beyond Reddit, and the overview of [burner email for social media](/blog/burner-email-for-social-media) explains how it works across different platforms.
+The same separation idea applies beyond Reddit, and the overview of [burner email for social media](/blog/burner-email-social-media-signups-guide) explains how it works across different platforms.
 
 ## When verification stalls
 
 Community platforms sometimes delay verification mail, and a temporary inbox makes the wait easier to judge. Refresh once, wait a minute or two, and check whether the message arrived under a sender name you do not recognise. Some platforms send from a notifications address rather than a name that matches the site.
 
-If nothing arrives, check the basics before assuming the platform blocked the address. Did you type the temporary address correctly into the signup form? Is the inbox still within its expiry window? Are you looking at the inbox you actually created the account with? Those three checks solve most cases. If the platform itself rejects disposable addresses, use a permanent address you control for that account, rather than trying to work around the block.
+If nothing arrives, check the basics before assuming the platform blocked the address. Did you type the temporary address correctly into the signup form? Is the inbox still within its expiry window? Are you looking at the inbox you actually created the account with? Those three checks solve most cases. If the platform itself rejects disposable addresses, use a permanent address you control for that account, rather than trying to work around the block. Why some sites reject disposable domains is explained in [Why Websites Block Disposable Email Addresses](/blog/why-websites-block-disposable-email).
 
 ## A checklist before you post
 
@@ -55,6 +81,6 @@ Deleting it closes the loop.
 
 Temporary inboxes are not suitable for every community account. Do not use one for an account tied to moderation duties, paid membership, private messages you cannot afford to lose, or an identity you plan to build a reputation on over years. In those cases, a permanent address is the right choice.
 
-Also respect the community itself. A temporary address is a privacy tool, not a way to evade a ban, harass other members, or create multiple accounts to manipulate votes or discussions. Use it to participate honestly, under one clear identity per community.
+Also respect the community itself. A temporary address is a privacy tool, not a way to evade a ban, harass other members, or create multiple accounts to manipulate votes or discussions. Use it to participate honestly, under one clear identity per community. Creating extra accounts to dodge a subreddit's karma gate or a forum's trust level is against the community's rules, and it will fail anyway — the gates are designed to catch exactly that.
 
 Finally, expired inboxes and their messages are assumed unrecoverable. If a community account starts to matter, move it to a permanent address before expiry, if the platform allows that change. A temporary inbox fits signups that are exploratory, short-lived, or deliberately separate, and where losing access would be an inconvenience rather than a serious loss.

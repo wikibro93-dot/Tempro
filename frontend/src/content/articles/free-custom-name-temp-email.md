@@ -64,5 +64,5 @@ For a truly one-off code where you do not need to recognise the address later, a
 ## Related reading
 
 - [Temp Mail With Multiple Inboxes Free: Complete Guide](/blog/free-temp-mail-multiple-inboxes-guide)
-- [How to Manage Multiple Temporary Emails for Different Websites](/blog/how-to-manage-multiple-temp-emails)
+- [Temp Mail With Multiple Inboxes Free: Complete Guide](/blog/free-temp-mail-multiple-inboxes-guide)
 - [Temp Email vs Email Alias: Which Protects Privacy Better?](/blog/temp-email-vs-email-alias)

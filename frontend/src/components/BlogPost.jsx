@@ -34,8 +34,6 @@ const NORD_RECOMMENDATION_SLUGS = {
   ]),
   pass: new Set([
     'temp-email-for-account-testing',
-    'temp-mail-for-qa-and-account-testing-teams',
-    'how-to-manage-multiple-temp-emails',
     'free-temp-mail-multiple-inboxes-guide',
   ]),
 };

@@ -24,7 +24,7 @@ Time zones matter for US deadlines. Eastern and Pacific Time are three hours apa
 
 ## A simple workflow
 
-Give each signup its own inbox. One inbox per trial or store keeps messages separate and makes it obvious which code belongs to which service. For a fuller method, see [how to manage multiple temporary emails for different websites](/blog/how-to-manage-multiple-temp-emails).
+Give each signup its own inbox. One inbox per trial or store keeps messages separate and makes it obvious which code belongs to which service. For a fuller method, see [how to manage multiple temporary emails for different websites](/blog/free-temp-mail-multiple-inboxes-guide).
 
 Pick an expiry that covers the whole job, not just the first code. Ten minutes suits a quick verification. One hour suits a form completed in one sitting. Twenty-four hours suits a trial that sends a follow-up. Seven days suits a multi-day trial. If a reminder or second message may arrive days later, choose the longer window and check the inbox before it ends.
 

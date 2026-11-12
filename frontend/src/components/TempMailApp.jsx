@@ -1074,7 +1074,7 @@ function TempMailApp({ onEmailCopied }) {
           the results repeatable and easier to report, because a teammate can see the same inbox
           pattern and reproduce the same steps. For a deeper walkthrough of this testing approach,
           see the guide on{" "}
-          <a href="/blog/temp-mail-for-qa-and-account-testing-teams">testing signup and verification flows</a>.
+          <a href="/blog/temp-email-for-account-testing">testing signup and verification flows</a>.
           That guide covers test design in more detail, while this page focuses on how the app
           supports the workflow: generate, test, read, and discard, one inbox at a time.
         </p>

@@ -30,7 +30,7 @@ A code itself may also have its own short validity window on the service's side.
 
 Most services limit how often you can request a code. Clicking "resend" five times in a row can trigger a temporary block, after which no further codes arrive for a while. If you have already clicked resend several times, stop, wait ten to fifteen minutes, then request one fresh code.
 
-Stick to one signup attempt, one inbox, and one current code at a time. The guide to [how to manage multiple temporary emails](/blog/how-to-manage-multiple-temp-emails) covers naming and switching inboxes without mixing them up.
+Stick to one signup attempt, one inbox, and one current code at a time. The guide to [how to manage multiple temporary emails](/blog/free-temp-mail-multiple-inboxes-guide) covers naming and switching inboxes without mixing them up.
 
 ## When the service blocks disposable addresses
 
