@@ -15,16 +15,18 @@ import AppIcon from "./AppIcon";
 // license key, which they paste into /app to unlock the custom-domain
 // section. No login, no account — the key is the credential.
 //
-// COMING-SOON GATE (9 Nov 2026): purchases are DISABLED until the
-// Postmark account is fully approved AND a real test purchase has proven
-// the checkout -> webhook -> license-key flow end to end. While the gate
-// is off, the page still shows pricing and features, but every Subscribe
-// button is a disabled "Coming soon" button, so nobody can pay for a
-// product that is not ready yet — and we never have to refund a premature
-// purchase. Flip PREMIUM_AVAILABLE to true only after Postmark approval
-// + the real purchase test passes. (The /app custom-domain section is
-// already key-gated, so no change is needed there.)
-const PREMIUM_AVAILABLE = true;
+// COMING-SOON GATE (9 Nov 2026; re-gated 22 Nov 2026): purchases are
+// DISABLED while the Creem store is still in TEST MODE pending Creem's
+// approval. The store approval takes about a week; until it is approved
+// AND the live products are wired into the checkout links below, the
+// page still shows pricing and features, but every Subscribe button is
+// a disabled "Coming soon" button, so nobody can pay for a product that
+// is not ready yet — and we never have to refund a premature purchase.
+// Flip PREMIUM_AVAILABLE to true only after Creem approves the store
+// and the live product checkout links are in place. (The /app
+// custom-domain section is already key-gated, so no change is needed
+// there.)
+const PREMIUM_AVAILABLE = false;
 
 const CREEM_MONTHLY_URL = "https://www.creem.io/payment/prod_5rlysHo03p4e5czTOZFe02";
 const CREEM_YEARLY_URL = "https://www.creem.io/payment/prod_7LDR5lYmCrzoHqjIDtO2K";
@@ -209,7 +211,7 @@ const Premium = () => {
               </div>
             </div>
 
-            <UpdatedAt date="November 9, 2026" />
+            <UpdatedAt date="November 22, 2026" />
           </div>
         </div>
       </div>
