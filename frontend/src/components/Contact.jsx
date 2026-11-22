@@ -110,7 +110,9 @@ const Contact = () => {
             <h1 className="text-center mb-3">Contact TempMail Pro</h1>
             <p className="text-center text-muted mb-5">
               Questions, a problem with the app, or feedback — send it here and
-              we will reply to the email address you give below.
+              we will reply to the email address you give below. You can also
+              reach us directly at{" "}
+              <a href="mailto:contact@tempmailpk.com">contact@tempmailpk.com</a>.
             </p>
 
             {status === "success" && (

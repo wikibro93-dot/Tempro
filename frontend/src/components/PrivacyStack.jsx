@@ -408,25 +408,6 @@ export default function PrivacyStack() {
           </div>
         </section>
 
-        <section className="privacy-stack__social-proof">
-          <div className="container">
-            <div className="privacy-stack__proof-grid">
-              <article className="privacy-stack__proof-card">
-                <strong className="privacy-stack__proof-number">1.2M+</strong>
-                <p>Temporary Emails Generated</p>
-              </article>
-              <article className="privacy-stack__proof-card">
-                <strong className="privacy-stack__proof-number">14K+</strong>
-                <p>Privacy-Focused Users</p>
-              </article>
-              <article className="privacy-stack__proof-card">
-                <strong className="privacy-stack__proof-number">42+</strong>
-                <p>Countries Served</p>
-              </article>
-            </div>
-          </div>
-        </section>
-
         <section className="privacy-stack__start-here">
           <div className="container">
             <div className="privacy-stack__section-head">
@@ -683,7 +664,7 @@ export default function PrivacyStack() {
         <section className="privacy-stack__trust-bar" aria-label="Privacy trust signals">
           <div className="container">
             <p>
-              No signup required • No inbox storage • Instant access • Trusted by privacy-focused users in 42+ countries
+              No signup required • No inbox storage • Instant access
             </p>
           </div>
         </section>

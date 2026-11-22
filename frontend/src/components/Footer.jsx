@@ -118,6 +118,11 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <a href="mailto:contact@tempmailpk.com" className="d-inline-flex align-items-center">
+                  <AppIcon iconClass="bi bi-envelope me-2" />contact@tempmailpk.com
+                </a>
+              </li>
+              <li>
                 <Link to="/privacy" className="d-inline-flex align-items-center">
                   <AppIcon iconClass="bi bi-shield-lock me-2" />Privacy Policy
                 </Link>
