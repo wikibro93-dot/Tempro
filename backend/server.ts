@@ -1756,29 +1756,64 @@ app.get('/api/premium/verify-dns/:domain', premiumLimiter, async (req: any, res:
 // Dashboard setup (user step): Creem dashboard > Developers > Webhooks,
 // add URL https://tempro.onrender.com/api/webhooks/creem, copy the secret
 // into Render as CREEM_WEBHOOK_SECRET.
-function creemSignatureIsValid(rawBody: Buffer, signatureHeader: any, secret: string): boolean {
-  if (!secret || typeof signatureHeader !== 'string' || !signatureHeader) return false;
-  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-  const a = Buffer.from(expected, 'utf8');
-  const b = Buffer.from(signatureHeader, 'utf8');
-  if (a.length !== b.length) return false;
-  try {
-    return crypto.timingSafeEqual(a, b);
-  } catch {
-    return false;
+// Verifies the `creem-signature` header against HMAC-SHA256(secret, rawBody).
+// Creem's docs say the header is a bare hex digest, the secret is used as
+// shown (including any `whsec_` prefix), and there is no timestamp — but the
+// live endpoint rejected valid test deliveries (401) even though the stored
+// secret matches Creem's, so the verifier is tolerant: it also accepts
+// Stripe-style `t=...,v1=...` headers (any v1 value) and also tries the
+// secret with a leading `whsec_` prefix stripped. Returns which variant
+// matched (e.g. 'bare-full', 'v1-noprefix') or null. The handler logs the
+// variant — never the secret or the signature value — so a future mismatch
+// can be diagnosed from the Render logs.
+function creemSignatureMatch(rawBody: Buffer, signatureHeader: any, secret: string): string | null {
+  if (!secret || typeof signatureHeader !== 'string' || !signatureHeader) return null;
+  const candidates: string[] = [signatureHeader];
+  if (signatureHeader.includes('v1=')) {
+    for (const part of signatureHeader.split(',')) {
+      const m = part.trim().match(/^v1=(.+)$/);
+      if (m) candidates.push(m[1]);
+    }
   }
+  const keys: Array<[string, string]> = [['full', secret]];
+  if (secret.startsWith('whsec_')) keys.push(['noprefix', secret.slice('whsec_'.length)]);
+  const sigEq = (expected: string, received: string): boolean => {
+    const a = Buffer.from(expected, 'utf8');
+    const b = Buffer.from(received, 'utf8');
+    if (a.length !== b.length) return false;
+    try {
+      return crypto.timingSafeEqual(a, b);
+    } catch {
+      return false;
+    }
+  };
+  for (const [keyLabel, key] of keys) {
+    const expected = crypto.createHmac('sha256', key).update(rawBody).digest('hex');
+    for (const cand of candidates) {
+      if (sigEq(expected, cand)) {
+        return `${cand === signatureHeader ? 'bare' : 'v1'}-${keyLabel}`;
+      }
+    }
+  }
+  return null;
 }
 
 app.post(
   '/api/webhooks/creem',
-  express.raw({ type: 'application/json', limit: '100kb' }),
+  // Raw body for ANY content type: if Creem ever sends a non-JSON
+  // content-type, a 'application/json'-only parser would leave req.body
+  // empty and the HMAC would be computed over the wrong bytes.
+  express.raw({ type: '*/*', limit: '100kb' }),
   async (req: any, res: any) => {
     if (!CREEM_WEBHOOK_SECRET) {
       console.warn('[Premium] Creem webhook called but CREEM_WEBHOOK_SECRET is not set.');
       return res.status(500).json({ error: 'Creem webhook is not configured on this server.' });
     }
     const rawBody: Buffer = Buffer.isBuffer(req.body) ? req.body : Buffer.from(String(req.body || ''), 'utf8');
-    if (!creemSignatureIsValid(rawBody, req.headers['creem-signature'], CREEM_WEBHOOK_SECRET)) {
+    const sigHeader = req.headers['creem-signature'];
+    const sigMatch = creemSignatureMatch(rawBody, sigHeader, CREEM_WEBHOOK_SECRET);
+    console.log(`[Premium] Creem webhook: sigMatch=${sigMatch || 'none'} sigLen=${typeof sigHeader === 'string' ? sigHeader.length : -1} sigHasV1=${typeof sigHeader === 'string' && sigHeader.includes('v1=')} contentType=${req.headers['content-type'] || ''} bodyBytes=${rawBody.length} bodyIsBuffer=${Buffer.isBuffer(req.body)} secretLen=${CREEM_WEBHOOK_SECRET.length}`);
+    if (!sigMatch) {
       return res.status(401).json({ error: 'Invalid webhook signature.' });
     }
     let event: any;
@@ -1787,9 +1822,14 @@ app.post(
     } catch {
       return res.status(400).json({ error: 'Invalid JSON payload.' });
     }
-    const eventId = String(event?.id || '');
     const eventType = String(event?.eventType || event?.type || '');
     const obj = event?.object || {};
+    // Creem's checkout.completed payload carries no top-level event id
+    // (the id only exists in the dashboard's delivery record), so fall back
+    // to the checkout id for that event type — one checkout fires exactly
+    // one checkout.completed, so it is a safe dedup key. Other event types
+    // keep requiring a top-level id.
+    const eventId = String(event?.id || (eventType === 'checkout.completed' ? obj?.id || '' : ''));
     if (!eventId || !eventType) {
       return res.status(400).json({ error: 'Webhook event is missing an id or type.' });
     }
