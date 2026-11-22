@@ -1174,8 +1174,10 @@ app.get('/api/inbound/messages/:address', inboxLimiter, async (req: any, res: an
 //    Render URL.
 // ---------------------------------------------------------------------------
 const PREMIUM_PRODUCT_IDS = new Set([
-  'prod_5rlysHo03p4e5czTOZFe02', // TempMail Pro Premium — Monthly ($5)
-  'prod_7LDR5lYmCrzoHqjIDtO2K', // TempMail Pro Premium — Yearly ($48)
+  'prod_5rlysHo03p4e5czTOZFe02', // TempMail Pro Premium — Monthly ($5), doc2slides store (archived)
+  'prod_7LDR5lYmCrzoHqjIDtO2K', // TempMail Pro Premium — Yearly ($48), doc2slides store (archived)
+  'prod_1D4JKQcll7kD447QFvbC9B', // TempMail Pro Premium — Monthly ($5), TempMail Pro store
+  'prod_2chIFoCC7LSaL3IEyNBr7V', // TempMail Pro Premium — Yearly ($48), TempMail Pro store
 ]);
 const PREMIUM_DOMAINS_PER_KEY = 1;
 // Usage limits — the industry answer to quota-drain abuse. A refund kills
