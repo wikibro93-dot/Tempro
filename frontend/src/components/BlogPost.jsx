@@ -34,8 +34,6 @@ const NORD_RECOMMENDATION_SLUGS = {
   ]),
   pass: new Set([
     'temp-email-for-account-testing',
-    'temp-mail-for-qa-and-account-testing-teams',
-    'how-to-manage-multiple-temp-emails',
     'free-temp-mail-multiple-inboxes-guide',
   ]),
 };
@@ -212,7 +210,6 @@ export default function BlogPost() {
           content={description || 'TempMail Pro Blog article about email privacy and security'}
         />
         <meta name="twitter:image" content={metaImage} />
-        <meta name="twitter:site" content="@tempmailpk" />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',
@@ -422,7 +419,7 @@ export default function BlogPost() {
                       )}
                     </div>
                     <small className="text-muted d-block mt-2">
-                      Partner notice: These are optional external services and not part of TempMail Pro.
+                      Partner notice: These are affiliate links to optional external services, not part of TempMail Pro.
                     </small>
                   </div>
                 </div>
