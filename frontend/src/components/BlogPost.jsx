@@ -419,7 +419,7 @@ export default function BlogPost() {
                       )}
                     </div>
                     <small className="text-muted d-block mt-2">
-                      Partner notice: These are optional external services and not part of TempMail Pro.
+                      Partner notice: These are affiliate links to optional external services, not part of TempMail Pro.
                     </small>
                   </div>
                 </div>

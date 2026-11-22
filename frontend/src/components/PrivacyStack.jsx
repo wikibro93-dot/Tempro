@@ -403,7 +403,7 @@ export default function PrivacyStack() {
                   Hide My IP
                 </a>
               </div>
-              <p className="privacy-stack__microcopy">Optional external tools. TempMail Pro and partner services are separate products.</p>
+              <p className="privacy-stack__microcopy">Affiliate link. Optional external tool. TempMail Pro and partner services are separate products.</p>
             </aside>
           </div>
         </section>
@@ -509,6 +509,9 @@ export default function PrivacyStack() {
                       <AppIcon iconClass="fas fa-arrow-right ms-2" />
                     </a>
                   )}
+                  {card.key === 'phone' && (
+                    <small className="text-muted d-block mt-2">Affiliate link</small>
+                  )}
 
                   {card.key === 'network' && (
                     <div className="privacy-stack__dual-actions">
@@ -535,6 +538,9 @@ export default function PrivacyStack() {
                         Protect Passwords
                       </a>
                     </div>
+                  )}
+                  {card.key === 'network' && (
+                    <small className="text-muted d-block mt-2">Affiliate links</small>
                   )}
                 </article>
               ))}

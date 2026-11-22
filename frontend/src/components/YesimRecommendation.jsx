@@ -34,6 +34,7 @@ const YesimRecommendation = () => {
             <AppIcon iconClass="bi bi-arrow-right-circle me-2" />
             View Yesim Options
           </a>
+          <small className="text-muted d-block mt-2">Affiliate link</small>
         </div>
       </div>
     </div>
