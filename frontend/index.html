@@ -363,11 +363,15 @@
       }
     </style>
     <!-- Monetag TEST 23 Nov-7 Dec 2026, clean formats only, free users only (Premium loads nothing). In-Page Push 12332970, Vignette 12333045. No Popunder/Push/MultiTag. -->
+    <template id="monetag-test-tags">
+      <script>(function(s){s.dataset.zone='12332970',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+      <script>(function(s){s.dataset.zone='12333045',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    </template>
     <script>
       try {
         if (!localStorage.getItem('tempmail_premium_key')) {
-          (function(s){s.dataset.zone='12332970',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
-          (function(s){s.dataset.zone='12333045',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
+          var monetagTpl = document.getElementById('monetag-test-tags');
+          if (monetagTpl) { document.head.appendChild(monetagTpl.content.cloneNode(true)); }
         }
       } catch (e) {}
     </script>
