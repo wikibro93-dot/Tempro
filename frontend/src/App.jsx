@@ -4,6 +4,7 @@ import { HelmetProvider } from "react-helmet-async";
 
 import ScrollToTop from "./components/ScrollToTop";
 import useIsPremium from "./hooks/useIsPremium";
+import MonetagTestAds from "./components/MonetagTestAds.jsx";
 import Landing from "./components/Landing.jsx";
 import OfflineIndicator from "./components/OfflineIndicator";
 import RouteSeoManager from "./components/RouteSeoManager";
@@ -139,6 +140,8 @@ function AppContent() {
         </Routes>
       </Suspense>
       <OfflineIndicator />
+      {/* Monetag TEST 23 Nov–7 Dec 2026: clean formats only, free users only (component checks Premium itself). */}
+      <MonetagTestAds />
       <Suspense fallback={null}>
         <PromoCard
           visible={showPromoCard && !promoSuppressed && promotablePage && !isPremium}
